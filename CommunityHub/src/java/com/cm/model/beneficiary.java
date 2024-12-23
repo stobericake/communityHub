@@ -96,7 +96,7 @@ public class beneficiary {
         this.addressID = addressID;
     }
     
-        @Override
+    @Override
     public String toString() {
         return "Beneficiary{" + "BeneficiaryID=" + beneficiaryID + ", name=" + getName() + ", contactInfo=" + getContactInfo() + '}';
     }

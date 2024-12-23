@@ -10,7 +10,9 @@
  */
 package com.cm.model;
 
-public class admin {
+import java.io.Serializable;
+
+public class admin implements Serializable {
     private int adminID;
     private String name;
     private String email;

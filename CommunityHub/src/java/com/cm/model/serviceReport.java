@@ -9,10 +9,10 @@
  * @author anaqi
  */
 package com.cm.model;
-
+import java.io.Serializable;
 import java.util.Date;
 
-public class serviceReport {
+public class serviceReport implements Serializable {
     private int reportID;
     private int eventID;
     private int volunteerID;

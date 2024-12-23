@@ -1,34 +1,35 @@
 package com.cm.model;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
+import java.sql.Time;
 
-public class events {
+public class events implements Serializable{
     private int eventID;
     private String name;
-    private LocalDate date;
-    private LocalTime time;
-    private LocalTime duration;
+    private Date date;
+    private Time time;
+    private Time duration;
     private String description;
     private int volunteersNeeded;
     private String status;
-    private String adminID;
-    private String beneficiaryID;
-    private String addressID;
+    private int adminID;
+    private int beneficiaryID;
+    private int addressID;
 
     // Constructor
-    public events(int eventID, String name, LocalDate date, LocalTime time, String description, int volunteersNeeded, String status) {
+    public events(int eventID, String name, Date date, Time time, Time duration,String description, int volunteersNeeded, String status) {
         this.eventID = eventID;
         this.name = name;
         this.date = date;
         this.time = time;
+        this.duration = duration;
         this.description = description;
         this.volunteersNeeded = volunteersNeeded;
         this.status = status;
     }
-
     // Getters
     public int getEventID() {
         return eventID;
@@ -38,11 +39,11 @@ public class events {
         return name;
     }
 
-    public LocalDate getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public LocalTime getTime() {
+    public Time getTime() {
         return time;
     }
 
@@ -67,11 +68,11 @@ public class events {
         this.name = name;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(Time time) {
         this.time = time;
     }
 
@@ -83,6 +84,33 @@ public class events {
         this.volunteersNeeded = volunteersNeeded;
     }
 
+    /**
+     * @return the duration
+     */
+    public Time getDuration() {
+        return duration;
+    }
+
+    /**
+     * @return the adminID
+     */
+    public int getAdminID() {
+        return adminID;
+    }
+
+    /**
+     * @return the beneficiaryID
+     */
+    public int getBeneficiaryID() {
+        return beneficiaryID;
+    }
+
+    /**
+     * @return the addressID
+     */
+    public int getAddressID() {
+        return addressID;
+    }
     // Update status method
     public void updateStatus(String newStatus) {
         this.status = newStatus;
@@ -99,6 +127,7 @@ public class events {
             eventDetails.put("name", this.name);
             eventDetails.put("date", this.date);
             eventDetails.put("time", this.time);
+            eventDetails.put("duration", this.duration);
             eventDetails.put("description", this.description);
             eventDetails.put("volunteersNeeded", this.volunteersNeeded);
             eventDetails.put("status", this.status);
@@ -110,34 +139,6 @@ public class events {
     // Override toString for better representation
     @Override
     public String toString() {
-        return "Event{" + "eventID=" + eventID + ", name=" + name + ", date=" + date + ", time=" + time + ", description=" + description + ", volunteersNeeded=" + volunteersNeeded + ", status=" + status + '}';
-    }
-
-    /**
-     * @return the duration
-     */
-    public LocalTime getDuration() {
-        return duration;
-    }
-
-    /**
-     * @return the adminID
-     */
-    public String getAdminID() {
-        return adminID;
-    }
-
-    /**
-     * @return the beneficiaryID
-     */
-    public String getBeneficiaryID() {
-        return beneficiaryID;
-    }
-
-    /**
-     * @return the addressID
-     */
-    public String getAddressID() {
-        return addressID;
+        return "Event{" + "eventID=" + eventID + ", name=" + name + ", date=" + date + ", time=" + time +  ", duration=" + duration + ", description=" + description + ", volunteersNeeded=" + volunteersNeeded + ", status=" + status + '}';
     }
 }

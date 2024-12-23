@@ -9,7 +9,10 @@ package com.cm.model;
  *
  * @author Rina
  */
-public class volunteer {
+import java.io.Serializable;
+import java.sql.*;
+
+public class volunteer implements Serializable {
     private int volunteerID;
     private String name;
     private int contactInfo;
@@ -101,4 +104,59 @@ public class volunteer {
         this.addressID = addressID;
     }
 
+    @Override
+    public String toString() {
+        return "Volunteer{" + "volunteerID=" + volunteerID + ", name=" + name + ", contactINfo=" + contactInfo + '}';
+    }
+
+
+    public void joinEvent(int eventID, Connection conn) throws SQLException {
+        String sql = "INSERT INTO Event (volunteerID, eventID) VALUES (?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, this.volunteerID);
+            ps.setInt(2, eventID);
+            ps.executeUpdate();
+        }
+    }
+
+
+    public void leaveEvent(int eventID, Connection conn) throws SQLException {
+        String sql = "DELETE FROM Volunteer_Event WHERE volunteerID = ? AND eventID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, this.volunteerID);
+            ps.setInt(2, eventID);
+            ps.executeUpdate();
+        }
+    }
+
+
+    public int makeDonation(int eventID, double amount, Connection conn) throws SQLException {
+        String sql = "INSERT INTO Donations (volunteerID, eventID, amount) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, this.volunteerID);
+            ps.setInt(2, eventID);
+            ps.setDouble(3, amount);
+            ps.executeUpdate();
+            
+            // Get the generated donation ID
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1); // Returning the donation ID
+                } else {
+                    return -1; // Indicating failure to get donation ID
+                }
+            }
+        }
+    }
+
+    // Choose task
+    public void chooseTask(int eventID, int taskID, Connection conn) throws SQLException {
+        String sql = "INSERT INTO Volunteer_Tasks (volunteerID, eventID, taskID) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, this.volunteerID);
+            ps.setInt(2, eventID);
+            ps.setInt(3, taskID);
+            ps.executeUpdate();
+        }
+    }
 }

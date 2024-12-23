@@ -10,20 +10,21 @@
  */
 package com.cm.model;
 
+import java.io.Serializable;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.time.LocalDate;
 import java.sql.Blob;
 
-public class donation {
+public class donation implements Serializable {
     private int donationID;
-    private double amount;
-    private LocalDate date;
-    private String receiptImagePath;
     private int eventID;
     private int donorID;
     private int volunteerID;
+    private double amount;
+    private LocalDate date;
+    private String receiptImagePath;
     
      public static Map<String, Object> getDonationDetails(int donationID, Connection conn) throws SQLException {
         String sql = "SELECT * FROM donations WHERE donationID = ?";

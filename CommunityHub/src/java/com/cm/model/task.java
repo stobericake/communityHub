@@ -1,8 +1,9 @@
 package com.cm.model;
 
+import java.io.Serializable;
 import java.sql.*;
 
-public class task {
+public class task implements Serializable  {
     private int taskID;
     private String description;
     private int volunteersNeeded;
@@ -53,6 +54,20 @@ public class task {
         this.status = status;
     }
 
+    /**
+     * @return the eventID
+     */
+    public int getEventID() {
+        return eventID;
+    }
+
+    /**
+     * @return the volunteerID
+     */
+    public int getVolunteerID() {
+        return volunteerID;
+    }
+
     // Method to assign the task to a volunteer (assuming volunteerID is passed)
     public void assignTask(int volunteerID) {
         String sql = "UPDATE tasks SET assigned_to = ? WHERE task_id = ?";
@@ -82,18 +97,5 @@ public class task {
     public String toString() {
         return "Task{" + "taskID=" + taskID + ", description=" + description + ", volunteersNeeded=" + volunteersNeeded + ", status=" + status + '}';
     }
-
-    /**
-     * @return the eventID
-     */
-    public int getEventID() {
-        return eventID;
-    }
-
-    /**
-     * @return the volunteerID
-     */
-    public int getVolunteerID() {
-        return volunteerID;
-    }
 }
+

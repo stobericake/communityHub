@@ -4,11 +4,14 @@
  * and open the template in the editor.
  */
 package com.cm.model;
+
+import java.io.Serializable;
+
 /**
  *
  * @author Ipah
  */
-public class eventsVolunteer {
+public class eventsVolunteer implements Serializable{
     private int eventsVolunteerID;
     private int eventID;
     private int volunteerID;

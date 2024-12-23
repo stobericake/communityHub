@@ -1,9 +1,10 @@
 package com.cm.model;
 
+import java.io.Serializable;
 import java.sql.*;
 import java.util.Map;
 
-public class address {
+public class address implements Serializable{
     private int addressID;
     private String country;
     private String postalCode;
