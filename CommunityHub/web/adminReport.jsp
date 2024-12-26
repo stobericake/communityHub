@@ -69,7 +69,7 @@
                                     PreparedStatement stmt = null;
                                     ResultSet rs = null;
 
-                                    conn = dbconnection.getConnection(); 
+                                    conn = dbconnection.getConnection();
 
 //                                    String sql = "SELECT eventID, name, date FROM events";
 //                                    stmt = conn.prepareStatement(sql);
@@ -81,7 +81,6 @@
 
                                     stmt = conn.prepareStatement(sql);
 
-                                    
                                     int idstat = 0;
                                     if (status != null && !"All".equalsIgnoreCase(status)) {
                                         if (status.equalsIgnoreCase("Pending")) {
@@ -164,7 +163,7 @@
                             </thead>
                             <tbody class="table-group-divider">
                                 <%
-                                    conn = dbconnection.getConnection(); 
+                                    conn = dbconnection.getConnection();
 
                                     String sql1 = "SELECT * FROM volunteer";
                                     stmt = conn.prepareStatement(sql1);
@@ -250,26 +249,26 @@
         const eventCheckAll = document.querySelector('#nav-home #checkAll');
         const eventRowCheckboxes = document.querySelectorAll('#nav-home .row-checkbox');
 
-        
+
         const volunteerCheckAll = document.querySelector('#nav-profile #checkAll');
         const volunteerRowCheckboxes = document.querySelectorAll('#nav-profile .row-checkbox');
 
-        
+
         function addCheckboxLogic(masterCheckbox, rowCheckboxes) {
-            
+
             masterCheckbox.addEventListener('change', function () {
                 rowCheckboxes.forEach(checkbox => {
                     checkbox.checked = this.checked;
                 });
             });
 
-            
+
             rowCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
                     const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
                     masterCheckbox.checked = allChecked;
 
-                    
+
                     if (!this.checked) {
                         masterCheckbox.indeterminate = Array.from(rowCheckboxes).some(cb => cb.checked);
                     } else {
@@ -284,5 +283,29 @@
 
 
     });
+
+    document.getElementById('generateEventReports').addEventListener('click', function () {
+        const selectedEvents = [];
+        document.querySelectorAll('.row-checkbox:checked').forEach(checkbox => {
+            console.log(checkbox); // Check the actual checkbox element
+            selectedEvents.push(checkbox.getAttribute('data-event-id'));
+        });
+
+        console.log("Selected Events: ", selectedEvents); // Log the selected event IDs
+
+        if (selectedEvents.length === 0) {
+            alert('No events selected!');
+            return;
+        }
+
+        // Open a new tab for each selected event
+        selectedEvents.forEach(eventID => {
+            const url = `reportEvent.jsp?eventID=${eventID}`;
+            console.log("Opening URL: ", url); // Log the URL being opened
+            window.open(url, '_blank');
+        });
+    });
+
+
 
 </script>

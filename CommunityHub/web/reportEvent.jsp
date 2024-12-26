@@ -137,8 +137,8 @@
                             <h4 class="fw-bold">Environement & Community Impact</h4>
                             <ul class="text-body-secondary">
                                 <%                                    while (rs.next()) {
-                                        String recommend = rs.getString("recommendations");
-                                        String problem = rs.getString("problem");
+                                        String recommend = rs.getString("recommendation");
+                                        String problem = rs.getString("challange");
                                         String solution = rs.getString("solution");
                                         String feedback = rs.getString("feedback");
                                 %>
@@ -156,7 +156,7 @@
                                     <%
                                         rs.beforeFirst(); // Move the result set pointer back to the beginning to reuse it
                                         while (rs.next()) {
-                                            String problem = rs.getString("problem");
+                                            String problem = rs.getString("challange");
                                     %>
                                     <%=problem + ", "%>
                                     <%
@@ -183,7 +183,7 @@
                                 <%
                                     rs.beforeFirst(); // Move the result set pointer back to the beginning to reuse it
                                     while (rs.next()) {
-                                        String recomm = rs.getString("recommendations");
+                                        String recomm = rs.getString("recommendation");
                                 %>
                                 <li><%=recomm%></li>
                                     <%
