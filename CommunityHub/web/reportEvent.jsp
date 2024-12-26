@@ -25,13 +25,6 @@
                 font-family: 'Kanit', sans-serif;
             }
 
-            @media print {
-                /* Hide the print button during print */
-                .print-button {
-                    display: none !important;
-                }
-                
-            }
         </style>
     </head>
     <body>
@@ -206,7 +199,7 @@
             </div>
         </div>
         <div class="text-center mt-4">
-            <button class="btn btn-primary  print-button" onclick="window.print();">
+            <button class="btn btn-primary print-button" onclick="window.print();">
                 <i class="bi bi-printer"></i> Print Report
             </button>
         </div>

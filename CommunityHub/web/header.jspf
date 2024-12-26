@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.Date" %>
-<%@ page import="com.cm.controller.dbconnection"%>
+<%@ page import="com.hub.controller.dbconnection"%>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -128,6 +128,18 @@
              .dropdown-menu .dropdown-item:hover {
               background-color: #f5f5f5;
               color: #333;
+            }
+            
+            @media print {
+                /* Hide the print button during print */
+                .print-button {
+                    display: none !important;
+                }
+                
+                .header {
+                    display: none !important;
+                }
+                
             }
     
     </style>

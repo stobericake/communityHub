@@ -23,6 +23,7 @@
             .event {
                 font-family: 'Kanit', sans-serif;
             }
+
         </style>
     </head>
     <body>
