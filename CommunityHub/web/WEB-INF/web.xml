@@ -8,6 +8,30 @@
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
     </servlet-mapping>
+    <servlet>
+        <servlet-name>getImage</servlet-name>
+        <servlet-class>com.hub.controller.getImage</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>getImage</servlet-name>
+        <url-pattern>/getImage.do</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>UpdateEventStatus</servlet-name>
+        <servlet-class>com.hub.controller.UpdateEventStatus</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateEventStatus</servlet-name>
+        <url-pattern>/updatestatus.do</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>addServiceReport</servlet-name>
+        <servlet-class>com.hub.controller.addServiceReport</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>addServiceReport</servlet-name>
+        <url-pattern>/addservice.do</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

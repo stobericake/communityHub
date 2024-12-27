@@ -71,7 +71,7 @@
                                     int num = 1;
                                     // Iterate through each event
                                     while (rs.next()) {
-
+                                        int eventID = rs.getInt("eventID");
                                         String name = rs.getString("name");
                                         String desc = rs.getString("description");
                                         String city = rs.getString("city");
@@ -89,7 +89,7 @@
                                         <div class="card my-2 mx-2">
                                             <div class="row g-0">
                                                 <div class="col-md-4">
-                                                    <img src="..." class="img-fluid rounded-start" alt="...">
+                                                    <img src="getImage.do?id=<%= eventID %>" class="img-fluid rounded-start" alt="...">
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">
@@ -105,8 +105,8 @@
                                     <td>
                                         <div class="container mt-4">
                                             <div class="d-grid gap-3 col mx-auto">
-                                                <a href="#" onclick="updateStatus(<%=rs.getInt("eventID")%>, 2)" class="btn btn-primary"><i class="bi bi-calendar-check me-2"></i> Approve</a>
-                                                <a href="#" onclick="updateStatus(<%=rs.getInt("eventID")%>, 3)" class="btn btn-danger"><i class="bi bi-x-circle me-2"></i> Reject</a>
+                                                <a href="#" onclick="updateStatus(<%=eventID%>, 2)" class="btn btn-primary"><i class="bi bi-calendar-check me-2"></i> Approve</a>
+                                                <a href="#" onclick="updateStatus(<%=eventID%>, 3)" class="btn btn-danger"><i class="bi bi-x-circle me-2"></i> Reject</a>
                                             </div>
                                         </div>
                                     </td>
