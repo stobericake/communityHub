@@ -30,7 +30,7 @@
     <body>
         <%@ include file="header.jspf" %>
         <%
-            String curreventID = request.getParameter("eventID");
+            String eventID = request.getParameter("eventID");
             Connection conn = null;
             PreparedStatement stmt = null;
             ResultSet rs = null;
@@ -45,7 +45,7 @@
                     + "JOIN address a ON e.addressID = a.addressID "
                     + "WHERE e.eventID = ?;";
             stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, Integer.parseInt(curreventID)); // Set the eventID
+            stmt.setInt(1, Integer.parseInt(eventID)); // Set the eventID
             rs = stmt.executeQuery();
 
             if (rs.next()) {

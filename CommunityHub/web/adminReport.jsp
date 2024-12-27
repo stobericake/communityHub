@@ -27,7 +27,7 @@
                             <div class="col-5 col-md-3 mb-3">
                                 <div class="search-container col">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="search">
+                                        <input type="text" class="form-control" id="eventSearchInput" placeholder="Event's Name" oninput="filterEventTable()">
                                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                                     </div>
                                 </div>
@@ -53,11 +53,11 @@
                                 <tr>
                                     <td scope="col" class="col-1">
                                         <div>
-                                            <input class="form-check-input" type="checkbox" id="checkAll" aria-label="Check All">
+                                            <input class="form-check-input" type="checkbox" id="eventCheckAll" aria-label="Check All">
                                         </div>
                                     </td>
                                     <th scope="col" class="col-1">ID</th>
-                                    <th scope="col" class="col-6">Event Handle</th>
+                                    <th scope="col" class="col-6">Event Name</th>
                                     <th scope="col" class="text-center col-2">Date</th>
                                     <th scope="col" class="text-center col-2">Report</th>
                                 </tr>
@@ -139,7 +139,7 @@
                             <div class="col-5 col-md-3 mb-3">
                                 <div class="search-container col">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="search">
+                                        <input type="text" class="form-control" id="volunteerSearchInput" placeholder="Volunteer's Name" oninput="filterVolunteerTable()">
                                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                                     </div>
                                 </div>
@@ -152,12 +152,12 @@
                                 <tr>
                                     <td scope="col" class="col-1">
                                         <div>
-                                            <input class="form-check-input" type="checkbox" id="checkAll" aria-label="Check All">
+                                            <input class="form-check-input" type="checkbox" id="volunteerCheckAll" aria-label="Check All">
                                         </div>
                                     </td>
                                     <th scope="col" class="col-1">ID</th>
                                     <th scope="col" class="col-6">Volunteer Name</th>
-                                    <th scope="col" class="text-center col-2">Date</th>
+                                    <th scope="col" class="text-center col-2">Contact Info</th>
                                     <th scope="col" class="text-center col-2">Report</th>
                                 </tr>
                             </thead>
@@ -179,7 +179,7 @@
                                 <tr>
                                     <td>
                                         <div>
-                                            <input class="form-check-input row-checkbox" type="checkbox" value="" aria-label="Row Checkbox">
+                                            <input class="form-check-input row-checkbox" type="checkbox" data-volunteer-id="<%=vol%>" aria-label="Row Checkbox">
                                         </div>
                                     </td>
                                     <td><%=num1%></td>
@@ -194,7 +194,9 @@
                                 %>
                             </tbody>
                         </table>
-
+                        <button id="generateVolunteerReports" class="btn btn-info bg-purple rounded-4">
+                            Generate Reports for Selected Volunteers
+                        </button>
                     </div>
                 </div>
             </div>
@@ -203,71 +205,23 @@
 </html>
 
 <script>
-//    const eventCheckAll = document.querySelector('#nav-home #checkAll');
-//    const eventRowCheckboxes = document.querySelectorAll('#nav-home .row-checkbox');
-//
-//    const volunteerCheckAll = document.querySelector('#nav-profile #checkAll');
-//    const volunteerRowCheckboxes = document.querySelectorAll('#nav-profile .row-checkbox');
-//
-//    // Function to add checkbox logic
-//    function addCheckboxLogic(masterCheckbox, rowCheckboxes) {
-//        // Master checkbox controls row checkboxes
-//        masterCheckbox.addEventListener('change', function () {
-//            rowCheckboxes.forEach(checkbox => {
-//                checkbox.checked = this.checked;
-//            });
-//        });
-//
-//        // Update master checkbox state when individual rows are toggled
-//        rowCheckboxes.forEach(checkbox => {
-//            checkbox.addEventListener('change', function () {
-//                const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
-//                masterCheckbox.checked = allChecked;
-//
-//                // Update indeterminate state
-//                if (!this.checked) {
-//                    masterCheckbox.indeterminate = Array.from(rowCheckboxes).some(cb => cb.checked);
-//                } else {
-//                    masterCheckbox.indeterminate = false;
-//                }
-//            });
-//        });
-//    }
-//
-////    function updateDropdownText(selectedItem) {
-////        // Get the dropdown button element
-////        document.getElementById('dropdownMenuButton').textContent = selectedItem;
-////    }
-//
-//    // Apply the logic to Event tab
-//    addCheckboxLogic(eventCheckAll, eventRowCheckboxes);
-//
-//    // Apply the logic to Volunteer tab
-//    addCheckboxLogic(volunteerCheckAll, volunteerRowCheckboxes);
     document.addEventListener("DOMContentLoaded", function () {
-        // Event tab checkboxes logic
-        const eventCheckAll = document.querySelector('#nav-home #checkAll');
+        // Checkbox logic for Event and Volunteer
+        const eventCheckAll = document.querySelector('#eventCheckAll');
         const eventRowCheckboxes = document.querySelectorAll('#nav-home .row-checkbox');
 
-
-        const volunteerCheckAll = document.querySelector('#nav-profile #checkAll');
+        const volunteerCheckAll = document.querySelector('#volunteerCheckAll');
         const volunteerRowCheckboxes = document.querySelectorAll('#nav-profile .row-checkbox');
 
-
         function addCheckboxLogic(masterCheckbox, rowCheckboxes) {
-
             masterCheckbox.addEventListener('change', function () {
-                rowCheckboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
+                rowCheckboxes.forEach(checkbox => (checkbox.checked = this.checked));
             });
-
 
             rowCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function () {
                     const allChecked = Array.from(rowCheckboxes).every(cb => cb.checked);
                     masterCheckbox.checked = allChecked;
-
 
                     if (!this.checked) {
                         masterCheckbox.indeterminate = Array.from(rowCheckboxes).some(cb => cb.checked);
@@ -281,30 +235,91 @@
         addCheckboxLogic(eventCheckAll, eventRowCheckboxes);
         addCheckboxLogic(volunteerCheckAll, volunteerRowCheckboxes);
 
+        document.getElementById('generateEventReports').addEventListener('click', function () {
+            const selectedEvents = [];
 
-    });
+            document.querySelectorAll('#nav-home .row-checkbox:checked').forEach(checkbox => {
+                const eventID = checkbox.getAttribute('data-event-id');
+                if (eventID) {
+                    selectedEvents.push(eventID);
+                }
+            });
 
-    document.getElementById('generateEventReports').addEventListener('click', function () {
-        const selectedEvents = [];
-        document.querySelectorAll('.row-checkbox:checked').forEach(checkbox => {
-            console.log(checkbox); // Check the actual checkbox element
-            selectedEvents.push(checkbox.getAttribute('data-event-id'));
+            if (selectedEvents.length === 0) {
+                alert('No events selected!');
+                return;
+            }
+
+
+            selectedEvents.forEach(eventID => {
+                const url = new URL("http://localhost:16113/CommunityHub/reportEvent.jsp");
+                url.searchParams.append("eventID", eventID);
+                window.open(url.toString(), '_blank');
+            });
         });
 
-        console.log("Selected Events: ", selectedEvents); // Log the selected event IDs
 
-        if (selectedEvents.length === 0) {
-            alert('No events selected!');
-            return;
-        }
+        document.getElementById('generateVolunteerReports').addEventListener('click', function () {
+            const selectedVolunteers = [];
 
-        // Open a new tab for each selected event
-        selectedEvents.forEach(eventID => {
-            const url = `reportEvent.jsp?eventID=${eventID}`;
-            console.log("Opening URL: ", url); // Log the URL being opened
-            window.open(url, '_blank');
+
+            document.querySelectorAll('#nav-profile .row-checkbox:checked').forEach(checkbox => {
+                const volunteerID = checkbox.getAttribute('data-volunteer-id');
+                if (volunteerID) {
+                    selectedVolunteers.push(volunteerID);
+                }
+            });
+
+            if (selectedVolunteers.length === 0) {
+                alert('No volunteers selected!');
+                return;
+            }
+
+            selectedVolunteers.forEach(volunteerID => {
+                const url = new URL("http://localhost:16113/CommunityHub/reportVolunteer.jsp");
+                url.searchParams.append("volunteerID", volunteerID);
+                window.open(url.toString(), '_blank');
+            });
         });
     });
+
+    function filterEventTable() {
+        // Get the search input value
+        const searchValue = document.getElementById('eventSearchInput').value.toLowerCase();
+
+        // Get all rows in the event table body
+        const rows = document.querySelectorAll('#nav-home tbody tr');
+
+        // Loop through rows and hide or show based on search match
+        rows.forEach(row => {
+            const eventName = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Adjust to the column index of the event name
+            if (eventName.includes(searchValue)) {
+                row.style.display = ''; // Show row
+            } else {
+                row.style.display = 'none'; // Hide row
+            }
+        });
+    }
+
+    function filterVolunteerTable() {
+        // Get the search input value
+        const searchValue = document.getElementById('volunteerSearchInput').value.toLowerCase();
+
+        // Get all rows in the volunteer table body
+        const rows = document.querySelectorAll('#nav-profile tbody tr');
+
+        // Loop through rows and hide or show based on search match
+        rows.forEach(row => {
+            const volunteerName = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Adjust to the column index of the volunteer name
+            if (volunteerName.includes(searchValue)) {
+                row.style.display = ''; // Show row
+            } else {
+                row.style.display = 'none'; // Hide row
+            }
+        });
+    }
+
+
 
 
 
