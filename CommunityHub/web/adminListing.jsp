@@ -35,7 +35,7 @@
                 <div class="col-md-4"></div>
                 <div class="search-container col-md-4 my-auto">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="search">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                     </div>
                 </div>
@@ -86,10 +86,10 @@
                                 <tr>    
                                     <td class="text-center"><%=num%></td>
                                     <td>
-                                        <div class="card my-2 mx-2">
+                                        <div class="card my-2 mx-2 event-card" data-title="<%=name%>" data-description="<%=desc%>" data-location="<%=city%>">
                                             <div class="row g-0">
                                                 <div class="col-md-4">
-                                                    <img src="getImage.do?id=<%= eventID %>" class="img-fluid rounded-start" alt="...">
+                                                    <img src="getImage.do?id=<%= eventID%>" class="img-fluid rounded-start" alt="...">
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">
@@ -102,6 +102,7 @@
                                             </div>
                                         </div>
                                     </td>
+
                                     <td>
                                         <div class="container mt-4">
                                             <div class="d-grid gap-3 col mx-auto">
@@ -148,7 +149,7 @@
             </div>
         </div>
 
-        <!--Hidden Fields-->
+        <!--Hidden-->
         <form id="updateStatusForm" method="post" action="updatestatus.do" style="display:none;">
             <input type="hidden" id="eventIdInput" name="eventId">
             <input type="hidden" id="statusInput" name="status">
@@ -162,4 +163,27 @@
         document.getElementById('statusInput').value = status;
         document.getElementById('updateStatusForm').submit();
     }
+
+    function filterEvents() {
+        var input = document.getElementById('searchInput').value.toLowerCase();
+        var eventCards = document.querySelectorAll('.event-card');
+        
+        eventCards.forEach(function(card) {
+            var title = card.getAttribute('data-title').toLowerCase();
+            var description = card.getAttribute('data-description').toLowerCase();
+            var location = card.getAttribute('data-location').toLowerCase();
+
+            // Check if the input matches any of the data attributes
+            if (title.includes(input) || description.includes(input) || location.includes(input)) {
+                card.closest('tr').style.display = ''; // Show the card's row
+            } else {
+                card.closest('tr').style.display = 'none'; // Hide the card's row
+            }
+        });
+    }
+
+    // Add event listener to search input
+    document.getElementById('searchInput').addEventListener('input', filterEvents);
+
+
 </script>

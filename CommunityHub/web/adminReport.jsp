@@ -27,7 +27,7 @@
                             <div class="col-5 col-md-3 mb-3">
                                 <div class="search-container col">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="eventSearchInput" placeholder="Event's Name" oninput="filterEventTable()">
+                                        <input type="text" class="form-control" id="eventSearchInput" placeholder="Search Events" oninput="filterEventTable()">
                                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                                     </div>
                                 </div>
@@ -139,7 +139,7 @@
                             <div class="col-5 col-md-3 mb-3">
                                 <div class="search-container col">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" id="volunteerSearchInput" placeholder="Volunteer's Name" oninput="filterVolunteerTable()">
+                                        <input type="text" class="form-control" id="volunteerSearchInput" placeholder="Search Volunteers" oninput="filterVolunteerTable()">
                                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                                     </div>
                                 </div>
@@ -250,7 +250,6 @@
                 return;
             }
 
-
             selectedEvents.forEach(eventID => {
                 const url = new URL("http://localhost:16113/CommunityHub/reportEvent.jsp");
                 url.searchParams.append("eventID", eventID);
@@ -258,10 +257,8 @@
             });
         });
 
-
         document.getElementById('generateVolunteerReports').addEventListener('click', function () {
             const selectedVolunteers = [];
-
 
             document.querySelectorAll('#nav-profile .row-checkbox:checked').forEach(checkbox => {
                 const volunteerID = checkbox.getAttribute('data-volunteer-id');
@@ -283,6 +280,7 @@
         });
     });
 
+
     function filterEventTable() {
         // Get the search input value
         const searchValue = document.getElementById('eventSearchInput').value.toLowerCase();
@@ -292,8 +290,11 @@
 
         // Loop through rows and hide or show based on search match
         rows.forEach(row => {
-            const eventName = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Adjust to the column index of the event name
-            if (eventName.includes(searchValue)) {
+            const eventName = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Event Name column
+            const eventDate = row.querySelector('td:nth-child(4)').textContent.toLowerCase(); // Event Date column
+
+            // Check if the search value matches the event name or date
+            if (eventName.includes(searchValue) || eventDate.includes(searchValue)) {
                 row.style.display = ''; // Show row
             } else {
                 row.style.display = 'none'; // Hide row
@@ -310,14 +311,18 @@
 
         // Loop through rows and hide or show based on search match
         rows.forEach(row => {
-            const volunteerName = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Adjust to the column index of the volunteer name
-            if (volunteerName.includes(searchValue)) {
+            const volunteerName = row.querySelector('td:nth-child(3)').textContent.toLowerCase(); // Volunteer Name column
+            const volunteerContact = row.querySelector('td:nth-child(4)').textContent.toLowerCase(); // Contact Info column
+
+            // Check if the search value matches the volunteer name or contact info
+            if (volunteerName.includes(searchValue) || volunteerContact.includes(searchValue)) {
                 row.style.display = ''; // Show row
             } else {
                 row.style.display = 'none'; // Hide row
             }
         });
     }
+
 
 
 
