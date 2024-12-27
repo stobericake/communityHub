@@ -25,19 +25,12 @@
                 font-family: 'Kanit', sans-serif;
             }
 
-            @media print {
-                /* Hide the print button during print */
-                .print-button {
-                    display: none !important;
-                }
-                
-            }
         </style>
     </head>
     <body>
         <%@ include file="header.jspf" %>
         <%
-            String curreventID = request.getParameter("eventID");
+            String eventID = request.getParameter("eventID");
             Connection conn = null;
             PreparedStatement stmt = null;
             ResultSet rs = null;
@@ -52,7 +45,7 @@
                     + "JOIN address a ON e.addressID = a.addressID "
                     + "WHERE e.eventID = ?;";
             stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, Integer.parseInt(curreventID)); // Set the eventID
+            stmt.setInt(1, Integer.parseInt(eventID)); // Set the eventID
             rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -144,8 +137,8 @@
                             <h4 class="fw-bold">Environement & Community Impact</h4>
                             <ul class="text-body-secondary">
                                 <%                                    while (rs.next()) {
-                                        String recommend = rs.getString("recommendations");
-                                        String problem = rs.getString("problem");
+                                        String recommend = rs.getString("recommendation");
+                                        String problem = rs.getString("challange");
                                         String solution = rs.getString("solution");
                                         String feedback = rs.getString("feedback");
                                 %>
@@ -163,7 +156,7 @@
                                     <%
                                         rs.beforeFirst(); // Move the result set pointer back to the beginning to reuse it
                                         while (rs.next()) {
-                                            String problem = rs.getString("problem");
+                                            String problem = rs.getString("challange");
                                     %>
                                     <%=problem + ", "%>
                                     <%
@@ -190,7 +183,7 @@
                                 <%
                                     rs.beforeFirst(); // Move the result set pointer back to the beginning to reuse it
                                     while (rs.next()) {
-                                        String recomm = rs.getString("recommendations");
+                                        String recomm = rs.getString("recommendation");
                                 %>
                                 <li><%=recomm%></li>
                                     <%
@@ -206,7 +199,7 @@
             </div>
         </div>
         <div class="text-center mt-4">
-            <button class="btn btn-primary  print-button" onclick="window.print();">
+            <button class="btn btn-primary print-button" onclick="window.print();">
                 <i class="bi bi-printer"></i> Print Report
             </button>
         </div>
