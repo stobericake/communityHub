@@ -90,7 +90,7 @@
 
        
             <div class="mt-4">
-                <a href="index.jsp" class="btn btn-home">Home</a>
+                <a href="index.html" class="btn btn-home">Home</a>
             </div>
             
             <div class="divider-bottom bottom-divider"></div>
