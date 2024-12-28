@@ -131,6 +131,7 @@
             </thead>
             <tbody>
                     <% 
+                    String loggedInUser = (String) session.getAttribute("volunteerID");
                     // Database Connection
                     Connection conn = null;
                     PreparedStatement stmt = null;
@@ -138,14 +139,19 @@
 
                     try {
                         conn = dbconnection.getConnection(); // Get DB connection
-                        String sql = "SELECT * from events e INNER JOIN address a ON e.addressID = a.addressID INNER eventsVolunteer ev ON e.event_id = ev.event_id;";
+                        String sql = "SELECT e.eventID, e.name, e.date, e.time, a.state " +
+                                    "FROM events e " +
+                                    "INNER JOIN address a ON e.addressID = a.addressID " +
+                                    "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
+                                    "WHERE ev.volunteerID = ?;";
                         stmt = conn.prepareStatement(sql);
+                        stmt.setString(1, loggedInUser); // Set the logged-in volunteerID
                         rs = stmt.executeQuery();
 
                         while (rs.next()) {
                             int id = rs.getInt("e.eventID");
                             String title = rs.getString("e.name");
-                            Date date = rs.getDate("date");
+                            Date date = rs.getDate("e.date");
                             Time time = rs.getTime("e.time");
                             String location = rs.getString("a.state");
 
@@ -163,7 +169,7 @@
                     <td><%= title %></td>
                     <td><%= formattedDateTime %></td>
                     <td>task</td>
-                    <td><a href="myEventDetail.jsp" class="view-details-button">View Details</a></td>
+                    <td><a href="myEventDetail.jsp?eventID=<%= id %>" class="view-details-button">View Details</a></td>
                 </tr>
                 <% 
                         } // End while
