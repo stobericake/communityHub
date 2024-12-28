@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.hub.controller;
+package com.cm.controller;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -75,45 +75,171 @@ public class getImage extends HttpServlet {
         // Establish connection to the database (adjust connection parameters)
         conn = dbconnection.getConnection();
         conn.setAutoCommit(false);  // Start transaction
-
-        // Query to fetch the BLOB data
-        String sql = "SELECT image FROM events WHERE eventID = ?";
-        ps = conn.prepareStatement(sql);
-        ps.setInt(1, Integer.parseInt(request.getParameter("id"))); // Get ID from request
-
-        rs = ps.executeQuery();
-
-        if (rs.next()) {
-            // Retrieve BLOB as InputStream
-            InputStream inputStream = rs.getBinaryStream("image");
-
-            // Check if the BLOB is NULL or empty
-            if (inputStream == null) {
-                // If BLOB is NULL, use the default image from assets folder
-                FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
-                OutputStream outStream = response.getOutputStream();
-                
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-                    outStream.write(buffer, 0, bytesRead);
+        String type = request.getParameter("type");
+        
+        switch (type) {
+            case "events":
+                {
+                    // Query to fetch the BLOB data
+                    String sql = "SELECT image FROM events WHERE eventID = ?";
+                    ps = conn.prepareStatement(sql);
+                    ps.setInt(1, Integer.parseInt(request.getParameter("id"))); // Get ID from request
+                    rs = ps.executeQuery();
+                    if (rs.next()) {
+                        // Retrieve BLOB as InputStream
+                        InputStream inputStream = rs.getBinaryStream("image");
+                        
+                        // Check if the BLOB is NULL or empty
+                        if (inputStream == null) {
+                            // If BLOB is NULL, use the default image from assets folder
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            fileInputStream.close();
+                            outStream.flush();
+                        } else {
+                            // Otherwise, send the BLOB data to the response
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            inputStream.close();
+                            outStream.flush();
+                        }
+                    }           break;
                 }
-                
-                fileInputStream.close();
-                outStream.flush();
-            } else {
-                // Otherwise, send the BLOB data to the response
-                OutputStream outStream = response.getOutputStream();
-                
-                byte[] buffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    outStream.write(buffer, 0, bytesRead);
+            case "volunteer":
+                {
+                    // Query to fetch the BLOB data
+                    String sql = "SELECT image FROM volunteer WHERE volunteerID = ?";
+                    ps = conn.prepareStatement(sql);
+                    ps.setInt(1, Integer.parseInt(request.getParameter("id"))); // Get ID from request
+                    rs = ps.executeQuery();
+                    if (rs.next()) {
+                        // Retrieve BLOB as InputStream
+                        InputStream inputStream = rs.getBinaryStream("image");
+                        
+                        // Check if the BLOB is NULL or empty
+                        if (inputStream == null) {
+                            // If BLOB is NULL, use the default image from assets folder
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            fileInputStream.close();
+                            outStream.flush();
+                        } else {
+                            // Otherwise, send the BLOB data to the response
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            inputStream.close();
+                            outStream.flush();
+                        }
+                    }           break;
                 }
-
-                inputStream.close();
-                outStream.flush();
-            }
+            case "beneficiary":
+                {
+                    // Query to fetch the BLOB data
+                    String sql = "SELECT image FROM beneficiary WHERE beneficiaryID = ?";
+                    ps = conn.prepareStatement(sql);
+                    ps.setInt(1, Integer.parseInt(request.getParameter("id"))); // Get ID from request
+                    rs = ps.executeQuery();
+                    if (rs.next()) {
+                        // Retrieve BLOB as InputStream
+                        InputStream inputStream = rs.getBinaryStream("image");
+                        
+                        // Check if the BLOB is NULL or empty
+                        if (inputStream == null) {
+                            // If BLOB is NULL, use the default image from assets folder
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            fileInputStream.close();
+                            outStream.flush();
+                        } else {
+                            // Otherwise, send the BLOB data to the response
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            inputStream.close();
+                            outStream.flush();
+                        }
+                    }           break;
+                }
+            case "admin":
+                {
+                    // Query to fetch the BLOB data
+                    String sql = "SELECT image FROM admin WHERE adminID = ?";
+                    ps = conn.prepareStatement(sql);
+                    ps.setInt(1, Integer.parseInt(request.getParameter("id"))); // Get ID from request
+                    rs = ps.executeQuery();
+                    if (rs.next()) {
+                        // Retrieve BLOB as InputStream
+                        InputStream inputStream = rs.getBinaryStream("image");
+                        
+                        // Check if the BLOB is NULL or empty
+                        if (inputStream == null) {
+                            // If BLOB is NULL, use the default image from assets folder
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            fileInputStream.close();
+                            outStream.flush();
+                        } else {
+                            // Otherwise, send the BLOB data to the response
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            inputStream.close();
+                            outStream.flush();
+                        }
+                    }           break;
+                }
+            default:
+                break;
         }
     } catch (SQLException | IOException e) {
         e.printStackTrace();
