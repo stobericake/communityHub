@@ -175,7 +175,7 @@
             <div class="card mb-4" style="border-radius: 10px;">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center justify-content-center">
-                    <img src="assets\Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
+                    <img src="../assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
                     <p><strong>DOWNLOAD CERTIFICATE</strong></p>
                     </div>
                     <button class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;" type="button" data-bs-toggle="modal" data-bs-target="#certificateModal">
@@ -206,7 +206,7 @@
             <div class="card mb-4" style="border-radius: 10px;">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center justify-content-center">
-                    <img src="assets\medal.svg" alt="Icon" style="width: 50px; height: 50px;">
+                    <img src="../assets/medal.svg" alt="Icon" style="width: 50px; height: 50px;">
                     <p><strong>SERVICE REPORT</strong></p>
                     </div>
                     <p class="card-text text-muted">
