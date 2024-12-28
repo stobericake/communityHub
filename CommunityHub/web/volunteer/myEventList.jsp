@@ -105,7 +105,7 @@
     </style>
 </head>
 <body>
-    <%@ include file="header.jspf" %>
+    <%@ include file="../header.jspf" %>
     <div class="container">
         <header>
             <div class="col">

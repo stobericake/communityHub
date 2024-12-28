@@ -62,7 +62,7 @@
         </style>
         </head>
         <body>
-            <%@ include file="header.jspf" %>
+            <%@ include file="../header.jspf" %>
             <img src="assets/gotong_royong.png" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">

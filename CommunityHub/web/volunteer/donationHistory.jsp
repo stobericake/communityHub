@@ -163,7 +163,7 @@
     </style>
 </head>
 <body>
-    <%@ include file="header.jspf" %>
+    <%@ include file="../header.jspf" %>
     <div class="container">
     <header>
         <h2 text-align: left>Donation History</h2>        
