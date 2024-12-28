@@ -4,6 +4,10 @@
         <servlet-name>volunteerServlet</servlet-name>
         <servlet-class>com.hub.controller.volunteerServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>addEvent</servlet-name>
+        <servlet-class>com.hub.controller.addEvent</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -31,6 +35,10 @@
     <servlet-mapping>
         <servlet-name>addServiceReport</servlet-name>
         <url-pattern>/addservice.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>addEvent</servlet-name>
+        <url-pattern>/addEvent.do</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
