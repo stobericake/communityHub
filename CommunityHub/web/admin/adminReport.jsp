@@ -56,7 +56,7 @@
                                             <input class="form-check-input" type="checkbox" id="eventCheckAll" aria-label="Check All">
                                         </div>
                                     </td>
-                                    <th scope="col" class="col-1">ID</th>
+                                    <th scope="col" class="col-1">No</th>
                                     <th scope="col" class="col-6">Event Name</th>
                                     <th scope="col" class="text-center col-2">Date</th>
                                     <th scope="col" class="text-center col-2">Report</th>
@@ -251,7 +251,7 @@
             }
 
             selectedEvents.forEach(eventID => {
-                const url = new URL("http://localhost:16113/CommunityHub/reportEvent.jsp");
+                const url = new URL("http://localhost:16113/CommunityHub/admin/reportEvent.jsp");
                 url.searchParams.append("eventID", eventID);
                 window.open(url.toString(), '_blank');
             });
@@ -273,7 +273,7 @@
             }
 
             selectedVolunteers.forEach(volunteerID => {
-                const url = new URL("http://localhost:16113/CommunityHub/reportVolunteer.jsp");
+                const url = new URL("http://localhost:16113/CommunityHub/admin/reportVolunteer.jsp");
                 url.searchParams.append("volunteerID", volunteerID);
                 window.open(url.toString(), '_blank');
             });

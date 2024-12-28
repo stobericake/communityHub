@@ -61,10 +61,10 @@
                         <thead class="table-dark">
                             <tr class='text-uppercase'>
                                 <th class="text-center">NO</th>
-                                <th class="col-4">Event List</th>
+                                <th class="">Event List</th>
                                 <th class="text-center">Date</th>
                                 <th class="text-center">Time</th>
-                                <th class="text-center">Role</th>
+                                <th class="text-center col-3">Role</th>
                                 <th class="text-center">Hours</th>
                             </tr>
                         </thead>

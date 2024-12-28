@@ -150,7 +150,7 @@
                 <div class="card h-100 event-card" data-title="<%= title %>" 
                      data-description="<%= desc %>" data-location="<%= location %>">
                 <div  style="width: 100%; height:200px; ">
-                    <img src="getImage.do?id=<%= id %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
+                    <img src="../getImage.do?type=events&id=<%= id %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
                 </div>
                     <div class="card-body">
                         <h5 class="card-title styl"><%= title %></h5>
@@ -169,7 +169,7 @@
 
                         <div class="d-flex justify-content-end align-items-center">                     
                             <a href="#" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
-                            <a href="eventDetail.jsp?eventID=<%= id %>" class="volunteer-button">View Details</a>      
+                            <a href="../eventDetail.jsp?eventID=<%= id %>" class="volunteer-button">View Details</a>      
                         </div>
                     </div>
                 </div>

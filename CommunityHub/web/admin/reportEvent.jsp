@@ -138,7 +138,7 @@
                             <ul class="text-body-secondary">
                                 <%                                    while (rs.next()) {
                                         String recommend = rs.getString("recommendation");
-                                        String problem = rs.getString("challange");
+                                        String problem = rs.getString("challenge");
                                         String solution = rs.getString("solution");
                                         String feedback = rs.getString("feedback");
                                 %>
@@ -156,7 +156,7 @@
                                     <%
                                         rs.beforeFirst(); // Move the result set pointer back to the beginning to reuse it
                                         while (rs.next()) {
-                                            String problem = rs.getString("challange");
+                                            String problem = rs.getString("challenge");
                                     %>
                                     <%=problem + ", "%>
                                     <%
