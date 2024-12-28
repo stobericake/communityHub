@@ -7,7 +7,6 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Events Dashboard</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
@@ -142,8 +141,6 @@
                         String title = rs.getString("name");
                         String desc = rs.getString("description");
                         String location = rs.getString("city");
-
-
                             
                         Date date = rs.getDate("date");
                         Time time = rs.getTime("time");
@@ -153,8 +150,8 @@
                 <div class="card h-100 event-card" data-title="<%= title %>" 
                      data-description="<%= desc %>" data-location="<%= location %>">
                 <div  style="width: 100%; height:200px; ">
-    <img src="getImage.do?id=<%= id %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
-</div>
+                    <img src="getImage.do?id=<%= id %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
+                </div>
                     <div class="card-body">
                         <h5 class="card-title styl"><%= title %></h5>
                         <p class="card-text text-truncate"><%= desc %></p>

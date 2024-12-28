@@ -9,18 +9,20 @@
 <%@ page import="java.util.*" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.time.LocalTime"%>
+<%@page import="java.util.Base64"%>
+<%@page import="java.io.ByteArrayOutputStream"%>
+<%@page import="java.io.InputStream"%>
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Event Detail</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
         <style>
             body {
-                font-family: 'Poppins', sans-serif;
+                font-family: 'Poppins', sans-serif !important;
                 margin: 0;
                 padding: 0;
                 background-color: #f8f9fa;
@@ -80,6 +82,9 @@
         <%
             // Get the event ID from the request
             String eventID = request.getParameter("eventID");
+            String loggedInUser = (String) session.getAttribute("volunteerID");
+
+            boolean isLoggedIn = loggedInUser != null;
             Connection conn = null;
             PreparedStatement stmt = null;
             ResultSet rs = null;
@@ -88,7 +93,7 @@
                 try {
                     // Database connection
                     conn = dbconnection.getConnection();
-                    String sql = "SELECT e.name, e.date, e.time, e.duration, e.description, a.state, t.description, b.name FROM events e INNER JOIN address a ON e.addressID = a.addressID INNER JOIN task t ON e.eventID = t.eventID INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
+                    String sql = "SELECT e.eventId, e.name, e.date, e.time, e.duration, e.description, a.state, t.description, b.name FROM events e INNER JOIN address a ON e.addressID = a.addressID INNER JOIN task t ON e.eventID = t.eventID INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
                     stmt = conn.prepareStatement(sql);
                     stmt.setInt(1, Integer.parseInt(eventID));
                     rs = stmt.executeQuery();
@@ -100,8 +105,13 @@
                         Time eventDuration = rs.getTime("e.duration");
                         String description = rs.getString("e.description");
                         String location = rs.getString("a.state");
-                        String task = rs.getString("t.description");
                         String beneficiary = rs.getString("b.name");
+                        
+                         // Task handling
+                        List<String> tasks = new ArrayList<String>();
+                        do {
+                            tasks.add(rs.getString("t.description"));
+                        } while (rs.next());
 
                         // Parse and format
                         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -121,7 +131,7 @@
 
                         // Display details
             %>
-        <img src="assets/gotong_royong.png" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+        <img src=src="getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
         <figure class="text-center">
             <blockquote class="blockquote">
               <p class="h6"><%= eventName %></p>
@@ -182,19 +192,30 @@
             </small>
             </div>
             <p><strong>Task required.</strong></p>
-            <li class="dropdown mb-3" style="list-style: none">
-                <a class="dropdown-toggle btn btn-primary" href="#" id="taskSelection" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Choose Task
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="taskSelection">
-                    <li><a class="dropdown-item"><%= task %></a></li>
-                </ul>
-            </li>
             <form action="volunteer_servlet.do" method="POST">
                 <input type="hidden" name="eventID" value="<%= eventID %>">
+                <% for (int i = 0; i < tasks.size(); i++) { %>
+                    <div class="form-check form-check-inline mb-3">
+                        <input type="radio" class="form-check-input" name="task" id="task<%= i %>" value="<%= tasks.get(i) %>" <%= i == 0 ? "checked" : "" %>>
+                        <label class="form-check-label" for="task<%= i %>"><%= tasks.get(i) %></label>
+                    </div>
+                <% } %>
+                <%
+                    if (!isLoggedIn) {
+                %>
+                <p class="text-danger">Please log in to volunteer for this event.</p>
+                <a href="login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                    LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
+                </a>
+                <%
+                    } else {
+                %>
                 <button type="submit" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
-                VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
-            </button>
+                    VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
+                </button>
+                <%
+                    }
+                %>
             </form>
         </div>
 

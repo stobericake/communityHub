@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.*;
-
+import java.util.*;
+import javax.servlet.http.HttpSession;
 /**
  *
  * @author Rina
@@ -72,8 +73,10 @@ public class volunteerServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        HttpSession session = request.getSession();
+        String volunteerID = (String) session.getAttribute("volunteerID");
         String eventID = request.getParameter("eventID");
-        String volunteerID = request.getSession().getAttribute("volunteerID").toString();
+        String selectedTask = request.getParameter("task");
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -81,22 +84,29 @@ public class volunteerServlet extends HttpServlet {
         try {
             // Database connection
             conn = dbconnection.getConnection();
+             if (volunteerID == null) {
+                // Redirect to login page if not logged in
+                response.sendRedirect("login.jsp?message=Please login to volunteer for this event.");
+            } else {
 
-            // Insert into eventsVolunteer table
-            String sql = "INSERT INTO eventsVolunteer (eventID, volunteerID) VALUES (?, ?)";
+            String sql = "INSERT INTO eventsVolunteer (eventID, volunteerID, task) VALUES (?, ?, ?)";
             stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, Integer.parseInt(eventID));
-            stmt.setInt(2, Integer.parseInt(volunteerID));
+            stmt.setString(1, eventID);
+            stmt.setString(2, volunteerID);
+            stmt.setString(3, selectedTask);
+            stmt.executeUpdate();
 
+            
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
                 response.sendRedirect("success.jsp");
             } else {
                 response.sendRedirect("error.jsp");
             }
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("volunteerError.jsp");
+            response.sendRedirect("error.jsp");
         } finally {
             try { if (stmt != null) stmt.close(); } catch (Exception e) { e.printStackTrace(); }
             try { if (conn != null) conn.close(); } catch (Exception e) { e.printStackTrace(); }
