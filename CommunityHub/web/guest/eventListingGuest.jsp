@@ -91,7 +91,7 @@
     </style>
 </head>
 <body>
-    <%@ include file="header.jspf" %>
+    <%@ include file="../header.jspf" %>
     <div class="container mt-4">
         <!-- Header Section -->
         <div class="row align-items-center mb-4">

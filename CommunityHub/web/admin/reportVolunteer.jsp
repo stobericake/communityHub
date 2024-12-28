@@ -27,7 +27,7 @@
         </style>
     </head>
     <body>
-        <%@ include file="header.jspf" %>
+        <%@ include file="../header.jspf" %>
         <%
             Connection conn = null;
             PreparedStatement stmt = null;

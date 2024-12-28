@@ -7,7 +7,7 @@
         <title>Generate Report</title>
     </head>
     <body>
-        <%@ include file="header.jspf" %>
+        <%@ include file="../header.jspf" %>
 
         <div class="container mt-5">
             <h4 class="fw-bold">GENERATE REPORT</h4>

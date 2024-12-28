@@ -7,7 +7,7 @@
         
     </head>
     <body>
-        <%@ include file="header.jspf" %>
+        <%@ include file="../header.jspf" %>
         <div class="container mt-4 pb-3 border w-50 w-md-75 rounded-4 shadow" style="background-color:#3A7CA5;">
             <div class="container">
                 <div class="row text-center">
@@ -45,7 +45,7 @@
                         </div>
                         <div class="col-12 col-md">
                             <label for="volunteer" class="form-label">ID</label>
-                            <input type="text" class="form-control" id="volunteer" name="volunteer" required>
+                            <input type="text" class="form-control" id="volunteer" name="volunteer" readonly>
                             <div class="invalid-feedback">
                                 Insert ID
                             </div>
