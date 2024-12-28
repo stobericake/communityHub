@@ -23,7 +23,7 @@
                 font-family: 'Poppins', sans-serif;
                 margin: 0;
                 padding: 0;
-                background-color: white !important;
+                background-color: #f8f9fa;
             }
 
             .container {
@@ -63,10 +63,11 @@
         </style>
         </head>
         <body>
-            <%@ include file="header.jspf" %>
+            <%@ include file="../header.jspf" %>
             <%
             String eventID = request.getParameter("eventID");
             String loggedInUser = (String) session.getAttribute("volunteerID");
+            String selectedTask = (String) session.getAttribute("selectedTask");
 
             Connection conn = null;
             PreparedStatement stmt = null;
@@ -128,7 +129,7 @@
                         }
 
         %>
-            <img src="getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <img src="../getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
                     <p class="h6"><%= eventName %></p>
@@ -165,6 +166,7 @@
                             </div>
                             </small>
                             </div>
+                            <p><strong>Selected Task:</strong> <%= selectedTask %></p>
         </div>
 
         <!-- Right Column: Cards -->
