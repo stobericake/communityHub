@@ -150,7 +150,7 @@
         </div>
 
         <!--Hidden-->
-        <form id="updateStatusForm" method="post" action="updatestatus.do" style="display:none;">
+        <form id="updateStatusForm" method="post" action="../updatestatus.do" style="display:none;">
             <input type="hidden" id="eventIdInput" name="eventId">
             <input type="hidden" id="statusInput" name="status">
         </form>
