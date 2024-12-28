@@ -5,7 +5,7 @@
 --%>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.*, java.sql.*" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -171,14 +171,34 @@
         <div class="container">
             <div class="center-card">
         <div class="donation-card">
+             <%
+            // Get the logged-in volunteer ID
+            String volunteerID = (String) session.getAttribute("volunteerID");
+            Connection con = dbconnection.getConnection();
+            Statement stmt = con.createStatement();
+
+            // Fetch total donation amount
+            String totalDonationQuery = "SELECT SUM(amount) AS totalDonation FROM donation WHERE volunteerID = '" + volunteerID + "'";
+            ResultSet totalDonationRs = stmt.executeQuery(totalDonationQuery);
+            totalDonationRs.next();
+            double totalDonation = totalDonationRs.getDouble("totalDonation");
+
+            // Fetch the latest donation
+            String latestDonationQuery = "SELECT amount FROM donation WHERE volunteerID = '" + volunteerID + "' ORDER BY date DESC LIMIT 1";
+            ResultSet latestDonationRs = stmt.executeQuery(latestDonationQuery);
+            double latestDonation = 0;
+            if (latestDonationRs.next()) {
+                latestDonation = latestDonationRs.getDouble("amount");
+            }
+        %>
             <!-- Total Donation Section -->
             <div class="donation-section">
                 <div class="donation-icon">
                     <i class="bi bi-bank2"></i>
                 </div>
                 <div>
-                    <p class="donation-amount">RM2,300</p>
-                    <p class="donation-text">Total Donation</p>
+                <p class="donation-amount">RM<%= totalDonation %></p>
+                <p class="donation-text">Total Donation</p>
                 </div>
             </div>
             
@@ -191,8 +211,8 @@
                     <i class="bi bi-receipt"></i>
                 </div>
                 <div>
-                    <p class="donation-amount">RM100</p>
-                    <p class="donation-text">Latest Donation</p>
+                <p class="donation-amount">RM<%= latestDonation %></p>
+                <p class="donation-text">Latest Donation</p>
                 </div>
             </div>
         </div>
@@ -212,56 +232,25 @@
                     </tr>
                 </table>
             </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-            <table class="event-table">
-               <tr>
-                    <td>1.</td>
-                    <td>Gotong Royong (Chendering)</td>
-                    <td>05/12/2023 - 04:42PM</td>
-                    <td>RM100</td>
-                    <td><button class="view-details-button">View Receipt</button></td>
-                </tr>
-               </table>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <table class="event-table">
-                    <td>2.</td>
-                    <td>Event Program (Kuala Terengganu)</td>
-                    <td>05/12/2023 - 04:42PM</td>
-                    <td>RM700</td>
-                    <td><button class="view-details-button">View Receipt</button></td>
-                </tr>
-              </table>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <table class="event-table">
-                    <td>3.</td>
-                    <td>Recyling Program (Batu Buruk)</td>
-                    <td>05/12/2023 - 04:42PM</td>
-                    <td>RM800</td>
-                    <td><button class="view-details-button">View Receipt</button></td>
-                </tr>
-              </table>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <table class="event-table">
-                    <td>4.</td>
-                    <td>Gotong Royong (Marang)</td>
-                    <td>05/12/2023 - 04:42PM</td>
-                    <td>RM500</td>
-                    <td><button class="view-details-button">View Receipt</button></td>
-                </tr>
-              </table>
-            </li><li class="list-group-item d-flex justify-content-between align-items-center">
-              <table class="event-table">
-                    <td>5.</td>
-                    <td>Cloth Donation (Chendering)</td>
-                    <td>05/12/2023 - 04:42PM</td>
-                    <td>RM200</td>
-                    <td><button class="view-details-button">View Receipt</button></td>
-                </tr>
-              </table>
-            </li>
+            <%
+                // Fetch donation history
+                String donationHistoryQuery = "SELECT d.donationID, d.amount, d.date, e.name FROM donation d JOIN events e ON d.eventID = e.eventID WHERE d.volunteerID = '" + volunteerID + "' ORDER BY d.date DESC";
+                ResultSet donationHistoryRs = stmt.executeQuery(donationHistoryQuery);
+                int index = 1;
+                while (donationHistoryRs.next()) {
+            %>
+           <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <table class="event-table">
+                        <tr>
+                            <td><%= index++ %>.</td>
+                            <td><%= donationHistoryRs.getString("name") %></td>
+                            <td><%= donationHistoryRs.getString("date") %></td>
+                            <td>RM<%= donationHistoryRs.getDouble("amount") %></td>
+                            <td><button class="view-details-button">View Receipt</button></td>
+                        </tr>
+                    </table>
+                </li>
+            <% } %>
             
             </ul>
 </div>
