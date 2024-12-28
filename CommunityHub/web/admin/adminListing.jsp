@@ -89,7 +89,7 @@
                                         <div class="card my-2 mx-2 event-card" data-title="<%=name%>" data-description="<%=desc%>" data-location="<%=city%>">
                                             <div class="row g-0">
                                                 <div class="col-md-4">
-                                                    <img src="../getImage.do?id=<%=eventID%>" class="img-fluid rounded-start" alt="...">
+                                                    <img src="../getImage.do?type=events&id=<%= eventID %>" class="img-fluid rounded-start" alt="...">
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">

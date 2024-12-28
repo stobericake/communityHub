@@ -150,7 +150,7 @@
                 <div class="card h-100 event-card" data-title="<%= title %>" 
                      data-description="<%= desc %>" data-location="<%= location %>">
                 <div  style="width: 100%; height:200px; ">
-                    <img src="getImage.do?id=<%= id %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
+                    <img src="../getImage.do?type=events&id=<%= id %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
                 </div>
                     <div class="card-body">
                         <h5 class="card-title styl"><%= title %></h5>
