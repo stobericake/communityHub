@@ -1,24 +1,17 @@
-<%-- 
-    Document   : volunteerDetail.jsp
-    Created on : Dec 18, 2024, 4:54:05 AM
-    Author     : Rina
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.time.LocalTime"%>
-<%@page import="java.util.Base64"%>
-<%@page import="java.io.ByteArrayOutputStream"%>
-<%@page import="java.io.InputStream"%>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.LocalTime" %>
+<%@ page import="java.time.temporal.ChronoUnit" %>
+<%@ page import="java.time.ZoneId" %>
 
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Event Detail</title>
-
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
         <style>
             body {
@@ -80,94 +73,133 @@
     <body>
         <%@ include file="header.jspf" %>
         <%
-            // Get the event ID from the request
             String eventID = request.getParameter("eventID");
             String loggedInUser = (String) session.getAttribute("volunteerID");
 
-            boolean isLoggedIn = loggedInUser != null;
             Connection conn = null;
             PreparedStatement stmt = null;
             ResultSet rs = null;
+            PreparedStatement taskStmt = null;
+            ResultSet taskRs = null;
+            PreparedStatement donationStmt = null;
+            ResultSet donationRs = null;
+            boolean isLoggedIn = loggedInUser != null;
 
             if (eventID != null && !eventID.isEmpty()) {
                 try {
-                    // Database connection
                     conn = dbconnection.getConnection();
-                    String sql = "SELECT e.eventId, e.name, e.date, e.time, e.duration, e.description, a.state, t.description, b.name FROM events e INNER JOIN address a ON e.addressID = a.addressID INNER JOIN task t ON e.eventID = t.eventID INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
+                    String sql = "SELECT e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration, e.description, a.state AS location, b.name AS beneficiary, e.donationLimit FROM events e " +
+                                 "INNER JOIN address a ON e.addressID = a.addressID " +
+                                 "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
                     stmt = conn.prepareStatement(sql);
                     stmt.setInt(1, Integer.parseInt(eventID));
                     rs = stmt.executeQuery();
 
                     if (rs.next()) {
-                        String eventName = rs.getString("e.name");
-                        Date eventDate = rs.getDate("e.date");
-                        Time eventTime = rs.getTime("e.time");
-                        Time eventDuration = rs.getTime("e.duration");
-                        String description = rs.getString("e.description");
-                        String location = rs.getString("a.state");
-                        String beneficiary = rs.getString("b.name");
-                        
-                         // Task handling
-                        List<String> tasks = new ArrayList<String>();
-                        do {
-                            tasks.add(rs.getString("t.description"));
-                        } while (rs.next());
-
-                        // Parse and format
-                        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                        String eventName = rs.getString("eventName");
+                        Date eventDate = rs.getDate("eventDate");
+                        Time eventTime = rs.getTime("eventTime");
+                        Time eventDuration = rs.getTime("duration");
+                        String description = rs.getString("description");
+                        String location = rs.getString("location");
+                        String beneficiary = rs.getString("beneficiary");
+                        double donationLimit = rs.getDouble("donationLimit");
+                        // Formatting setup
                         SimpleDateFormat outputFormat = new SimpleDateFormat("MM/dd/yyyy - hh:mma");
+                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                        String formattedDateTime = outputFormat.format(inputFormat.parse(eventDate + " " + eventTime));
-                        
+                        // Convert `eventDate` to LocalDate (compatible approach)
+                        LocalDate eventLocalDate = new java.util.Date(eventDate.getTime())
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate();
+
                         // Convert SQL Time to LocalTime
                         LocalTime startTime = eventTime.toLocalTime();
                         LocalTime duration = eventDuration.toLocalTime();
-                        
-                        // Calculate end time
+
+                        // Calculate the event's end time
                         LocalTime endTime = startTime.plusHours(duration.getHour()).plusMinutes(duration.getMinute());
 
-                        // Format the end time if needed
-                        String formattedEndTime =  outputFormat.format(inputFormat.parse(eventDate + " " +endTime.toString()));
+                        // Format the date and time for display
+                        String formattedDate = inputDateFormat.format(eventDate);
+                        String formattedStartTime = outputFormat.format(eventTime);
+                        String formattedEndTime = outputFormat.format(Time.valueOf(endTime));
 
-                        // Display details
-            %>
-        <img src=src="getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
-        <figure class="text-center">
-            <blockquote class="blockquote">
-              <p class="h6"><%= eventName %></p>
-            </blockquote>
-            <figcaption class="blockquote-footer">
-              BY <cite title="Beneficiary Name">@<%= beneficiary%></cite>
-            </figcaption>
-        </figure>
-        <div class="divider"></div>
-        <div class="container">
-        <div class="clearfix">
-            <div class="card col-md-3 float-md-end mb-4 ms-md-3" style="border-radius: 10px;">
-                <div class="card-body text-start">
-                    <h2 class="fw-bold">RM124,000</h2>
-                    <div class="progress mb-3" style="height: 8px; border-radius: 5px;">
-                        <div class="progress-bar" role="progressbar" style="width: 62%;" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <small class="text-muted  text-start">Goal<br>RM2,00,000</small>
-                        <small class="text-muted  text-end">Remaining<br>RM1234</small>
-                    </div>
-                    
-                    <div class="d-flex align-items-start justify-content-start">
+                        // Calculate days left from the current date to the event date
+                        LocalDate currentDate = LocalDate.now();
+                        long daysLeft = ChronoUnit.DAYS.between(currentDate, eventLocalDate);
+
+                        // Fetch tasks
+                        List<String> tasks = new ArrayList<String>();
+                        String taskSql = "SELECT description FROM task WHERE eventID = ?";
+                        taskStmt = conn.prepareStatement(taskSql);
+                        taskStmt.setInt(1, Integer.parseInt(eventID));
+                        taskRs = taskStmt.executeQuery();
+                        while (taskRs.next()) {
+                            tasks.add(taskRs.getString("description"));
+                        }
+
+                        // Fetch donation details
+                        double totalDonation = 0;
+                        String donationSql = "SELECT SUM(amount) AS totalDonation FROM donation WHERE eventID = ?";
+                        donationStmt = conn.prepareStatement(donationSql);
+                        donationStmt.setInt(1, Integer.parseInt(eventID));
+                        donationRs = donationStmt.executeQuery();
+                        if (donationRs.next()) {
+                            totalDonation = donationRs.getDouble("totalDonation");
+                        }
+                        
+                            // Fetch the total number of contributors (donors)
+                        String contributorsQuery = "SELECT COUNT(DISTINCT donorID) AS totalContributors FROM donation WHERE eventID = ?";
+                        PreparedStatement contributorsStmt = conn.prepareStatement(contributorsQuery);
+                        contributorsStmt.setInt(1, Integer.parseInt(eventID));
+                        ResultSet contributorsRs = contributorsStmt.executeQuery();
+                        int totalContributors = 0;
+                        if (contributorsRs.next()) {
+                            totalContributors = contributorsRs.getInt("totalContributors");
+                        }
+                        double remainingAmount = donationLimit - totalDonation;
+                        double progress = (totalDonation / donationLimit) * 100;
+
+        %>
+            <img src="getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <figure class="text-center">
+                <blockquote class="blockquote">
+                    <p class="h6"><%= eventName %></p>
+                </blockquote>
+                <figcaption class="blockquote-footer">
+                    BY <cite title="Beneficiary Name">@<%= beneficiary %></cite>
+                </figcaption>
+            </figure>
+            <div class="divider"></div>
+            <div class="container">
+            <div class="clearfix">
+                <div class="card col-md-3 float-md-end mb-4 ms-md-3" style="border-radius: 10px;">
+                    <div class="card-body text-start">
+                        <h2 class="fw-bold">RM<%= totalDonation %></h2>
+                        <div class="progress mb-3" style="height: 8px; border-radius: 5px;">
+                            <div class="progress-bar" role="progressbar" style="width: <%= progress %>%;" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <small class="text-muted text-start">Goal<br>RM<%= donationLimit %></small>
+                            <small class="text-muted text-end">Remaining<br>RM<%= remainingAmount %></small>
+                        </div>
+                        <div class="d-flex align-items-start justify-content-start">
                         <i class="bi bi-clock me-2"></i>
-                        <small class="text-muted">12 days left</small>
+                        <small class="text-muted"><%= daysLeft %> days </small>
                     </div>
                     <div class="d-flex align-items-start justify-content-start">
                         <i class="bi bi-heart-fill text-danger me-2"></i>
-                        <small class="text-muted">12354 Contributors</small>
+                        <small class="text-muted"><%= totalContributors %> Contributors</small>
                     </div>
                     <hr>
                     <button class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
                         DONATE <i class="bi bi-heart"></i>
                     </button>
                 </div>
-            </div>
+                    </div>
+       
             <p><strong>About.</strong></p>
             <p><%= description %></p>
             <p><strong>Location.</strong></p>
@@ -181,7 +213,7 @@
             
                 <br><div class="d-flex align-items-start justify-content-start">
                 <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"><%= formattedDateTime %></p>
+                <p class="text-muted"><%= formattedStartTime %></p>
             </div>
             </small>
             <small>End Date
@@ -191,8 +223,8 @@
             </div>
             </small>
             </div>
-            <p><strong>Task required.</strong></p>
-            <form action="volunteer_servlet.do" method="POST">
+                <p><strong>Tasks Required:</strong></p>
+                <form action="volunteer_servlet.do" method="POST">
                 <input type="hidden" name="eventID" value="<%= eventID %>">
                 <% for (int i = 0; i < tasks.size(); i++) { %>
                     <div class="form-check form-check-inline mb-3">
@@ -217,31 +249,36 @@
                     }
                 %>
             </form>
+            </div>
         </div>
-
-        </div>
-        <%
-            } else {
+        <% 
+                    } else { 
         %>
         <div class="container">
             <p>Event not found.</p>
         </div>
-        <%
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-                }
-            } else {
-        %>
-        <div class="container">
-            <p>Invalid Event ID.</p>
-        </div>
-        <%
+        <%  }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Close resources manually
+            try {
+                if (taskRs != null) taskRs.close();
+                if (taskStmt != null) taskStmt.close();
+                if (donationRs != null) donationRs.close();
+                if (donationStmt != null) donationStmt.close();
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        %>
+        }
+    } else { 
+    %>
+    <div class="container">
+        <p>Invalid Event ID.</p>
+    </div>
+    <% } %>
     </body>
 </html>
