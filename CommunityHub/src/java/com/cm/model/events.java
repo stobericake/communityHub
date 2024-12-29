@@ -23,7 +23,8 @@ public class events implements Serializable{
     private int addressID;
 
     // Constructor
-    public events(int eventID, String name, Date date, Time time, Time duration,String description, int volunteersNeeded, String status) {
+    public events(int eventID, String name, Date date, Time time, Time duration,String description, int volunteersNeeded, String status
+                  ,Blob image, double donationLimit, int addressID) {
         this.eventID = eventID;
         this.name = name;
         this.date = date;
@@ -32,7 +33,9 @@ public class events implements Serializable{
         this.description = description;
         this.volunteersNeeded = volunteersNeeded;
         this.status = status;
-        
+        this.image = image;
+        this.donationLimit = donationLimit;
+        this.addressID = addressID;
     }
     // Getters
     public int getEventID() {
@@ -62,6 +65,10 @@ public class events implements Serializable{
     public String getStatus() {
         return status;
     }
+    
+    public double getDonationLimit(){
+        return donationLimit;
+    }
 
     // Setters
     public void setEventID(int eventID) {
@@ -86,6 +93,10 @@ public class events implements Serializable{
 
     public void setVolunteersNeeded(int volunteersNeeded) {
         this.volunteersNeeded = volunteersNeeded;
+    }
+    
+    public void setDonationLimit(double donationLimit){
+        this.donationLimit = donationLimit;
     }
 
     /**

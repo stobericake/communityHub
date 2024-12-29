@@ -7,13 +7,13 @@ import java.util.Map;
 public class address implements Serializable{
     private int addressID;
     private String country;
-    private String postalCode;
+    private int postalCode;
     private String street;
     private String city;
     private String state;
 
     // Constructor
-    public address(int addressID, String country, String postalCode, String street, String city, String state) {
+    public address(int addressID, String country, int postalCode, String street, String city, String state) {
         this.addressID = addressID;
         this.country = country;
         this.postalCode = postalCode;
@@ -31,7 +31,7 @@ public class address implements Serializable{
         return country;
     }
 
-    public String getPostalCode() {
+    public int getPostalCode() {
         return postalCode;
     }
 
@@ -55,7 +55,7 @@ public class address implements Serializable{
         this.country = country;
     }
 
-    public void setPostalCode(String postalCode) {
+    public void setPostalCode(int postalCode) {
         this.postalCode = postalCode;
     }
 

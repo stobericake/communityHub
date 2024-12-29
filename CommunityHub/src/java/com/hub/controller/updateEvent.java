@@ -79,7 +79,7 @@ public class updateEvent extends HttpServlet {
             request.setAttribute("id", temp);
 
             // Forward the request to the JSP
-            RequestDispatcher dispatcher = request.getRequestDispatcher("editEvent.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/editEvent.jsp");
             dispatcher.forward(request, response);
             }
         } catch (SQLException e) {
@@ -116,7 +116,7 @@ public class updateEvent extends HttpServlet {
                 } else {
                     // Handle the case where the event ID was not found
                     request.setAttribute("error", "Event not found.");
-                    request.getRequestDispatcher("../error.jsp").forward(request, response);
+                    request.getRequestDispatcher("error.jsp").forward(request, response);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

@@ -14,7 +14,7 @@ import java.sql.*;
 
 public class dbconnection {
     public static Connection getConnection() throws SQLException, ClassNotFoundException {
-        String url = "jdbc:mysql://localhost:3307/communityhub"; // Replace with your DB name
+        String url = "jdbc:mysql://localhost:3306/communityhub"; // Replace with your DB name
         String user = "root"; // Replace with your DB username
         String password = ""; // Replace with your DB password
 
