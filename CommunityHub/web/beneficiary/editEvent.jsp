@@ -90,15 +90,15 @@
 <body class="bg-light">
      <%@ include file="../header.jspf" %>
     <div class="container py-5">
-        <form action="../updateEvent.do" method="POST" enctype="multipart/form-data">
+        <form action="updateEvent.do" method="POST" enctype="multipart/form-data">
             <% 
                 events event = (events) request.getAttribute("event"); 
                 address address = (address) request.getAttribute("address"); 
-               int id = Integer.parseInt(request.getAttribute("id").toString()); 
+                int id = Integer.parseInt(request.getAttribute("id").toString()); 
             %>
              
         <div class="card p-4">
-            <input type="hidden" name="eventID" class="form-control"  value=<%= id %> />
+            <input type="hidden" name="eventID" class="form-control"  value="<%= id %>" />
             <h4 class="text-center mb-4">Update Your Event</h4>
             
             <!-- Progress Steps -->

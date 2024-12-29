@@ -65,11 +65,11 @@
                                     <td><%= location %></td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="updateEvent.do?editEventId=<%= id %>" 
+                                            <a href="../updateEvent.do?editEventId=<%= id %>" 
                                                class="btn btn-outline-primary btn-sm">
                                                 <i class="bi bi-pencil"></i> Edit
                                             </a>
-                                            <a href="updateEvent.do?eventDeleteId=<%= id %>" 
+                                            <a href="../updateEvent.do?eventDeleteId=<%= id %>" 
                                                class="btn btn-outline-danger btn-sm">
                                                 <i class="bi bi-trash"></i> Delete
                                             </a>
