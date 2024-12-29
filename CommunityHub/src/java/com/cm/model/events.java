@@ -32,6 +32,7 @@ public class events implements Serializable{
         this.description = description;
         this.volunteersNeeded = volunteersNeeded;
         this.status = status;
+        
     }
     // Getters
     public int getEventID() {

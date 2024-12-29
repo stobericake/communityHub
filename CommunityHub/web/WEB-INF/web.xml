@@ -12,6 +12,10 @@
         <servlet-name>donationFormServlet</servlet-name>
         <servlet-class>com.hub.controller.donationFormServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>updateEvent</servlet-name>
+        <servlet-class>com.hub.controller.updateEvent</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -47,6 +51,10 @@
     <servlet-mapping>
         <servlet-name>donationFormServlet</servlet-name>
         <url-pattern>/addDonor.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>updateEvent</servlet-name>
+        <url-pattern>/updateEvent.do</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
