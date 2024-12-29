@@ -5,14 +5,17 @@ import java.util.Map;
 import java.io.Serializable;
 import java.util.*;
 import java.sql.Time;
+import java.sql.Blob;
 
 public class events implements Serializable{
     private int eventID;
     private String name;
+    private Blob image;
     private Date date;
     private Time time;
     private Time duration;
     private String description;
+    private double donationLimit;
     private int volunteersNeeded;
     private String status;
     private int adminID;

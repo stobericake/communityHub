@@ -19,6 +19,7 @@ public class volunteer implements Serializable {
     private String username;
     private String password;
     private int addressID;
+    private Blob image;
 
     /**
      * @return the volunteerID

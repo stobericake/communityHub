@@ -9,8 +9,8 @@
  * @author anaqi
  */
 package com.cm.model;
-
 import java.io.Serializable;
+import java.sql.Blob;
 
 public class admin implements Serializable {
     private int adminID;
@@ -19,6 +19,7 @@ public class admin implements Serializable {
     private int contactInfo;
     private String username;
     private String password;
+    private Blob image;
 
     /**
      * @return the adminID

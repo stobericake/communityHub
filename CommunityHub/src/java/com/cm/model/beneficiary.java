@@ -11,6 +11,7 @@ public class beneficiary {
     private String username;
     private String password;
     private int addressID;
+    private Blob image;
 
     /**
      * @return the beneficiaryID

@@ -24,7 +24,7 @@ public class donation implements Serializable {
     private int volunteerID;
     private double amount;
     private LocalDate date;
-    private String receiptImagePath;
+    private Blob receiptImage;
     
      public static Map<String, Object> getDonationDetails(int donationID, Connection conn) throws SQLException {
         String sql = "SELECT * FROM donations WHERE donationID = ?";
@@ -124,15 +124,15 @@ public class donation implements Serializable {
     /**
      * @return the receiptImagePath
      */
-    public String getReceiptImagePath() {
-        return receiptImagePath;
+    public Blob getReceiptImagePath() {
+        return receiptImage;
     }
 
     /**
      * @param receiptImagePath the receiptImagePath to set
      */
-    public void setReceiptImagePath(String receiptImagePath) {
-        this.receiptImagePath = receiptImagePath;
+    public void setReceiptImagePath(Blob receiptImage) {
+        this.receiptImage = receiptImage;
     }
 
     /**

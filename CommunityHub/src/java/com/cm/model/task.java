@@ -6,17 +6,15 @@ import java.sql.*;
 public class task implements Serializable  {
     private int taskID;
     private String description;
-    private int volunteersNeeded;
     private String status;
     private int eventID;
     private int volunteerID;
     private Connection connection; // Database connection object
 
     // Constructor that initializes the Task object and the database connection
-    public task(int taskID, String description, int volunteersNeeded, String status, Connection connection) {
+    public task(int taskID, String description, String status, Connection connection) {
         this.taskID = taskID;
         this.description = description;
-        this.volunteersNeeded = volunteersNeeded;
         this.status = status;
         this.connection = connection; // Set the connection from outside
     }
@@ -30,10 +28,6 @@ public class task implements Serializable  {
         return description;
     }
 
-    public int getVolunteersNeeded() {
-        return volunteersNeeded;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -44,10 +38,6 @@ public class task implements Serializable  {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setVolunteersNeeded(int volunteersNeeded) {
-        this.volunteersNeeded = volunteersNeeded;
     }
 
     public void setStatus(String status) {
@@ -95,7 +85,7 @@ public class task implements Serializable  {
 
     @Override
     public String toString() {
-        return "Task{" + "taskID=" + taskID + ", description=" + description + ", volunteersNeeded=" + volunteersNeeded + ", status=" + status + '}';
+        return "Task{" + "taskID=" + taskID + ", description=" + description + ", status=" + status + '}';
     }
 }
 
