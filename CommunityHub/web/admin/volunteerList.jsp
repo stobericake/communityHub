@@ -213,7 +213,7 @@
                         <tr>
                             <td><%= volunteerID %></td>
                             <td><%= name %></td>
-                            <td><%= contactInfo %></td>
+                            <td>0<%= contactInfo %></td>
                             <td><%= username %></td>
                             <td><%= eventName %></td>
                             <td><%= date %></td>
