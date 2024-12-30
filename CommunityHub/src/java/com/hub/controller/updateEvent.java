@@ -19,8 +19,10 @@ import java.util.logging.Logger;
 import com.cm.model.events;
 import java.io.InputStream;
 import java.sql.Blob;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.Part;
 
+@MultipartConfig
 public class updateEvent extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -76,7 +78,7 @@ public class updateEvent extends HttpServlet {
                     request.setAttribute("id", eventID);
 
                     // Forward the request to the JSP
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/editEvent.jsp");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/test.jsp");
                     dispatcher.forward(request, response);
                 }
             } catch (SQLException e) {
