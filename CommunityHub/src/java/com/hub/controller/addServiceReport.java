@@ -100,7 +100,7 @@ public class addServiceReport extends HttpServlet {
             // Get database connection
             conn = dbconnection.getConnection();
 
-            String sql = "INSERT INTO servicereport (eventID, volunteerID, problem, solution, feedback, recommendations, dateSubmitted) "
+            String sql = "INSERT INTO servicereport (eventID, volunteerID, challenge, solution, feedback, recommendation, dateSubmitted) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
             stmt = conn.prepareStatement(sql);
@@ -116,16 +116,16 @@ public class addServiceReport extends HttpServlet {
             int rowsInserted = stmt.executeUpdate();
 
             if (rowsInserted > 0) {
-                response.sendRedirect("success.jsp?msg=Status Updated");
+                response.sendRedirect(request.getContextPath() + "/success.jsp?msg=Status Updated");
 //                RequestDispatcher view = request.getRequestDispatcher("/success.jsp");
 //                view.forward(request, response);
             } else {
-                response.sendRedirect("index.jsp?msg=error");
+                response.sendRedirect(request.getContextPath() + "/error.jsp?msg=error");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("index.jsp?msg=exception");
+            response.sendRedirect(request.getContextPath() + "/index.jsp?msg=exception");
         } finally {
             // Clean up resources
             try {
