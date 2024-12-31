@@ -13,7 +13,7 @@
                 <div class="row text-center">
                     <h1 class="fw-bolder text-white my-3"  style="text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);">Service Report</h1>
                 </div>
-                <form class="needs-validation" method="post" action="addservice.do" novalidate>
+                <form class="needs-validation" method="post" action="<%=request.getContextPath()%>/addservice.do" novalidate>
                     <div class="row border mb-3 mx-3 rounded-4 bg-white gy-2 p-3">
                         <div class="col-12 col-md">
                             <label for="eventMenu" class="form-label">Event</label>
@@ -45,7 +45,7 @@
                         </div>
                         <div class="col-12 col-md">
                             <label for="volunteer" class="form-label">ID</label>
-                            <input type="text" class="form-control" id="volunteer" name="volunteer" readonly>
+                            <input type="text" class="form-control" id="volunteer" name="volunteer" value="1" readonly>
                             <div class="invalid-feedback">
                                 Insert ID
                             </div>

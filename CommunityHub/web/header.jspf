@@ -148,9 +148,9 @@
         <!-- Header -->
         <nav class="header navbar navbar-expand-lg navbar-dark fixed-top">
             <div class="container-fluid">
-                <a href="../index.html" class="text-decoration-none">
+                <a href="<%=request.getContextPath()%>/index.html" class="text-decoration-none">
                     <div class="d-flex align-items-center">
-                        <img src="../assets/logo.png" alt="Logo" style="height: 60px; vertical-align: middle;" class="me-2 mb-3">
+                        <img src="<%=request.getContextPath()%>/assets/logo.png" alt="Logo" style="height: 60px; vertical-align: middle;" class="me-2 mb-3">
                         <h1 class="h5 text-white font-weight-bold" style="font-size: 30px; -webkit-text-stroke-width: 1px;">CommUNITYHub</h1>
                     </div>
 
@@ -179,8 +179,8 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                                 <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Generate Reports')">Generate Report</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminListing.jsp" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminReport.jsp" onclick="updateDropdownText('Generate Reports')">Generate Report</a></li>
                             </ul>
                         </li>
 
@@ -197,7 +197,7 @@
                                 <li><a class="dropdown-item" href="#">Generate Report</a></li>
                             </ul>
                         </li>
-                        <!-- <% } else if (userRole.equals("beneficiary")) { %> -->
+                        <% } else if (userRole.equals("beneficiary")) { %>
                         <!-- Beneficiary Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -205,19 +205,31 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                                 <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Overview</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Event Management')">Event Management</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/eventmanagement.jsp" onclick="updateDropdownText('Event Management')">Event Management</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Donor Management')">Donor Management</a></li>
                             </ul>
                         </li>
                         <% } %> 
 
 
-                        <!-- Profile Picture and Dropdown -->
-                        <% if (session != null && session.getAttribute("user") != null || session.getAttribute("admin") != null || session.getAttribute("beneficiary") != null) {%>
+                        
+                        <%
+                            String profileImageUrl = "";
+                            if (session != null) {
+                                if (session.getAttribute("volunteer") != null) {
+                                    profileImageUrl = "../getImage.do?type=volunteer&id=" + session.getAttribute("volunteer");
+                                } else if (session.getAttribute("admin") != null) {
+                                    profileImageUrl = "../getImage.do?type=admin&id=" + session.getAttribute("admin");
+                                } else if (session.getAttribute("beneficiary") != null) {
+                                    profileImageUrl = "../getImage.do?type=beneficiary&id=" + session.getAttribute("beneficiary");
+                                }
+                            }
+                        %>
+                        <% if (session != null && (session.getAttribute("volunteer") != null || session.getAttribute("admin") != null || session.getAttribute("beneficiary") != null)) {%>
                         <li class="nav-item dropdown profile-dropdown ms-3">
                             <a class="nav-drop dropdown-toggle" href="#" id="profileDropdown" role="button" 
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="<%= session.getAttribute("profilePicture") != null ? session.getAttribute("profilePicture") : "assets/ipah.png"%>" 
+                                <img src="<%= profileImageUrl %>" 
                                      alt="Profile" class="profile-img">
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
@@ -225,16 +237,16 @@
                                         <i class="bi bi-person me-2"></i>My Profile
                                     </a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="logout.jsp">
+                                <li><a class="dropdown-item text-danger" href="<%=request.getContextPath()%>/logout">
                                         <i class="bi bi-box-arrow-right me-2"></i>Logout
                                     </a></li>
                             </ul>
                         </li>
-                        <% } else { %>
-                        <!-- Login and Register Buttons for Guests -->
+                        <% } else {%>
+                        
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button class="btn btn-dark shadow-sm" type="button">Login</button>
-                            <button class="btn btn-dark shadow-lg" type="button">Register</button>
+                            <a href="<%=request.getContextPath()%>/login.jsp"><button class="btn btn-dark shadow-sm" type="button">Login</button></a>
+                            <a href="<%=request.getContextPath()%>/register.jsp"><button class="btn btn-dark shadow-lg" type="button">Register</button></a>
                         </div>
 
 

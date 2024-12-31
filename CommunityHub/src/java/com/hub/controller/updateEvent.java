@@ -1,35 +1,36 @@
 package com.hub.controller;
 
 import com.cm.model.address;
+import com.cm.model.events;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+
 import java.net.URLEncoder;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.RequestDispatcher;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import com.cm.model.events;
-import java.io.InputStream;
-import java.sql.Blob;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.Part;
+import static java.lang.System.console;
+import java.util.Enumeration;
 
 @MultipartConfig
 public class updateEvent extends HttpServlet {
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-    }
-
+    
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String editEventId = request.getParameter("editEventId");
@@ -75,7 +76,6 @@ public class updateEvent extends HttpServlet {
                     // Now you can pass this event object to the request
                     request.setAttribute("event", event);  // Pass the entire event object
                     request.setAttribute("address", address);
-                    request.setAttribute("id", eventID);
 
                     // Forward the request to the JSP
                     RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/test.jsp");
@@ -162,118 +162,136 @@ public class updateEvent extends HttpServlet {
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
+    
+@Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    String idValue = request.getParameter("id");
+    String eventName = request.getParameter("eventName");
+    String eventDate = request.getParameter("eventDate"); // yyyy-MM-dd format
+    String eventTime = request.getParameter("eventTime"); // HH:mm format
+    String city = request.getParameter("city");
+    String country = request.getParameter("country");
+    String state = request.getParameter("state");
+    String postalCode = request.getParameter("postalCode");
+    String desc = request.getParameter("eventDescription");
+    String street = request.getParameter("street");
+    String hoursStr = request.getParameter("durationHours");
+    String minutesStr = request.getParameter("durationMinutes");
+    Double donationLimit = Double.parseDouble(request.getParameter("donationLimit"));
 
-        // Parse parameters
-        String eventId = request.getParameter("eventID");
-        if (eventId == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid eventID format.");
-            return;
+Part filePart = request.getPart("eventImage"); // Get the uploaded file
+InputStream imageInputStream = null;
+
+if (filePart != null && filePart.getSize() > 0) {
+    imageInputStream = filePart.getInputStream();
+} else {
+    // Fallback to existing image from the database
+    try (Connection conn = dbconnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement("SELECT image FROM events WHERE eventID = ?")) {
+        stmt.setInt(1, Integer.parseInt(idValue));
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                imageInputStream = rs.getBlob("image").getBinaryStream();
+            }
         }
-
-        int eventIdInt = Integer.parseInt(eventId);  // Convert to integer after validation
-
-        String eventName = request.getParameter("eventName");
-        String eventDate = request.getParameter("eventDate"); // yyyy-MM-dd format
-        String eventTime = request.getParameter("eventTime"); // HH:mm format
-        String city = request.getParameter("city");
-        String country = request.getParameter("country");
-        String state = request.getParameter("state");
-        String postalCode = request.getParameter("postalCode");
-        String desc = request.getParameter("eventDescription");
-        String street = request.getParameter("street");
-        String hoursStr = request.getParameter("durationHours"); // "3"
-        String minutesStr = request.getParameter("durationMinutes"); // "0"
-        Double donationLimit = Double.parseDouble(request.getParameter("donationLimit"));
-
-        Part filePart = request.getPart("eventImage"); // Get the image file from the form
-        InputStream imageInputStream = filePart.getInputStream();
-
-        PreparedStatement psTask = null;
-
-        // Parse the hours and minutes
-        int hours = (hoursStr != null && !hoursStr.isEmpty()) ? Integer.parseInt(hoursStr) : 0;
-        int minutes = (minutesStr != null && !minutesStr.isEmpty()) ? Integer.parseInt(minutesStr) : 0;
-
-        // Validate minutes
-        if (minutes < 0 || minutes >= 60) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid duration. Minutes must be between 0 and 59.");
-            return;
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching existing image.");
+        return;
+    } catch (ClassNotFoundException ex) {
+            Logger.getLogger(updateEvent.class.getName()).log(Level.SEVERE, null, ex);
         }
+}
 
-        // Create a Time object for the duration
-        String timeString = String.format("%02d:%02d:%02d", hours, minutes, 00); // Format without seconds
-        Time duration = Time.valueOf(timeString); // Append ":00" for seconds as zero
+    int hours = (hoursStr != null && !hoursStr.isEmpty()) ? Integer.parseInt(hoursStr) : 0;
+    int minutes = (minutesStr != null && !minutesStr.isEmpty()) ? Integer.parseInt(minutesStr) : 0;
 
-        // Establish database connection and execute update query
-        try (Connection conn = dbconnection.getConnection()) {
-            String sql = "UPDATE events e "
-                    + "JOIN address a ON e.addressID = a.addressID "
-                    + "SET e.name = ?, e.date = ?, e.time = ?, e.duration = ?, e.description = ?, "
-                    + "e.image = ?, e.donationLimit = ?, a.city = ?, a.country = ?, a.state = ?, a.postalCode = ?, a.street = ? "
-                    + "WHERE e.eventID = ?";
+    if (minutes < 0 || minutes >= 60) {
+        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid duration. Minutes must be between 0 and 59.");
+        return;
+    }
 
-            PreparedStatement stmt = conn.prepareStatement(sql);
+    String timeString = String.format("%02d:%02d:%02d", hours, minutes, 0);
+    Time duration = Time.valueOf(timeString);
+    
+    try (Connection conn = dbconnection.getConnection()) {
+     
+
+        // Update the event with the image
+        String sql = "UPDATE events e "
+                   + "JOIN address a ON e.addressID = a.addressID "
+                   + "SET e.name = ?, e.date = ?, e.time = ?, e.duration = ?, e.description = ?, "
+                   + "e.image = ?, e.donationLimit = ?, a.city = ?, a.country = ?, a.state = ?, a.postalCode = ?, a.street = ? "
+                   + "WHERE e.eventID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, eventName);
-            stmt.setDate(2, Date.valueOf(eventDate)); // Convert to SQL Date
-            stmt.setTime(3, Time.valueOf(eventTime)); // Event time (HH:mm:ss)
+            stmt.setDate(2, Date.valueOf(eventDate));
+            stmt.setTime(3, Time.valueOf(eventTime));
             stmt.setTime(4, duration);
             stmt.setString(5, desc);
+           
             stmt.setBlob(6, imageInputStream);
+             
             stmt.setDouble(7, donationLimit);
             stmt.setString(8, city);
             stmt.setString(9, country);
             stmt.setString(10, state);
             stmt.setInt(11, Integer.parseInt(postalCode));
             stmt.setString(12, street);
-            stmt.setInt(13, eventIdInt); // Use validated eventID
+            stmt.setInt(13, Integer.parseInt(idValue));
 
             stmt.executeUpdate();
-
-            /*
+            
+            PreparedStatement psTask;   
         String sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
         psTask = conn.prepareStatement(sqlTask);
 
         // Retrieve tasks dynamically
-        for (int i = 0; ; i++) {
-            String taskName = request.getParameter("task[" + i + "].name");
-            if (taskName == null || taskName.trim().isEmpty()) { 
-                break;  // No more tasks or invalid task name
-            }
+Enumeration<String> parameterNames = request.getParameterNames();
+while (parameterNames.hasMoreElements()) {
+    String paramName = parameterNames.nextElement();
+    System.out.println("Parameter Name: " + paramName + ", Value: " + request.getParameter(paramName));
+}
 
-            psTask.setInt(1, 1);
-            psTask.setString(2, taskName);
-            psTask.setInt(3, eventIdInt);
-            psTask.setNull(4, java.sql.Types.NULL);
-            psTask.addBatch();
-        }
+
+ for (int index = 0; ; index++) {
+    String taskName = request.getParameter("task[" + index + "].name");
+    
+    // Display taskName for debugging
+    System.out.println("Task " + index + ": " + taskName);
+
+    if (taskName == null || taskName.trim().isEmpty()) { 
+        break;  // No more tasks or invalid task name
+    }
+
+    psTask.setInt(1, 1);
+    psTask.setString(2, taskName);
+    psTask.setInt(3, Integer.parseInt(idValue));
+    psTask.setNull(4, java.sql.Types.NULL);
+    psTask.addBatch();
+}
+
 
         // Execute batch task insertions
         if (psTask != null) {
             psTask.executeBatch();
-        } */
-            String message = "The Event Name: " + eventName + " Successfully Updated";
-            String encodedMessage = URLEncoder.encode(message, "UTF-8");
-
-            response.sendRedirect("success.jsp?msg=" + encodedMessage);
-
-        } catch (NumberFormatException e) {
-            getServletContext().log("Invalid input format for numeric fields", e);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid input format for numeric fields, please check your input.");
-        } catch (SQLException e) {
-            getServletContext().log("Error updating event", e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error while updating event. Please try again later.");
-        } catch (ClassNotFoundException ex) {
-            getServletContext().log("Database driver not found", ex);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database connection error. Please contact support.");
+        } 
         }
+
+        String message = "The Event Name: " + eventName + " Successfully Updated";
+        response.sendRedirect("/CommunityHub/success.jsp?msg=" + URLEncoder.encode(message, "UTF-8"));
+
+    } catch (SQLException | ClassNotFoundException ex) {
+        ex.printStackTrace();
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "An error occurred while updating the event.");
     }
+}
+
 
     @Override
     public String getServletInfo() {
-        return "Handles event updates and repopulates the form.";
+        return "Servlet for updating event details including image upload.";
     }
 }

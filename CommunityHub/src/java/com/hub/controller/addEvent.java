@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
 import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 /**
  *
@@ -91,7 +92,7 @@ public class addEvent extends HttpServlet {
     String state = request.getParameter("state");
     String street = request.getParameter("street");
     int numParticipants = Integer.parseInt(request.getParameter("numParticipants"));
-    Double donationLimit = Double.parseDouble(request.getParameter("donationLimit"));
+    double donationLimit = Double.parseDouble(request.getParameter("donationLimit"));
 
    
 
@@ -127,7 +128,10 @@ public class addEvent extends HttpServlet {
     Connection conn = null;
     PreparedStatement psEvent = null, psAddress = null, psTask = null;
     ResultSet rs = null;
-
+    
+     HttpSession session = request.getSession();
+     String beneficiaryID = session.getAttribute("beneficiary").toString();
+     
     try {
         conn = dbconnection.getConnection();
         conn.setAutoCommit(false);  // Start transaction
@@ -159,7 +163,7 @@ public class addEvent extends HttpServlet {
                 psEvent.setInt(6, numParticipants);
                 psEvent.setDouble(7, donationLimit);
                 psEvent.setInt(8, 1);
-                psEvent.setInt(9, 3);
+                psEvent.setInt(9, Integer.parseInt(beneficiaryID));
                 psEvent.setInt(10, addressID);
                 psEvent.setBlob(11, imageInputStream);
        
