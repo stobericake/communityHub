@@ -42,10 +42,13 @@
                                 PreparedStatement stmt = null;
                                 ResultSet rs = null;
 
+                             session = request.getSession();
+                                String beneficiaryID = session.getAttribute("beneficiary").toString();
                                 try {
                                     conn = dbconnection.getConnection();
-                                    String sql = "SELECT * from events e, address a WHERE e.addressID = a.addressID";
+                                    String sql = "SELECT * from events e, address a WHERE e.addressID = a.addressID && beneficiaryID = ?";
                                     stmt = conn.prepareStatement(sql);
+                                    stmt.setInt(1, Integer.parseInt(beneficiaryID));
                                     rs = stmt.executeQuery();
                                     int count=1;
                           

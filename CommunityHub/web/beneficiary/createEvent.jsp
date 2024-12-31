@@ -66,7 +66,7 @@
 <body class="bg-light">
      <%@ include file="../header.jspf" %>
     <div class="container py-5">
-        <form action="addEvent.do" method="POST" enctype="multipart/form-data">
+        <form action="../addEvent.do" method="POST" enctype="multipart/form-data">
         <div class="card p-4">
             <h4 class="text-center mb-4">Create Your Event</h4>
             
@@ -166,26 +166,7 @@
 
         <div class="col-md-6">
             <label class="form-label fw-medium">State <span class="text-danger">*</span></label>
-            <select class="form-select" name="state" required>
-                <option value="" disabled selected>Select your state</option>
-                <optgroup label="Peninsular Malaysia">
-                    <option value="Johor">Johor</option>
-                    <option value="Kedah">Kedah</option>
-                    <option value="Kelantan">Kelantan</option>
-                    <option value="Melaka">Melaka</option>
-                    <option value="Negeri Sembilan">Negeri Sembilan</option>
-                    <option value="Pahang">Pahang</option>
-                    <option value="Penang">Penang</option>
-                    <option value="Perak">Perak</option>
-                    <option value="Perlis">Perlis</option>
-                    <option value="Selangor">Selangor</option>
-                    <option value="Terengganu">Terengganu</option>
-                </optgroup>
-                <optgroup label="East Malaysia">
-                    <option value="Sabah">Sabah</option>
-                    <option value="Sarawak">Sarawak</option>
-                </optgroup>
-            </select>
+             <input type="text" name="state" class="form-control" placeholder="Enter your state" required />
         </div>
 
         <!-- Postal Code and Country - Two Columns -->
@@ -551,7 +532,7 @@
                 }
             }
                 document.addEventListener('DOMContentLoaded', function() {
-                var form = document.querySelector('form[action="addevent.do"][method="POST"]');
+                var form = document.querySelector('form[action="../addEvent.do"][method="POST"]');
 
 
                     form.addEventListener('submit', function(event) {

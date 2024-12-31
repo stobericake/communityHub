@@ -65,7 +65,20 @@
     </head>
     <body class="d-flex justify-content-center align-items-center vh-100">
         <%
-           
+                  String h = "guest/eventListingGuest.jsp";
+                  String role = (String) session.getAttribute("userRole");
+                if (role != null) {
+                    // Redirect based on the user role
+                    if (role.equals("volunteer")) {
+                        h = "volunteer/eventListingVolunteer.jsp";
+                    } else if (role.equals("admin")) {
+                       h = "admin/adminListing.jsp";
+                    } else if (role.equals("beneficiary")) {
+                        h = "beneficiary/eventManagement.jsp";
+                    }
+                }
+               
+                
             String message = request.getParameter("msg");
         %>
         <div class="container text-center rounded-card p-4 w-25">
@@ -82,7 +95,7 @@
                 <% } %>
             </div>
             <div class="mt-4">
-                <a href="index.jsp" class="btn btn-home">Home</a>
+                <a href=<%= h %> class="btn btn-home">Home</a>
             </div>
             <div class="divider-bottom bottom-divider"></div>
         </div>
