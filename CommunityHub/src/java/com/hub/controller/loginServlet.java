@@ -95,7 +95,7 @@ public class loginServlet extends HttpServlet {
 
             if (resultSet.next()) {
                 // User is a volunteer
-                int volunteerID = resultSet.getInt("volunteerID");
+                String volunteerID = resultSet.getString("volunteerID");
                 HttpSession session = request.getSession();
                 session.setAttribute("userRole", "volunteer");
                 session.setAttribute("volunteer", volunteerID);

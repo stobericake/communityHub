@@ -116,8 +116,15 @@
         <!-- Events Grid -->
         <div class="row g-4">
             <%
-            String volunteerId = (String) session.getAttribute("volunteerID");
+            
 
+                String user = (String) session.getAttribute("userRole");
+
+                if (user == null) {
+                    response.sendRedirect(request.getContextPath()+"/login.jsp");
+                    return; 
+                }
+                String volunteerID = (String) session.getAttribute("volunteer");
             Connection conn = null;
             PreparedStatement stmt = null;
             ResultSet rs = null;
@@ -127,7 +134,7 @@
 
                 String query = "SELECT a.postalCode FROM volunteer v JOIN address a ON v.addressID = a.addressID WHERE v.volunteerID = ?";
                 stmt = conn.prepareStatement(query);
-                stmt.setString(1, volunteerId);
+                stmt.setString(1, volunteerID);
                 rs = stmt.executeQuery();
 
                 String postalCode = null;
