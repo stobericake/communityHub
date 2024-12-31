@@ -4,8 +4,6 @@ import com.cm.model.address;
 import com.cm.model.events;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-
 import java.net.URLEncoder;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -23,7 +21,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import static java.lang.System.console;
 import java.util.Enumeration;
 
 @MultipartConfig
@@ -33,8 +30,11 @@ public class updateEvent extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String editEventId = request.getParameter("editEventId");
-        String eventdeleteId = request.getParameter("eventDeleteId");
+        String editEventId = null;
+        String eventdeleteId = null;
+        
+        editEventId = request.getParameter("editEventId");
+        eventdeleteId = request.getParameter("eventDeleteId");
 
         if (editEventId != null && !editEventId.isEmpty()) {
             int eventId = Integer.parseInt(editEventId);
@@ -111,7 +111,7 @@ public class updateEvent extends HttpServlet {
                     getServletContext().log("Error closing connection", e);
                 }
             }
-        } else if (eventdeleteId != null) {
+        } else if (eventdeleteId != null && !eventdeleteId.isEmpty()) {
             Connection conn = null;
             PreparedStatement stmt = null;
 
@@ -119,15 +119,45 @@ public class updateEvent extends HttpServlet {
                 conn = dbconnection.getConnection(); // Get DB connection
 
                 // SQL query to delete the event from the database
-                String deleteSQL = "DELETE FROM events WHERE eventID = ?";
+              // Fetch the addressID before deleting the event
+                String deleteSQL = "SELECT addressID FROM events WHERE eventID = ?";
                 stmt = conn.prepareStatement(deleteSQL);
                 stmt.setInt(1, Integer.parseInt(eventdeleteId));
 
-                int rowsDeleted = stmt.executeUpdate();
+                ResultSet rs = stmt.executeQuery();
+                int addressID = -1;
+                if (rs.next()) {
+                    addressID = rs.getInt("addressID");
+                }
+                rs.close();
+                stmt.close();
 
+                // Delete tasks associated with the event
+                deleteSQL = "DELETE FROM task WHERE eventID = ?";
+                stmt = conn.prepareStatement(deleteSQL);
+                stmt.setInt(1, Integer.parseInt(eventdeleteId));
+                stmt.executeUpdate();
+                stmt.close();
+
+                // Delete the event
+                deleteSQL = "DELETE FROM events WHERE eventID = ?";
+                stmt = conn.prepareStatement(deleteSQL);
+                stmt.setInt(1, Integer.parseInt(eventdeleteId));
+                stmt.executeUpdate();
+                stmt.close();
+
+                // Delete the address
+                deleteSQL = "DELETE FROM address WHERE addressID = ?";
+                stmt = conn.prepareStatement(deleteSQL);
+                stmt.setInt(1, addressID);
+                int rowsDeleted = stmt.executeUpdate();
+                stmt.close();
+
+               
+                
                 if (rowsDeleted > 0) {
-                    // Redirect back to the event list or show a success message
-                    response.sendRedirect("eventmanagement.jsp"); // You may need to adjust the redirect
+                    // Redirect back to the event list
+                    response.sendRedirect("beneficiary/eventManagement.jsp"); // You may need to adjust the redirect
                 } else {
                     // Handle the case where the event ID was not found
                     request.setAttribute("error", "Event not found.");
@@ -248,30 +278,19 @@ if (filePart != null && filePart.getSize() > 0) {
         String sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
         psTask = conn.prepareStatement(sqlTask);
 
-        // Retrieve tasks dynamically
-Enumeration<String> parameterNames = request.getParameterNames();
-while (parameterNames.hasMoreElements()) {
-    String paramName = parameterNames.nextElement();
-    System.out.println("Parameter Name: " + paramName + ", Value: " + request.getParameter(paramName));
-}
+            for (int index = 0; ; index++) {
+               String taskName = request.getParameter("task[" + index + "].name");
 
+               if (taskName == null || taskName.trim().isEmpty()) { 
+                   break;  
+               }
 
- for (int index = 0; ; index++) {
-    String taskName = request.getParameter("task[" + index + "].name");
-    
-    // Display taskName for debugging
-    System.out.println("Task " + index + ": " + taskName);
-
-    if (taskName == null || taskName.trim().isEmpty()) { 
-        break;  // No more tasks or invalid task name
-    }
-
-    psTask.setInt(1, 1);
-    psTask.setString(2, taskName);
-    psTask.setInt(3, Integer.parseInt(idValue));
-    psTask.setNull(4, java.sql.Types.NULL);
-    psTask.addBatch();
-}
+               psTask.setInt(1, 1);
+               psTask.setString(2, taskName);
+               psTask.setInt(3, Integer.parseInt(idValue));
+               psTask.setNull(4, java.sql.Types.NULL);
+               psTask.addBatch();
+           }
 
 
         // Execute batch task insertions
