@@ -209,7 +209,7 @@
             </style>
 </head>
 <body>
-    <%@ include file="header.jspf" %>
+    <%@ include file="../header.jspf" %>
     <div class="container">
         <header>
             <h2>Donation History</h2>        

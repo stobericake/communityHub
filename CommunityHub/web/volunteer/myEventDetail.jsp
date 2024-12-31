@@ -104,7 +104,7 @@
         </style>
         </head>
         <body>
-            <%@ include file="header.jspf" %>
+            <%@ include file="../header.jspf" %>
             <%
             String eventID = request.getParameter("eventID");
             String loggedInUser = (String) session.getAttribute("volunteerID");
