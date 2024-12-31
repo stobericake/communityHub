@@ -40,51 +40,61 @@
             .input-group {
                 max-width: 250px; 
             }  
+            .search-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin: 20px 0;
+        }
+
+        .search-bar input {
+            border-radius: 20px;
+            padding: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+
                      
-            .table {
+            .event-table {
             width: 100%;
             border-collapse: collapse;
             font-family: 'Poppins', sans-serif;
-            border-radius: 15px;
-            border-color: #6c757d;
-            border-width: 1px;
-            overflow: hidden;
-            table-layout: fixed;
-            }
+        }
+
+        .event-table td {
             
-            .custom-thead{
-                background-color: #2F6690; 
-                color: white;
-                text-align: left; /* Align headers to the left */
-                padding: 10px;
-            }
+        }
             
-            .table th:nth-child(1), 
-            .table td:nth-child(1) {
-                width: 15%; /* Width for the first column */
-                text-align: center; /* Optional */
-            }
+       /* Define fixed column widths */
+        .event-table th:nth-child(1),
+        .event-table td:nth-child(1) {
+            width: 5%; /* First column is 10% */
+            text-align: left;
+        }
 
-            .table th:nth-child(2), 
-            .table td:nth-child(2) {
-                width: 35%; /* Width for the second column */
-            }
+        .event-table th:nth-child(2),
+        .event-table td:nth-child(2) {
+            width: 30%; /* Second column is 30% */
+            text-align: left;
+        }
 
-            .table th:nth-child(3), 
-            .table td:nth-child(3) {
-                width: 25%; /* Width for the third column */
-            }
+        .event-table th:nth-child(3),
+        .event-table td:nth-child(3) {
+            width: 25%; /* Third column is 20% */
+            text-align: center;
+        }
 
-            .table th:nth-child(4), 
-            .table td:nth-child(4) {
-                width: 20%; /* Width for the fourth column */
-            }
+        .event-table th:nth-child(4),
+        .event-table td:nth-child(4) {
+            width: 25%; /* Fourth column is 20% */
+            text-align: center;
+        }
 
-            .table th:nth-child(5), 
-            .table td:nth-child(5) {
-                text-align: center;
-                width: 20%px; /* Width for the fifth column */
-            }
+        .event-table th:nth-child(5),
+        .event-table td:nth-child(5) {
+            width: 15%; /* Fifth column is 20% */
+            text-align: center;
+            
+        }
                                   
             .view-details-button {
                 background-color: #C3DFE6;
@@ -102,6 +112,26 @@
             .view-detail-button:hover{
                 background-color: #F56476;
             }
+            .pagination {
+            justify-content: center;
+        }
+
+        .pagination .page-link {
+            color: #2F6690;
+            border-radius: 50%; /* Makes the button circular */
+            width: 40px;        /* Fixed width for circular shape */
+            height: 40px;       /* Fixed height for circular shape */
+            display: flex;      /* Center the content inside */
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #2F6690; /* Add border for clarity */
+            margin: 0 5px;     /* Add spacing between buttons */
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #2F6690;
+            border-color: #2F6690;
+            color: #C3DFE6;
+        }
     </style>
 </head>
 <body>
@@ -112,77 +142,152 @@
                 <h3>MY EVENT</h3>
                 <p>Events List</p>
             </div>
-            <div class="input-group rounded">
-                <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
-                <span class="input-group-text border-0" id="search-addon">
-                <i class="fas fa-search"></i>
-                </span>
+            <div class="col-md-4 offset-md-4">
+                <input type="text" id="searchInput" class="form-control rounded" 
+                       placeholder="Search events..." onkeyup="filterTable()">
             </div>
         </header>
-        <table class="table rounded">
-            <thead class="custom-thead">
-                <tr>
-                    <th style="width: 50px;">No.</th>
+        <div class="container">
+        <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #2F6690; color: white;">
+                <table class="event-table">
+                    <tr>
+                    <th>No.</th>
                     <th>Events</th>
                     <th>Date & Time</th>
                     <th>Task</th>
                     <th>View Details</th>
                 </tr>
-            </thead>
-            <tbody>
-                    <% 
-                    String loggedInUser = (String) session.getAttribute("volunteerID");
-                    // Database Connection
-                    Connection conn = null;
-                    PreparedStatement stmt = null;
-                    ResultSet rs = null;
-
-                    try {
-                        conn = dbconnection.getConnection(); // Get DB connection
-                        String sql = "SELECT e.eventID, e.name, e.date, e.time, a.state " +
-                                    "FROM events e " +
-                                    "INNER JOIN address a ON e.addressID = a.addressID " +
-                                    "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
-                                    "WHERE ev.volunteerID = ?;";
-                        stmt = conn.prepareStatement(sql);
-                        stmt.setString(1, loggedInUser); // Set the logged-in volunteerID
-                        rs = stmt.executeQuery();
-
-                        while (rs.next()) {
-                            int id = rs.getInt("e.eventID");
-                            String title = rs.getString("e.name");
-                            Date date = rs.getDate("e.date");
-                            Time time = rs.getTime("e.time");
-                            String location = rs.getString("a.state");
-
-
-                            // Parse and format
-                            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                            SimpleDateFormat outputFormat = new SimpleDateFormat("MM/dd/yyyy - hh:mma");
-
-                            String formattedDateTime = outputFormat.format(inputFormat.parse(date + " " + time));
-                           
-                       
-                %>
-                <tr>
-                    <td style="width: 50px;"><%= id %></td>
-                    <td><%= title %></td>
-                    <td><%= formattedDateTime %></td>
-                    <td>task</td>
-                    <td><a href="myEventDetail.jsp?eventID=<%= id %>" class="view-details-button">View Details</a></td>
-                </tr>
+                </table>
+            </li>
                 <% 
-                        } // End while
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-                        try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                        try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+                String loggedInUser = (String) session.getAttribute("volunteerID");
+                String selectedTask = (String) session.getAttribute("selectedTask");
+                int pageSize = 10; // Number of events per page
+                int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+                int totalRecords = 0;
+                int totalPages = 0;
+
+                Connection conn = null;
+                PreparedStatement stmt = null;
+                ResultSet rs = null;
+
+                try {
+                    conn = dbconnection.getConnection(); // Get DB connection
+
+                    // Count total records
+                    String countQuery = "SELECT COUNT(*) AS total FROM events e " +
+                                        "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
+                                        "WHERE ev.volunteerID = ?";
+                    stmt = conn.prepareStatement(countQuery);
+                    stmt.setString(1, loggedInUser);
+                    rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        totalRecords = rs.getInt("total");
+                        totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
                     }
+                    rs.close();
+                    stmt.close();
+
+                     // Fetch paginated data
+                    String sql ="SELECT e.eventID, e.name, e.date, e.time, a.state, t.description "+
+                                "FROM events e " +
+                                "INNER JOIN address a ON e.addressID = a.addressID " +
+                                "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
+                                "INNER JOIN task t ON ev.volunteerID = t.volunteerID AND e.eventID = t.eventID " +
+                                "WHERE ev.volunteerID = ? "+
+                                "LIMIT ? OFFSET ?";
+
+                    stmt = conn.prepareStatement(sql);
+                    stmt.setString(1, loggedInUser);
+                    stmt.setInt(2, pageSize);
+                    stmt.setInt(3, (currentPage - 1) * pageSize);
+                    rs = stmt.executeQuery();
+
+                    
+                     String taskSql ="SELECT * FROM task where volunteerID = ?";
+                     stmt.setString(1, loggedInUser);
+                     ResultSet rsTask = stmt.executeQuery();
+
+                    while (rs.next()) {
+                        int index = 1;
+                        int id = rs.getInt("e.eventID");
+                        String title = rs.getString("e.name");
+                        Date date = rs.getDate("e.date");
+                        Time time = rs.getTime("e.time");
+                        String task = rsTask.getString("description");
+                        String location = rs.getString("a.state");
+
+                        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                        SimpleDateFormat outputFormat = new SimpleDateFormat("MM/dd/yyyy - hh:mma");
+                        String formattedDateTime = outputFormat.format(inputFormat.parse(date + " " + time));
                 %>
-            </tbody>
-        </table>        
+               <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <table class="volunteerTable">
+                        <tr>
+                           <td><%= id %>.</td>
+                            <td><%= title %></td>
+                            <td><%= formattedDateTime %></td>                            
+                            <td><%= task %></td>
+                            <td><a href="myEventDetail.jsp?eventID=<%= id %>" class="view-details-button">View Details</a></td>
+                        </tr>                                       
+
+                </table>
+                
+                    
+                <% 
+                    } // End while
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+                    try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+                    try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+                }
+                %>
+                </li>
+            
+        </div>
+        <!-- Pagination -->
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    
+                    <% for (int i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage == i ? "active" : "" %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    
+                    <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
+                             <!-- Keep your existing filterEvents() function -->
+    <script>
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#volunteerTable tbody tr');
+
+            rows.forEach(row => {
+                const columns = row.querySelectorAll('td');
+                const match = Array.from(columns).some(td =>
+                    td.textContent.toLowerCase().includes(input)
+                );
+
+                row.style.display = match ? '' : 'none';
+            });
+        }
+    </script>
 </body>
 </html>

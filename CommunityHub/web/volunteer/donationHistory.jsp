@@ -1,9 +1,3 @@
-<%-- 
-    Document   : donaionHistory
-    Created on : Dec 15, 2024, 1:41:38 AM
-    Author     : Rina
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, java.sql.*" %>
 
@@ -20,8 +14,8 @@
     />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-        <style>
-            body {
+    <style>
+        body {
                 font-family: 'Poppins', sans-serif;
                 margin: 0;
                 padding: 0;
@@ -114,150 +108,257 @@
             width: 100%;
             border-collapse: collapse;
             font-family: 'Poppins', sans-serif;
-            }
+        }
 
-            .event-table th, .event-table td {
-                text-align: left;
-            }
+        .event-table th, .event-table td {
+            text-align: left;
+        }
             
-            /* Define fixed column widths */
-            .event-table th:nth-child(1),
-            .event-table td:nth-child(1) {
-                width: 5%; /* First column is 10% */
-            }
+        /* Define fixed column widths */
+        .event-table th:nth-child(1),
+        .event-table td:nth-child(1) {
+            width: 5%; /* First column is 10% */
+        }
 
-            .event-table th:nth-child(2),
-            .event-table td:nth-child(2) {
-                width: 40%; /* Second column is 30% */
-            }
+        .event-table th:nth-child(2),
+        .event-table td:nth-child(2) {
+            width: 40%; /* Second column is 30% */
+        }
 
-            .event-table th:nth-child(3),
-            .event-table td:nth-child(3) {
-                width: 20%; /* Third column is 20% */
-            }
+        .event-table th:nth-child(3),
+        .event-table td:nth-child(3) {
+            width: 20%; /* Third column is 20% */
+        }
 
-            .event-table th:nth-child(4),
-            .event-table td:nth-child(4) {
-                width: 15%; /* Fourth column is 20% */
-            }
+        .event-table th:nth-child(4),
+        .event-table td:nth-child(4) {
+            width: 15%; /* Fourth column is 20% */
+        }
 
-            .event-table th:nth-child(5),
-            .event-table td:nth-child(5) {
-                width: 15%; /* Fifth column is 20% */
+        .event-table th:nth-child(5),
+        .event-table td:nth-child(5) {
+            width: 15%; /* Fifth column is 20% */
+        }
+                      
+        .view-details-button {
+            background-color: #C3DFE6;
+            border-radius: 15px;
+            border: none;
+            color: black;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
             }
-                       
-            .view-details-button {
-                background-color: #C3DFE6;
-                border-radius: 15px;
-                border: none;
-                color: black;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                cursor: pointer;
-                font-family: 'Poppins', sans-serif;
+        .modal-dialog {
+            max-width: none;
+            width: auto;
+            height: auto;
+            display: inline-block;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 0;
+            border: none;
+        }
+
+        .modal-header, .modal-footer {
+            border: none;
+        }
+
+        .receipt-content {
+            text-align: center;
+        }
+
+        .modal-img {
+            max-width: 100%;
+            max-height: 80vh; /* Adjust height to prevent overflow */
+            object-fit: contain;
+        }
+
+        .print-button {
+            background-color: #000;
+            color: #fff;
+            border-radius: 30px;
+        }
+        .pagination {
+            justify-content: center;
+        }
+
+            .pagination .page-link {
+                color: #2F6690;
+                border-radius: 50%; /* Makes the button circular */
+                width: 40px;        /* Fixed width for circular shape */
+                height: 40px;       /* Fixed height for circular shape */
+                display: flex;      /* Center the content inside */
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #2F6690; /* Add border for clarity */
+                margin: 0 5px;     /* Add spacing between buttons */
             }
-    </style>
+            .pagination .page-item.active .page-link {
+                background-color: #2F6690;
+                border-color: #2F6690;
+                color: #C3DFE6;
+            }
+            </style>
 </head>
 <body>
     <%@ include file="../header.jspf" %>
     <div class="container">
-    <header>
-        <h2 text-align: left>Donation History</h2>        
-    </header>
+        <header>
+            <h2>Donation History</h2>        
+        </header>
         <div class="container">
-            <div class="center-card">
-        <div class="donation-card">
-             <%
-            // Get the logged-in volunteer ID
-            String volunteerID = (String) session.getAttribute("volunteerID");
-            Connection con = dbconnection.getConnection();
-            Statement stmt = con.createStatement();
+        <div class="center-card">
+            <div class="donation-card">
+                <%
+                    String volunteerID = (String) session.getAttribute("volunteerID");
+                    Connection con = dbconnection.getConnection();
+                    Statement stmt = con.createStatement();
 
-            // Fetch total donation amount
-            String totalDonationQuery = "SELECT SUM(amount) AS totalDonation FROM donation WHERE volunteerID = '" + volunteerID + "'";
-            ResultSet totalDonationRs = stmt.executeQuery(totalDonationQuery);
-            totalDonationRs.next();
-            double totalDonation = totalDonationRs.getDouble("totalDonation");
+                    // Fetch total donation amount
+                    String totalDonationQuery = "SELECT SUM(amount) AS totalDonation FROM donation WHERE volunteerID = '" + volunteerID + "'";
+                    ResultSet totalDonationRs = stmt.executeQuery(totalDonationQuery);
+                    totalDonationRs.next();
+                    double totalDonation = totalDonationRs.getDouble("totalDonation");
 
-            // Fetch the latest donation
-            String latestDonationQuery = "SELECT amount FROM donation WHERE volunteerID = '" + volunteerID + "' ORDER BY date DESC LIMIT 1";
-            ResultSet latestDonationRs = stmt.executeQuery(latestDonationQuery);
-            double latestDonation = 0;
-            if (latestDonationRs.next()) {
-                latestDonation = latestDonationRs.getDouble("amount");
-            }
-        %>
-            <!-- Total Donation Section -->
-            <div class="donation-section">
-                <div class="donation-icon">
-                    <i class="bi bi-bank2"></i>
+                    // Fetch the latest donation
+                    String latestDonationQuery = "SELECT amount FROM donation WHERE volunteerID = '" + volunteerID + "' ORDER BY date DESC LIMIT 1";
+                    ResultSet latestDonationRs = stmt.executeQuery(latestDonationQuery);
+                    double latestDonation = 0;
+                    if (latestDonationRs.next()) {
+                        latestDonation = latestDonationRs.getDouble("amount");
+                    }
+
+                    // Pagination variables
+                    int itemsPerPage = 5;
+                    String pageParam = request.getParameter("page");
+                    int currentPage = (pageParam == null) ? 1 : Integer.parseInt(pageParam);
+                    int offset = (currentPage - 1) * itemsPerPage;
+
+                    // Get total number of donations
+                    String countQuery = "SELECT COUNT(*) AS total FROM donation WHERE volunteerID = '" + volunteerID + "'";
+                    ResultSet countRs = stmt.executeQuery(countQuery);
+                    countRs.next();
+                    int totalDonations = countRs.getInt("total");
+
+                    // Calculate total number of pages
+                    int totalPages = (int) Math.ceil(totalDonations * 1.0 / itemsPerPage);
+
+                    // Fetch the donation history with pagination
+                    String donationHistoryQuery = "SELECT d.donationID, d.amount, d.date, e.name " +
+                                                  "FROM donation d JOIN events e ON d.eventID = e.eventID " +
+                                                  "WHERE d.volunteerID = '" + volunteerID + "' " +
+                                                  "ORDER BY d.date DESC LIMIT " + itemsPerPage + " OFFSET " + offset;
+                    ResultSet donationHistoryRs = stmt.executeQuery(donationHistoryQuery);
+                %>
+                <!-- Total Donation Section -->
+                <div class="donation-section">
+                    <div class="donation-icon">
+                        <i class="bi bi-bank2"></i>
+                    </div>
+                    <div>
+                        <p class="donation-amount">RM<%= totalDonation %></p>
+                        <p class="donation-text">Total Donation</p>
+                    </div>
                 </div>
-                <div>
-                <p class="donation-amount">RM<%= totalDonation %></p>
-                <p class="donation-text">Total Donation</p>
-                </div>
-            </div>
-            
-            <!-- Divider -->
-            <div class="divider"></div>
-            
-            <!-- Latest Donation Section -->
-            <div class="donation-section">
-                <div class="donation-icon latest">
-                    <i class="bi bi-receipt"></i>
-                </div>
-                <div>
-                <p class="donation-amount">RM<%= latestDonation %></p>
-                <p class="donation-text">Latest Donation</p>
+                <div class="divider"></div>
+                <!-- Latest Donation Section -->
+                <div class="donation-section">
+                    <div class="donation-icon latest">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                    <div>
+                        <p class="donation-amount">RM<%= latestDonation %></p>
+                        <p class="donation-text">Latest Donation</p>
+                    </div>
                 </div>
             </div>
         </div>
-                </div>
-      </div>
+        </div>
         <div class="container">
         <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #2F6690;; color: white;">
-              <table class="event-table">
-                
-                <tr>
-                    <th>No.</th>
-                    <th>Events</th>
-                    <th>Date & Time</th>
-                    <th>Amount</th>
-                    <th>View Receipts</th>
+            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #2F6690; color: white;">
+                <table class="event-table">
+                    <tr>
+                        <th>No.</th>
+                        <th>Events</th>
+                        <th>Date & Time</th>
+                        <th>Amount</th>
+                        <th>View Receipts</th>
                     </tr>
                 </table>
             </li>
             <%
-                // Fetch donation history
-                String donationHistoryQuery = "SELECT d.donationID, d.amount, d.date, e.name FROM donation d JOIN events e ON d.eventID = e.eventID WHERE d.volunteerID = '" + volunteerID + "' ORDER BY d.date DESC";
-                ResultSet donationHistoryRs = stmt.executeQuery(donationHistoryQuery);
                 int index = 1;
                 while (donationHistoryRs.next()) {
             %>
-           <li class="list-group-item d-flex justify-content-between align-items-center">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
                     <table class="event-table">
                         <tr>
                             <td><%= index++ %>.</td>
                             <td><%= donationHistoryRs.getString("name") %></td>
                             <td><%= donationHistoryRs.getString("date") %></td>
                             <td>RM<%= donationHistoryRs.getDouble("amount") %></td>
-                            <td><button class="view-details-button">View Receipt</button></td>
+                            <td><button class="view-details-button" data-bs-toggle="modal" data-bs-target="#receiptOverlay">View Receipt</button></td>
                         </tr>
                     </table>
                 </li>
+                
+                <!-- Fullscreen Overlay -->
+               <div class="modal fade" id="receiptOverlay" tabindex="-1" aria-labelledby="receiptOverlayLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="receiptOverlayLabel">Receipt</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Wrap the certificate content with a specific class -->
+                            <div class="receipt-content">
+                                <img src="getImage.do?id=<%= donationHistoryRs.getInt("donationID") %>" class="modal-img">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <% } %>
-            
-            </ul>
-</div>
-    <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+        </ul>
+       </div>
+        <!-- Pagination -->
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    <% for (int i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage == i ? "active" : "" %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+
+                    <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+                           
 </body>
 </html>
