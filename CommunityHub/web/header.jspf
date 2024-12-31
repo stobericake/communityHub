@@ -191,10 +191,9 @@
                                 Menu
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="volunteerDropdown">
-                                <li><a class="dropdown-item" href="#">Home</a></li>
-                                <li><a class="dropdown-item" href="#">Event Approval</a></li>
-                                <li><a class="dropdown-item" href="#">History Approval</a></li>
-                                <li><a class="dropdown-item" href="#">Generate Report</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/volunteer/eventListingVolunteer.jsp">Home</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/volunteer/myEventList.jsp">My Events</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/volunteer/donationHistory.jsp">My Donations</a></li>
                             </ul>
                         </li>
                         <% } else if (userRole.equals("beneficiary")) { %>
@@ -206,7 +205,8 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                                 <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Overview</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/eventmanagement.jsp" onclick="updateDropdownText('Event Management')">Event Management</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Donor Management')">Donor Management</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/donorList.jsp" onclick="updateDropdownText('Donor Management')">Donor List</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/volunteerList.jsp" onclick="updateDropdownText('Donor Management')">Volunteer List</a></li>
                             </ul>
                         </li>
                         <% } %> 
