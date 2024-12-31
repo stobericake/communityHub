@@ -148,9 +148,9 @@
         <!-- Header -->
         <nav class="header navbar navbar-expand-lg navbar-dark fixed-top">
             <div class="container-fluid">
-                <a href="../index.html" class="text-decoration-none">
+                <a href="index.html" class="text-decoration-none">
                     <div class="d-flex align-items-center">
-                        <img src="../assets/logo.png" alt="Logo" style="height: 60px; vertical-align: middle;" class="me-2 mb-3">
+                        <img src="assets/logo.png" alt="Logo" style="height: 60px; vertical-align: middle;" class="me-2 mb-3">
                         <h1 class="h5 text-white font-weight-bold" style="font-size: 30px; -webkit-text-stroke-width: 1px;">CommUNITYHub</h1>
                     </div>
 
