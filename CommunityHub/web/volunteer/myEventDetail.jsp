@@ -97,7 +97,7 @@
                 }
 
                 /* Hide other unnecessary elements like the header */
-                .header, .modal-header, .modal-footer, .btn-close {
+                .modal-header, .modal-header, .modal-footer, .btn-close {
                     display: none;
                 }
             }
