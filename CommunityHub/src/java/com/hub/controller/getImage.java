@@ -238,6 +238,46 @@ public class getImage extends HttpServlet {
                         }
                     }           break;
                 }
+                case "donation":
+                {
+                    // Query to fetch the BLOB data
+                    String sql = "SELECT receiptImage FROM donation WHERE donationID = ?";
+                    ps = conn.prepareStatement(sql);
+                    ps.setInt(1, Integer.parseInt(request.getParameter("id"))); // Get ID from request
+                    rs = ps.executeQuery();
+                    if (rs.next()) {
+                        // Retrieve BLOB as InputStream
+                        InputStream inputStream = rs.getBinaryStream("receiptImage");
+                        
+                        // Check if the BLOB is NULL or empty
+                        if (inputStream == null) {
+                            // If BLOB is NULL, use the default image from assets folder
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            fileInputStream.close();
+                            outStream.flush();
+                        } else {
+                            // Otherwise, send the BLOB data to the response
+                            OutputStream outStream = response.getOutputStream();
+                            
+                            byte[] buffer = new byte[1024];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outStream.write(buffer, 0, bytesRead);
+                            }
+                            
+                            inputStream.close();
+                            outStream.flush();
+                        }
+                    }           break;
+                }
             default:
                 break;
         }
