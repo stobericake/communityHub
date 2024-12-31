@@ -233,8 +233,8 @@
                         <% } else { %>
                         <!-- Login and Register Buttons for Guests -->
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button class="btn btn-dark shadow-sm" type="button">Login</button>
-                            <button class="btn btn-dark shadow-lg" type="button">Register</button>
+                            <a href="login.jsp"><button class="btn btn-dark shadow-sm" type="button">Login</button></a>
+                            <a href="register.jsp"><button class="btn btn-dark shadow-lg" type="button">Register</button></a>
                         </div>
 
 
