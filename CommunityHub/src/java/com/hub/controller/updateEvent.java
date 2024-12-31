@@ -278,30 +278,19 @@ if (filePart != null && filePart.getSize() > 0) {
         String sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
         psTask = conn.prepareStatement(sqlTask);
 
-        // Retrieve tasks dynamically
-Enumeration<String> parameterNames = request.getParameterNames();
-while (parameterNames.hasMoreElements()) {
-    String paramName = parameterNames.nextElement();
-    System.out.println("Parameter Name: " + paramName + ", Value: " + request.getParameter(paramName));
-}
+            for (int index = 0; ; index++) {
+               String taskName = request.getParameter("task[" + index + "].name");
 
+               if (taskName == null || taskName.trim().isEmpty()) { 
+                   break;  
+               }
 
- for (int index = 0; ; index++) {
-    String taskName = request.getParameter("task[" + index + "].name");
-    
-    // Display taskName for debugging
-    System.out.println("Task " + index + ": " + taskName);
-
-    if (taskName == null || taskName.trim().isEmpty()) { 
-        break;  // No more tasks or invalid task name
-    }
-
-    psTask.setInt(1, 1);
-    psTask.setString(2, taskName);
-    psTask.setInt(3, Integer.parseInt(idValue));
-    psTask.setNull(4, java.sql.Types.NULL);
-    psTask.addBatch();
-}
+               psTask.setInt(1, 1);
+               psTask.setString(2, taskName);
+               psTask.setInt(3, Integer.parseInt(idValue));
+               psTask.setNull(4, java.sql.Types.NULL);
+               psTask.addBatch();
+           }
 
 
         // Execute batch task insertions
