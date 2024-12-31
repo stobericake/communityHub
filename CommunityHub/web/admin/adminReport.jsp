@@ -321,10 +321,10 @@
     document.addEventListener("DOMContentLoaded", function () {
         // Checkbox logic for Event and Volunteer
         const eventCheckAll = document.querySelector('#eventCheckAll');
-        const eventRowCheckboxes = document.querySelectorAll('#nav-home .row-checkbox');
+        const eventRowCheckboxes = document.querySelectorAll('#events .row-checkbox');
 
         const volunteerCheckAll = document.querySelector('#volunteerCheckAll');
-        const volunteerRowCheckboxes = document.querySelectorAll('#nav-profile .row-checkbox');
+        const volunteerRowCheckboxes = document.querySelectorAll('#volunteers .row-checkbox');
 
         function addCheckboxLogic(masterCheckbox, rowCheckboxes) {
             masterCheckbox.addEventListener('change', function () {
@@ -351,7 +351,7 @@
         document.getElementById('generateEventReports').addEventListener('click', function () {
             const selectedEvents = [];
 
-            document.querySelectorAll('#nav-home .row-checkbox:checked').forEach(checkbox => {
+            document.querySelectorAll('#events .row-checkbox:checked').forEach(checkbox => {
                 const eventID = checkbox.getAttribute('data-event-id');
                 if (eventID) {
                     selectedEvents.push(eventID);
@@ -373,7 +373,7 @@
         document.getElementById('generateVolunteerReports').addEventListener('click', function () {
             const selectedVolunteers = [];
 
-            document.querySelectorAll('#nav-profile .row-checkbox:checked').forEach(checkbox => {
+            document.querySelectorAll('#volunteers .row-checkbox:checked').forEach(checkbox => {
                 const volunteerID = checkbox.getAttribute('data-volunteer-id');
                 if (volunteerID) {
                     selectedVolunteers.push(volunteerID);
@@ -399,7 +399,7 @@
         const searchValue = document.getElementById('eventSearchInput').value.toLowerCase();
 
         // Get all rows in the event table body
-        const rows = document.querySelectorAll('#nav-home tbody tr');
+        const rows = document.querySelectorAll('#events tbody tr');
 
         // Loop through rows and hide or show based on search match
         rows.forEach(row => {
@@ -420,7 +420,7 @@
         const searchValue = document.getElementById('volunteerSearchInput').value.toLowerCase();
 
         // Get all rows in the volunteer table body
-        const rows = document.querySelectorAll('#nav-profile tbody tr');
+        const rows = document.querySelectorAll('#volunteers tbody tr');
 
         // Loop through rows and hide or show based on search match
         rows.forEach(row => {
