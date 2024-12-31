@@ -174,20 +174,20 @@
                         <% if (userRole.equals("admin")) { %>
                         <!-- Admin Specific Navigation -->
                         <li class="nav-item dropdown">
-                            <a class="nav-drop dropdown-toggle" href="#" id="aDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Menu
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                                 <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminListing.jsp" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminReport.jsp" onclick="updateDropdownText('Generate Reports')">Generate Report</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminReport.jsp" onclick="updateDropdownText('Generate Report')">Generate Report</a></li>
                             </ul>
                         </li>
 
                         <% } else if (userRole.equals("volunteer")) { %>
                         <!-- Volunteer Specific Navigation -->
                         <li class="nav-item dropdown">
-                            <a class="nav-drop dropdown-toggle" href="#" id="aDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Menu
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="volunteerDropdown">
@@ -199,10 +199,10 @@
                         <% } else if (userRole.equals("beneficiary")) { %>
                         <!-- Beneficiary Specific Navigation -->
                         <li class="nav-item dropdown">
-                            <a class="nav-drop dropdown-toggle" href="#" id="aDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Menu
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="beneficiaryDropdown">
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/eventManagement.jsp" onclick="updateDropdownText('Event Management')">Event Management</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/donorList.jsp" onclick="updateDropdownText('Donor List')">Donor List</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/volunteerList.jsp" onclick="updateDropdownText('Volunteer List')">Volunteer List</a></li>
@@ -261,7 +261,7 @@
         <script>
                                     function updateDropdownText(selectedItem) {
 
-                                       document.getElementById('aDropdown').textContent = selectedItem;
+                                       document.getElementById('DropdownHeader').textContent = selectedItem;
                                         
                                          // Store the selected item in localStorage
                                             localStorage.setItem('dropdownSelection', selectedItem);
@@ -276,7 +276,7 @@
 
                                     // If there's a stored selection, update the dropdown text
                                     if (selectedItem) {
-                                        const dropdown = document.getElementById('aDropdown');
+                                        const dropdown = document.getElementById('DropdownHeader');
                                         if (dropdown) {
                                             dropdown.textContent = selectedItem;
                                         }
