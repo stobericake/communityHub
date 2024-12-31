@@ -1,5 +1,14 @@
 <%@page import="java.text.SimpleDateFormat"%>
 <!DOCTYPE html>
+<%
+    int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+    int currentPage1 = request.getParameter("page2") != null ? Integer.parseInt(request.getParameter("page2")) : 1;
+    int totalPages = 5; // Total pages for events
+    int totalPages1 = 3; // Total pages for volunteers
+    String status = request.getParameter("status") != null ? request.getParameter("status") : "all";
+    String activeTab = request.getParameter("activeTab") != null ? request.getParameter("activeTab") : "events";
+%>
+
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -12,15 +21,33 @@
         <div class="container mt-5">
             <h4 class="fw-bold">GENERATE REPORT</h4>
             <p>Report Information Event and Volunteer</p>
-            <nav>
-                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Event</button>
-                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Volunteer</button>
-
-                </div>
-            </nav>
-            <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab" tabindex="0">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link <%= "events".equals(activeTab) ? "active" : ""%>" 
+                       id="events-tab" 
+                       data-bs-toggle="tab" 
+                       href="#events" 
+                       role="tab"
+                       aria-controls="events" 
+                       aria-selected="<%= "events".equals(activeTab)%>">
+                        Events
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link <%= "volunteers".equals(activeTab) ? "active" : ""%>" 
+                       id="volunteers-tab" 
+                       data-bs-toggle="tab" 
+                       href="#volunteers" 
+                       role="tab"
+                       aria-controls="volunteers" 
+                       aria-selected="<%= "volunteers".equals(activeTab)%>">
+                        Volunteers
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content mt-3">
+                <!-- Events Tab -->
+                <div class="tab-pane fade <%= "events".equals(activeTab) ? "show active" : ""%>" id="events" role="tabpanel">
                     <!-- Event -->
                     <div class="container mt-4">
                         <div class="row">
@@ -64,24 +91,35 @@
                             </thead>
                             <tbody class="table-group-divider">
                                 <%
-                                    String status = request.getParameter("status");
+                                    status = request.getParameter("status");
                                     Connection conn = null;
                                     PreparedStatement stmt = null;
                                     ResultSet rs = null;
 
                                     conn = dbconnection.getConnection();
 
-//                                    String sql = "SELECT eventID, name, date FROM events";
-//                                    stmt = conn.prepareStatement(sql);
-//                                    rs = stmt.executeQuery();
-                                    String sql = "SELECT eventID, name, date FROM events";
-                                    if (status != null && !"All".equalsIgnoreCase(status)) {
-                                        sql += " WHERE status = ?";
-                                    }
+                                    String countSql = "SELECT COUNT(*) as total FROM events";
+                                    PreparedStatement countStmt = conn.prepareStatement(countSql);
+                                    ResultSet countRs = countStmt.executeQuery();
+                                    countRs.next();
+                                    int totalEvents = countRs.getInt("total");
+                                    countRs.close();
+                                    countStmt.close();
 
-                                    stmt = conn.prepareStatement(sql);
+                                    int eventsPerPage = 5;
+                                    totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
+                                    currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+                                    if (currentPage > totalPages) {
+                                        currentPage = totalPages > 0 ? totalPages : 1;
+                                    }
+                                    if (eventsPerPage > totalEvents) {
+                                        eventsPerPage = totalEvents;
+                                    }
+                                    int offset = (currentPage - 1) * eventsPerPage;
 
                                     int idstat = 0;
+                                    String sql = "SELECT eventID, name, date FROM events";
+
                                     if (status != null && !"All".equalsIgnoreCase(status)) {
                                         if (status.equalsIgnoreCase("Pending")) {
                                             idstat = 1;
@@ -90,8 +128,17 @@
                                         } else {
                                             idstat = 3;
                                         }
-
+                                        sql += " WHERE status = ?";
+                                        sql += " LIMIT ? OFFSET ?";
+                                        stmt = conn.prepareStatement(sql);
                                         stmt.setInt(1, idstat);
+                                        stmt.setInt(2, eventsPerPage);
+                                        stmt.setInt(3, offset);
+                                    } else {
+                                        sql += " LIMIT ? OFFSET ?";
+                                        stmt = conn.prepareStatement(sql);
+                                        stmt.setInt(1, eventsPerPage);
+                                        stmt.setInt(2, offset);
                                     }
 
                                     rs = stmt.executeQuery();
@@ -114,7 +161,7 @@
                                             <input class="form-check-input row-checkbox" type="checkbox" data-event-id="<%=evt%>" aria-label="Row Checkbox">
                                         </div>
                                     </td>
-                                    <td class=""><%=num%></td>
+                                    <td class=""><%=evt%></td>
                                     <td><%=ename%></td>
                                     <td class="text-center"><%=formattedDate%></td>
                                     <td class="text-center ">
@@ -126,6 +173,28 @@
                                 %>
                             </tbody>
                         </table>
+                        <!-- Pagination -->
+                        <div class="col-12 d-flex justify-content-center">
+                            <nav aria-label="Event Page navigation">
+                                <ul class="pagination">
+                                    <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
+                                        <a class="page-link" href="?status=<%= status%>&page=<%= currentPage - 1%>&page2=<%= currentPage1%>&activeTab=events" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <% for (int i = 1; i <= totalPages; i++) {%>
+                                    <li class="page-item <%= currentPage == i ? "active" : ""%>">
+                                        <a class="page-link" href="?status=<%= status%>&page=<%= i%>&page2=<%= currentPage1%>&activeTab=events"><%= i%></a>
+                                    </li>
+                                    <% }%>
+                                    <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
+                                        <a class="page-link" href="?status=<%= status%>&page=<%= currentPage + 1%>&page2=<%= currentPage1%>&activeTab=events" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
                         <button id="generateEventReports" class="btn btn-info bg-purple rounded-4">
                             Generate Reports for Selected Events
                         </button>
@@ -133,7 +202,7 @@
                 </div>
 
                 <!-- Volunteer -->
-                <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" tabindex="0">
+                <div class="tab-pane fade <%= "volunteers".equals(activeTab) ? "show active" : ""%>" id="volunteers" role="tabpanel">
                     <div class="container mt-4">
                         <div class="row">
                             <div class="col-5 col-md-3 mb-3">
@@ -165,8 +234,30 @@
                                 <%
                                     conn = dbconnection.getConnection();
 
-                                    String sql1 = "SELECT * FROM volunteer";
+                                    String countVol = "SELECT COUNT(*) as total FROM volunteer";
+                                    PreparedStatement countStmt1 = conn.prepareStatement(countVol);
+                                    ResultSet countRs1 = countStmt1.executeQuery();
+                                    countRs1.next();
+                                    int totalVolunteer = countRs1.getInt("total");
+                                    countRs.close();
+                                    countStmt.close();
+
+                                    int volunteerPerPage = 5;
+                                    totalPages1 = (int) Math.ceil((double) totalVolunteer / volunteerPerPage);
+                                    currentPage1 = request.getParameter("page2") != null ? Integer.parseInt(request.getParameter("page2")) : 1;
+                                    if (currentPage1 > totalPages1) {
+                                        currentPage1 = totalPages1 > 0 ? totalPages1 : 1;
+                                    }
+                                    if (volunteerPerPage > totalVolunteer) {
+                                        volunteerPerPage = totalVolunteer;
+                                    }
+                                    int offset1 = (currentPage1 - 1) * volunteerPerPage;
+
+                                    String sql1 = "SELECT * FROM volunteer LIMIT ? OFFSET ?";
                                     stmt = conn.prepareStatement(sql1);
+                                    stmt.setInt(1, volunteerPerPage);
+                                    stmt.setInt(2, offset1);
+
                                     rs = stmt.executeQuery();
 
                                     int num1 = 0;
@@ -182,7 +273,7 @@
                                             <input class="form-check-input row-checkbox" type="checkbox" data-volunteer-id="<%=vol%>" aria-label="Row Checkbox">
                                         </div>
                                     </td>
-                                    <td><%=num1%></td>
+                                    <td><%=vol%></td>
                                     <td><%=name%></td>
                                     <td class="text-center"><%=contact%></td>
                                     <td class="text-center ">
@@ -194,6 +285,28 @@
                                 %>
                             </tbody>
                         </table>
+                        <!-- Pagination -->
+                        <div class="col-12 d-flex justify-content-center">
+                            <nav aria-label="Volunteer Page navigation">
+                                <ul class="pagination">
+                                    <li class="page-item <%= currentPage1 == 1 ? "disabled" : ""%>">
+                                        <a class="page-link" href="?status=<%= status%>&page=<%= currentPage%>&page2=<%= currentPage1 - 1%>&activeTab=volunteers" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                    <% for (int i = 1; i <= totalPages1; i++) {%>
+                                    <li class="page-item <%= currentPage1 == i ? "active" : ""%>">
+                                        <a class="page-link" href="?status=<%= status%>&page=<%= currentPage%>&page2=<%= i%>&activeTab=volunteers"><%= i%></a>
+                                    </li>
+                                    <% }%>
+                                    <li class="page-item <%= currentPage1 == totalPages1 ? "disabled" : ""%>">
+                                        <a class="page-link" href="?status=<%= status%>&page=<%= currentPage%>&page2=<%= currentPage1 + 1%>&activeTab=volunteers" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
                         <button id="generateVolunteerReports" class="btn btn-info bg-purple rounded-4">
                             Generate Reports for Selected Volunteers
                         </button>
