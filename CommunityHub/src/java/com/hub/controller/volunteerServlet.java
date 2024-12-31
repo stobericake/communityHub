@@ -86,7 +86,7 @@ public class volunteerServlet extends HttpServlet {
             conn = dbconnection.getConnection();
              if (volunteerID == null) {
                 // Redirect to login page if not logged in
-                response.sendRedirect("login.jsp?message=Please login to volunteer for this event.");
+                response.sendRedirect("../login.jsp?message=Please login to volunteer for this event.");
             } else {
 
             String sql = "INSERT INTO eventsVolunteer (eventID, volunteerID, task) VALUES (?, ?, ?)";
