@@ -57,55 +57,54 @@
                 border-radius: 10px; 
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
-            
-            .modal-fullscreen .modal-content {
+             .modal-fullscreen .modal-content {
                 background-color: #fff; /* Overlay background color */
                 padding: 5px; /* Adjust padding */
-            }
+                }
 
-            .modal-fullscreen .modal-header, 
-            .modal-fullscreen .modal-footer {
-                border: none; /* Remove borders */
-            }
+                .modal-fullscreen .modal-header, 
+                .modal-fullscreen .modal-footer {
+                    border: none; /* Remove borders */
+                }
 
-            .print-button {
-                background-color: #000; /* Black button */
-                color: #fff; /* White text */
-                border-radius: 30px; /* Rounded edges */
-            }
-            @media print {
-            body * {
-                visibility: hidden;
-            }
+                .print-button {
+                    background-color: #000; /* Black button */
+                    color: #fff; /* White text */
+                    border-radius: 30px; /* Rounded edges */
+                }
+                @media print {
+                body * {
+                    visibility: hidden;
+                }
 
-            /* Show only the certificate content */
-            .certificate-content, .certificate-content * {
-                 visibility: visible;
-            }
+                /* Show only the certificate content */
+                .certificate-content, .certificate-content * {
+                    visibility: visible;
+                }
 
-            /* Optionally, adjust the positioning to ensure it's centered */
-            .certificate-content {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
+                /* Optionally, adjust the positioning to ensure it's centered */
+                .certificate-content {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                }
 
-            /* Hide the print button */
-            .print-button {
-                display: none;
-            }
+                /* Hide the print button */
+                .print-button {
+                    display: none;
+                }
 
                 /* Hide other unnecessary elements like the header */
-            .header, .modal-header, .modal-footer, .btn-close {
-                display: none;
-            }
+                .header, .modal-header, .modal-footer, .btn-close {
+                    display: none;
+                }
             }
         </style>
         </head>
         <body>
-            <%@ include file="../header.jspf" %>
+            <%@ include file="header.jspf" %>
             <%
             String eventID = request.getParameter("eventID");
             String loggedInUser = (String) session.getAttribute("volunteerID");
@@ -171,7 +170,7 @@
                         }
 
         %>
-            <img src="../getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <img src="getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
                     <p class="h6"><%= eventName %></p>
@@ -209,89 +208,92 @@
                             </small>
                             </div>
                             <p><strong>Selected Task:</strong> <%= selectedTask %></p>
+        </div>
+
+        <!-- Right Column: Cards -->
+        <div class="col-md-4">
+            <div class="card mb-4" style="border-radius: 10px;">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                        <img src="assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
+                        <p><strong>DOWNLOAD CERTIFICATE</strong></p>
+                    </div>
+                    <button class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;" type="button" data-bs-toggle="modal" data-bs-target="#certificateOverlay">
+                        DOWNLOAD <i class="bi bi-download"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fullscreen Overlay -->
+            <div class="modal fade" id="certificateOverlay" tabindex="-1" aria-labelledby="certificateOverlayLabel" aria-hidden="true">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="certificateOverlayLabel">Certificate</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-
-                        <div class="col-md-4">
-                                    <div class="card mb-4" style="border-radius: 10px;">
-                                        <div class="card-body text-center">
-                                            <div class="d-flex align-items-center justify-content-center">
-                                                <img src="assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
-                                                <p><strong>DOWNLOAD CERTIFICATE</strong></p>
-                                            </div>
-                                            <button class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;" type="button" data-bs-toggle="modal" data-bs-target="#certificateOverlay">
-                                                DOWNLOAD <i class="bi bi-download"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Fullscreen Overlay -->
-                                    <div class="modal fade" id="certificateOverlay" tabindex="-1" aria-labelledby="certificateOverlayLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-fullscreen">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="certificateOverlayLabel">Certificate</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <!-- Wrap the certificate content with a specific class -->
-                                                    <div class="certificate-content">
-                                                        <%@ include file="certificate.jsp" %>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-primary print-button" onclick="window.print();">Download</button>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Second Card -->
-                                    <div class="card mb-4" style="border-radius: 10px;">
-                                        <div class="card-body text-center">
-                                            <div class="d-flex align-items-center justify-content-center">
-                                            <img src="../assets/medal.svg" alt="Icon" style="width: 50px; height: 50px;">
-                                            <p><strong>SERVICE REPORT</strong></p>
-                                            </div>
-                                            <p class="card-text text-muted">
-                                                Tell us about your experience and suggestions to improve our service and enhance our system.
-                                            </p>
-                                            <a href="serviceForm.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
-                                                FILL IN FORM? <i class="bi bi-pencil-square"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="modal-body">
+                            <!-- Wrap the certificate content with a specific class -->
+                            <div class="certificate-content">
+                                <%@ include file="certificate.jsp" %>
                             </div>
                         </div>
-                    <% 
-                    } else { 
-                    %>
-                    <div class="container">
-                        <p>Event not found.</p>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary print-button" onclick="window.print();">Download</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
-                <%  }
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        } finally {
-                            // Close resources manually
-                            try {
-                                if (taskRs != null) taskRs.close();
-                                if (taskStmt != null) taskStmt.close();
-                                if (donationRs != null) donationRs.close();
-                                if (donationStmt != null) donationStmt.close();
-                                if (rs != null) rs.close();
-                                if (stmt != null) stmt.close();
-                                if (conn != null) conn.close();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    } else { 
-                 %>
-            <div class="container">
-                <p>Invalid Event ID.</p>
+                </div>
             </div>
-            <% } %>
+
+
+            <!-- Second Card -->
+            <div class="card mb-4" style="border-radius: 10px;">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center">
+                    <img src="assets\medal.svg" alt="Icon" style="width: 50px; height: 50px;">
+                    <p><strong>SERVICE REPORT</strong></p>
+                    </div>
+                    <p class="card-text text-muted">
+                        Tell us about your experience and suggestions to improve our service and enhance our system.
+                    </p>
+                    <a href="serviceForm.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                        FILL IN FORM? <i class="bi bi-pencil-square"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <% 
+                    } else { 
+        %>
+        <div class="container">
+            <p>Event not found.</p>
+        </div>
+    <%  }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                // Close resources manually
+                try {
+                    if (taskRs != null) taskRs.close();
+                    if (taskStmt != null) taskStmt.close();
+                    if (donationRs != null) donationRs.close();
+                    if (donationStmt != null) donationStmt.close();
+                    if (rs != null) rs.close();
+                    if (stmt != null) stmt.close();
+                    if (conn != null) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else { 
+         %>
+    <div class="container">
+        <p>Invalid Event ID.</p>
+    </div>
+    <% } %>
     </body>
 </html>
+
