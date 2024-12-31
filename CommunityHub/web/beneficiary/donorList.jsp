@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
-<%@ page import="com.cm.controller.dbconnection" %>
+<%@ page import="com.hub.controller.dbconnection" %>
 
 <!DOCTYPE html>
 <html>
@@ -99,7 +99,7 @@
     </script>
 </head>
 <body>
-    <%@ include file="header.jspf" %>
+    <%@ include file="../header.jspf" %>
     <div class="container my-4">
         <!-- Donor List Overview Header -->
         <div class="row align-items-center mb-4">
