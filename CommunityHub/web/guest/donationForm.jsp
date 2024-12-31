@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-    <%@ include file="header.jspf" %>
+    <%@ include file="../header.jspf" %>
     <%
         String eventID = "1"; // Example: Replace with dynamic ID if needed.
         Connection conn = null;

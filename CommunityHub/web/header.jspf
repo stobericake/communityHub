@@ -179,8 +179,8 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                                 <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Generate Reports')">Generate Report</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminListing.jsp" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminReport.jsp" onclick="updateDropdownText('Generate Reports')">Generate Report</a></li>
                             </ul>
                         </li>
 
@@ -197,7 +197,7 @@
                                 <li><a class="dropdown-item" href="#">Generate Report</a></li>
                             </ul>
                         </li>
-                        <!-- <% } else if (userRole.equals("beneficiary")) { %> -->
+                        <% } else if (userRole.equals("beneficiary")) { %>
                         <!-- Beneficiary Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -205,14 +205,14 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                                 <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Overview</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Event Management')">Event Management</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/eventmanagement.jsp" onclick="updateDropdownText('Event Management')">Event Management</a></li>
                                 <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Donor Management')">Donor Management</a></li>
                             </ul>
                         </li>
                         <% } %> 
 
 
-                        <!-- Profile Picture and Dropdown -->
+                        
                         <%
                             String profileImageUrl = "";
                             if (session != null) {
@@ -243,7 +243,7 @@
                             </ul>
                         </li>
                         <% } else {%>
-                        <!-- Login and Register Buttons for Guests -->
+                        
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="<%=request.getContextPath()%>/login.jsp"><button class="btn btn-dark shadow-sm" type="button">Login</button></a>
                             <a href="<%=request.getContextPath()%>/register.jsp"><button class="btn btn-dark shadow-lg" type="button">Register</button></a>

@@ -99,8 +99,9 @@ public class loginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("userRole", "volunteer");
                 session.setAttribute("volunteer", volunteerID);
-                RequestDispatcher view = request.getRequestDispatcher("/volunteer/eventListingVolunteer.jsp");
-                view.forward(request, response);
+                response.sendRedirect(request.getContextPath() + "/volunteer/eventListingVolunteer.jsp");
+//                RequestDispatcher view = request.getRequestDispatcher(request.getContextPath() + "/volunteer/eventListingVolunteer.jsp");
+//                view.forward(request, response);
                 return;
             }
 
@@ -134,12 +135,12 @@ public class loginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("userRole", "beneficiary");
                 session.setAttribute("beneficiary", beneficiaryID);
-                RequestDispatcher view = request.getRequestDispatcher("/beneficiary/eventManagement.jsp");
-                view.forward(request, response);
+                response.sendRedirect(request.getContextPath() + "/beneficiary/eventmanagement.jsp");
+//                RequestDispatcher view = request.getRequestDispatcher(request.getContextPath() + "/beneficiary/eventManagement.jsp");
+//                view.forward(request, response);
                 return;
             }
 
-            // If no match found, redirect to login page with an error
             request.setAttribute("error", "Invalid username or password");
             RequestDispatcher view = request.getRequestDispatcher("/login.jsp");
             view.forward(request, response);
