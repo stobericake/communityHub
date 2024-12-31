@@ -154,7 +154,7 @@
                     countRs.close();
                     countStmt.close();
 
-                    // Pagination parameters
+
                     int eventsPerPage = 4;
                     int currentPage = request.getParameter("page") != null ? 
                     Integer.parseInt(request.getParameter("page")) : 1;
@@ -182,7 +182,7 @@
                 <div class="card h-100 event-card" data-title="<%= title %>" 
                      data-description="<%= desc %>" data-location="<%= location %>">
                     <div class="position-relative">
-                        <img src="getImage.do?id=<%= id %>" alt="Image" class="w-100 h-100" style="object-fit: cover;">
+                        <img src="../getImage.do?type=events&id=<%= id%>" alt="Image" class="w-100 h-100" style="object-fit: cover;">
                     </div>
                     <div class="card-body">
                         <h5 class="card-title styl"><%= title %></h5>
