@@ -86,7 +86,7 @@ public class volunteerServlet extends HttpServlet {
             conn = dbconnection.getConnection();
              if (volunteerID == null) {
                 // Redirect to login page if not logged in
-                response.sendRedirect("login.jsp?message=Please login to volunteer for this event.");
+                response.sendRedirect("../login.jsp?message=Please login to volunteer for this event.");
             } else {
 
             String sql = "INSERT INTO eventsVolunteer (eventID, volunteerID, task) VALUES (?, ?, ?)";
@@ -99,14 +99,14 @@ public class volunteerServlet extends HttpServlet {
             
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
-                response.sendRedirect("success.jsp");
+                response.sendRedirect("../success.jsp");
             } else {
-                response.sendRedirect("error.jsp");
+                response.sendRedirect("../error.jsp");
             }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            response.sendRedirect("../error.jsp");
         } finally {
             try { if (stmt != null) stmt.close(); } catch (Exception e) { e.printStackTrace(); }
             try { if (conn != null) conn.close(); } catch (Exception e) { e.printStackTrace(); }

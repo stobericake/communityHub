@@ -7,13 +7,13 @@
         if (userRole != null) {
             // Redirect based on the user role
             if (userRole.equals("volunteer")) {
-                response.sendRedirect("volunteer/eventListingVolunteer.jsp"); // Redirect to volunteer page
+                response.sendRedirect(request.getContextPath()+ "/volunteer/eventListingVolunteer.jsp"); // Redirect to volunteer page
                 return;
             } else if (userRole.equals("admin")) {
-                response.sendRedirect("admin/adminListing.jsp"); // Redirect to admin page
+                response.sendRedirect(request.getContextPath()+ "/admin/adminListing.jsp"); // Redirect to admin page
                 return;
             } else if (userRole.equals("beneficiary")) {
-                response.sendRedirect("beneficiary/eventManagement.jsp"); // Redirect to beneficiary page
+                response.sendRedirect(request.getContextPath()+ "/beneficiary/eventmanagement.jsp"); // Redirect to beneficiary page
                 return;
             }
         }

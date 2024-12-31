@@ -204,18 +204,13 @@
                     stmt.setInt(3, (currentPage - 1) * pageSize);
                     rs = stmt.executeQuery();
 
-                    
-                     String taskSql ="SELECT * FROM task where volunteerID = ?";
-                     stmt.setString(1, loggedInUser);
-                     ResultSet rsTask = stmt.executeQuery();
-
                     while (rs.next()) {
                         int index = 1;
                         int id = rs.getInt("e.eventID");
                         String title = rs.getString("e.name");
                         Date date = rs.getDate("e.date");
                         Time time = rs.getTime("e.time");
-                        String task = rsTask.getString("description");
+                        String task = rs.getString("t.description");
                         String location = rs.getString("a.state");
 
                         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");

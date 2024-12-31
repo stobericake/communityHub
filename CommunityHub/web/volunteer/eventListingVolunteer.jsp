@@ -201,7 +201,7 @@
 
                         <div class="d-flex justify-content-end align-items-center">                     
                             <a href="#" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
-                            <a href="eventDetail.jsp?eventID=<%= id %>" class="volunteer-button">View Details</a>      
+                            <a href="../eventDetail.jsp?eventID=<%= id %>" class="volunteer-button">View Details</a>      
                         </div>
                     </div>
                 </div>

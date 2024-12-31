@@ -236,7 +236,7 @@
                     if (!isLoggedIn) {
                 %>
                 <p class="text-danger">Please log in to volunteer for this event.</p>
-                <a href="login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                <a href="../login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
                     LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
                 </a>
                 <%
