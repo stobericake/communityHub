@@ -6,6 +6,15 @@
 
 <%@page import="java.text.SimpleDateFormat"%>
 
+<%
+
+    String user = (String) session.getAttribute("userRole");
+
+    if (user == null) {
+        response.sendRedirect(request.getContextPath()+"/login.jsp");
+        return; 
+    }
+%>
 <!DOCTYPE html>
 <html>
     <head>

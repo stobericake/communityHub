@@ -92,7 +92,7 @@ public class getImage extends HttpServlet {
                         // Check if the BLOB is NULL or empty
                         if (inputStream == null) {
                             // If BLOB is NULL, use the default image from assets folder
-                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/noevent.jpg"));
                             OutputStream outStream = response.getOutputStream();
                             
                             byte[] buffer = new byte[1024];
@@ -132,7 +132,7 @@ public class getImage extends HttpServlet {
                         // Check if the BLOB is NULL or empty
                         if (inputStream == null) {
                             // If BLOB is NULL, use the default image from assets folder
-                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.png"));
                             OutputStream outStream = response.getOutputStream();
                             
                             byte[] buffer = new byte[1024];
@@ -172,7 +172,7 @@ public class getImage extends HttpServlet {
                         // Check if the BLOB is NULL or empty
                         if (inputStream == null) {
                             // If BLOB is NULL, use the default image from assets folder
-                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.png"));
                             OutputStream outStream = response.getOutputStream();
                             
                             byte[] buffer = new byte[1024];
@@ -212,7 +212,7 @@ public class getImage extends HttpServlet {
                         // Check if the BLOB is NULL or empty
                         if (inputStream == null) {
                             // If BLOB is NULL, use the default image from assets folder
-                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.jpg"));
+                            FileInputStream fileInputStream = new FileInputStream(getServletContext().getRealPath("/assets/nopicture.png"));
                             OutputStream outStream = response.getOutputStream();
                             
                             byte[] buffer = new byte[1024];

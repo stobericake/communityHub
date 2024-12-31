@@ -1,4 +1,24 @@
 <!DOCTYPE html>
+<%@ page import="javax.servlet.http.HttpSession"%>
+<%
+    HttpSession checkSession = request.getSession(false); // Check if session already exists
+    if (checkSession != null) {
+        String userRole = (String) checkSession.getAttribute("userRole");
+        if (userRole != null) {
+            // Redirect based on the user role
+            if (userRole.equals("volunteer")) {
+                response.sendRedirect("volunteer/eventListingVolunteer.jsp"); // Redirect to volunteer page
+                return;
+            } else if (userRole.equals("admin")) {
+                response.sendRedirect("admin/adminListing.jsp"); // Redirect to admin page
+                return;
+            } else if (userRole.equals("beneficiary")) {
+                response.sendRedirect("beneficiary/eventManagement.jsp"); // Redirect to beneficiary page
+                return;
+            }
+        }
+    }
+%>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -24,7 +44,7 @@
             <div class="text-center w-100 bg-white rounded-4" style="max-width: 450px;">
                 <div class="container p-4">
                     <h1 class="fw-bold mb-4" style="color:#2F6690;">CommUNITYHub</h1>
-                    <form>
+                    <form action="login.do" method="POST">
                         <div class="mb-3">
                             <input type="text" class="form-control" placeholder="Username" name="username" required>
                         </div>
