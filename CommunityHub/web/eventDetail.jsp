@@ -74,7 +74,7 @@
         <%@ include file="header.jspf" %>
         <%
             String eventID = request.getParameter("eventID");
-            String loggedInUser = (String) session.getAttribute("volunteerID");
+            String loggedInUser = (String) session.getAttribute("volunteer");
 
             Connection conn = null;
             PreparedStatement stmt = null;

@@ -107,7 +107,7 @@
             <%@ include file="../header.jspf" %>
             <%
             String eventID = request.getParameter("eventID");
-            String loggedInUser = (String) session.getAttribute("volunteerID");
+            String loggedInUser = (String) session.getAttribute("volunteer");
             String selectedTask = (String) session.getAttribute("selectedTask");
 
             Connection conn = null;
@@ -122,7 +122,7 @@
             if (eventID != null && !eventID.isEmpty()) {
                 try {
                     conn = dbconnection.getConnection();
-                    String sql = "SELECT e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration, e.description, a.state AS location, b.name AS beneficiary, e.donationLimit FROM events e " +
+                    String sql = "SELECT e.eventID, e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration, e.description, a.state AS location, b.name AS beneficiary, e.donationLimit FROM events e " +
                                  "INNER JOIN address a ON e.addressID = a.addressID " +
                                  "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
                     stmt = conn.prepareStatement(sql);
@@ -130,6 +130,7 @@
                     rs = stmt.executeQuery();
 
                     if (rs.next()) {
+                        int id = rs.getInt("e.eventID");
                         String eventName = rs.getString("eventName");
                         Date eventDate = rs.getDate("eventDate");
                         Time eventTime = rs.getTime("eventTime");
@@ -170,7 +171,7 @@
                         }
 
         %>
-            <img src="getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <img src="getImage.do?type=events&id=<%= id %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
                     <p class="h6"><%= eventName %></p>
@@ -215,7 +216,7 @@
             <div class="card mb-4" style="border-radius: 10px;">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center justify-content-center">
-                        <img src="assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
+                        <img src="../assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
                         <p><strong>DOWNLOAD CERTIFICATE</strong></p>
                     </div>
                     <button class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;" type="button" data-bs-toggle="modal" data-bs-target="#certificateOverlay">
@@ -251,7 +252,7 @@
             <div class="card mb-4" style="border-radius: 10px;">
                 <div class="card-body text-center">
                     <div class="d-flex align-items-center justify-content-center">
-                    <img src="assets\medal.svg" alt="Icon" style="width: 50px; height: 50px;">
+                    <img src="../assets/medal.svg" alt="Icon" style="width: 50px; height: 50px;">
                     <p><strong>SERVICE REPORT</strong></p>
                     </div>
                     <p class="card-text text-muted">

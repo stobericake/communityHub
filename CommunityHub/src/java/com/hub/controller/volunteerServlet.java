@@ -74,7 +74,7 @@ public class volunteerServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String volunteerID = (String) session.getAttribute("volunteerID");
+        String volunteerID = (String) session.getAttribute("volunteer");
         String eventID = request.getParameter("eventID");
         String selectedTask = request.getParameter("task");
 
