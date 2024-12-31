@@ -218,7 +218,7 @@
         <div class="center-card">
             <div class="donation-card">
                 <%
-                    String volunteerID = (String) session.getAttribute("volunteerID");
+                    String volunteerID = (String) session.getAttribute("volunteer");
                     Connection con = dbconnection.getConnection();
                     Statement stmt = con.createStatement();
 

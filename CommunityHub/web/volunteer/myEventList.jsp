@@ -54,43 +54,43 @@
         }
 
                      
-            .event-table {
+            .volunteerTable {
             width: 100%;
             border-collapse: collapse;
             font-family: 'Poppins', sans-serif;
         }
 
-        .event-table td {
+        .volunteerTable td {
             
         }
             
        /* Define fixed column widths */
-        .event-table th:nth-child(1),
-        .event-table td:nth-child(1) {
+        .volunteerTable th:nth-child(1),
+        .volunteerTable td:nth-child(1) {
             width: 5%; /* First column is 10% */
             text-align: left;
         }
 
-        .event-table th:nth-child(2),
-        .event-table td:nth-child(2) {
+        .volunteerTable th:nth-child(2),
+        .volunteerTable td:nth-child(2) {
             width: 30%; /* Second column is 30% */
             text-align: left;
         }
 
-        .event-table th:nth-child(3),
-        .event-table td:nth-child(3) {
+        .volunteerTable th:nth-child(3),
+        .volunteerTable td:nth-child(3) {
             width: 25%; /* Third column is 20% */
             text-align: center;
         }
 
-        .event-table th:nth-child(4),
-        .event-table td:nth-child(4) {
+        .volunteerTable th:nth-child(4),
+        .volunteerTable td:nth-child(4) {
             width: 25%; /* Fourth column is 20% */
             text-align: center;
         }
 
-        .event-table th:nth-child(5),
-        .event-table td:nth-child(5) {
+        .volunteerTable th:nth-child(5),
+        .volunteerTable td:nth-child(5) {
             width: 15%; /* Fifth column is 20% */
             text-align: center;
             
@@ -150,7 +150,7 @@
         <div class="container">
         <ul class="list-group">
             <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #2F6690; color: white;">
-                <table class="event-table">
+                <table class="volunteerTable">
                     <tr>
                     <th>No.</th>
                     <th>Events</th>
@@ -161,8 +161,7 @@
                 </table>
             </li>
                 <% 
-                String loggedInUser = (String) session.getAttribute("volunteerID");
-                String selectedTask = (String) session.getAttribute("selectedTask");
+                String loggedInUser = (String) session.getAttribute("volunteer");
                 int pageSize = 10; // Number of events per page
                 int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
                 int totalRecords = 0;
@@ -203,9 +202,9 @@
                     stmt.setInt(2, pageSize);
                     stmt.setInt(3, (currentPage - 1) * pageSize);
                     rs = stmt.executeQuery();
-
+                    int index = 1;
                     while (rs.next()) {
-                        int index = 1;
+                        
                         int id = rs.getInt("e.eventID");
                         String title = rs.getString("e.name");
                         Date date = rs.getDate("e.date");
@@ -220,7 +219,7 @@
                <li class="list-group-item d-flex justify-content-between align-items-center">
                     <table class="volunteerTable">
                         <tr>
-                           <td><%= id %>.</td>
+                           <td><%= index++%>.</td>
                             <td><%= title %></td>
                             <td><%= formattedDateTime %></td>                            
                             <td><%= task %></td>
@@ -268,21 +267,19 @@
             </nav>
         </div>
     </div>
-                             <!-- Keep your existing filterEvents() function -->
+
     <script>
-        function filterTable() {
-            const input = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.querySelectorAll('#volunteerTable tbody tr');
+    function filterTable() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('.list-group-item:not(:first-child)'); // Skip the header row
 
-            rows.forEach(row => {
-                const columns = row.querySelectorAll('td');
-                const match = Array.from(columns).some(td =>
-                    td.textContent.toLowerCase().includes(input)
-                );
+        rows.forEach(row => {
+            const textContent = row.textContent.toLowerCase(); // Get all text content in the row
+            row.style.display = textContent.includes(input) ? '' : 'none'; // Show/Hide row based on match
+        });
+    }
+</script>
 
-                row.style.display = match ? '' : 'none';
-            });
-        }
-    </script>
+
 </body>
 </html>
