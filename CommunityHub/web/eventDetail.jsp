@@ -88,7 +88,7 @@
             if (eventID != null && !eventID.isEmpty()) {
                 try {
                     conn = dbconnection.getConnection();
-                    String sql = "SELECT e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration, e.description, a.state AS location, b.name AS beneficiary, e.donationLimit FROM events e " +
+                    String sql = "SELECT e.eventID, e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration, e.description, a.state AS location, b.name AS beneficiary, e.donationLimit FROM events e " +
                                  "INNER JOIN address a ON e.addressID = a.addressID " +
                                  "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
                     stmt = conn.prepareStatement(sql);
@@ -96,6 +96,7 @@
                     rs = stmt.executeQuery();
 
                     if (rs.next()) {
+                        int id = rs.getInt("eventID");
                         String eventName = rs.getString("eventName");
                         Date eventDate = rs.getDate("eventDate");
                         Time eventTime = rs.getTime("eventTime");
@@ -163,7 +164,7 @@
                         double progress = (totalDonation / donationLimit) * 100;
 
         %>
-            <img src="getImage.do?id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <img src="getImage.do?type=events&id=<%= id%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
                     <p class="h6"><%= eventName %></p>

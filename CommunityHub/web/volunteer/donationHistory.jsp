@@ -322,7 +322,7 @@
                         <div class="modal-body">
                             <!-- Wrap the certificate content with a specific class -->
                             <div class="receipt-content">
-                                <img src="getImage.do?id=<%= donationHistoryRs.getInt("donationID") %>" class="modal-img">
+                                <img src="../getImage.do?type=events&id=<%= donationHistoryRs.getInt("donationID") %>" class="modal-img">
                             </div>
                         </div>
                         <div class="modal-footer">

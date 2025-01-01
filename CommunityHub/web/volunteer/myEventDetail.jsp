@@ -97,7 +97,7 @@
                 }
 
                 /* Hide other unnecessary elements like the header */
-                .header, .modal-header, .modal-footer, .btn-close {
+                .modal-header, .modal-header, .modal-footer, .btn-close {
                     display: none;
                 }
             }
@@ -171,7 +171,7 @@
                         }
 
         %>
-            <img src="getImage.do?type=events&id=<%= id %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <img src="../getImage.do?type=events&id=<%= id%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
                     <p class="h6"><%= eventName %></p>
