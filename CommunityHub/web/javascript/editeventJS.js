@@ -215,12 +215,13 @@
 
         // Update `taskCount` to match the current number of rows
         taskCount = rows.length + 1;
+        check = rows.length;
 
 
         // Show empty state if no tasks remain
         const emptyState = document.getElementById('emptyState');
         if (!emptyState) return;
-        if (taskCount === 0) {
+        if (check === 0) {
             emptyState.classList.add('show');
         } else {
             emptyState.classList.remove('show');
