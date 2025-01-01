@@ -78,7 +78,7 @@ public class updateEvent extends HttpServlet {
                     request.setAttribute("address", address);
 
                     // Forward the request to the JSP
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/test.jsp");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/editEvent.jsp");
                     dispatcher.forward(request, response);
                 }
             } catch (SQLException e) {
@@ -211,6 +211,13 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
     String minutesStr = request.getParameter("durationMinutes");
     Double donationLimit = Double.parseDouble(request.getParameter("donationLimit"));
 
+    String[] updatedTask = request.getParameterValues("updatedTask");
+    String[] taskIDs = request.getParameterValues("taskID");
+     
+    String[] newTasks = request.getParameterValues("newTask");
+    
+    String[] deleteTasks = request.getParameterValues("deleteTask");
+   
 Part filePart = request.getPart("eventImage"); // Get the uploaded file
 InputStream imageInputStream = null;
 
@@ -275,29 +282,67 @@ if (filePart != null && filePart.getSize() > 0) {
             stmt.executeUpdate();
             
             PreparedStatement psTask;   
-        String sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
-        psTask = conn.prepareStatement(sqlTask);
+            String sqlTask = "UPDATE task SET status = ?, description = ?, eventID = ? WHERE taskID = ?";
+            psTask = conn.prepareStatement(sqlTask);
 
-            for (int index = 0; ; index++) {
-               String taskName = request.getParameter("task[" + index + "].name");
-
-               if (taskName == null || taskName.trim().isEmpty()) { 
-                   break;  
+               for (int i = 0; i < updatedTask.length; i++) {
+                String newTask = updatedTask[i];
+                String taskID = taskIDs[i];
+                
+                    psTask.setInt(1, 1);
+                    psTask.setString(2, newTask);
+                    psTask.setInt(3, Integer.parseInt(idValue));
+                    psTask.setInt(4, Integer.parseInt(taskID));
+                    psTask.addBatch();
                }
-
-               psTask.setInt(1, 1);
-               psTask.setString(2, taskName);
-               psTask.setInt(3, Integer.parseInt(idValue));
-               psTask.setNull(4, java.sql.Types.NULL);
-               psTask.addBatch();
-           }
-
-
-        // Execute batch task insertions
-        if (psTask != null) {
+               
+                if (psTask != null) {
             psTask.executeBatch();
-        } 
-        }
+            } 
+        
+                if(!(newTasks == null)){
+                   sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
+                   psTask = conn.prepareStatement(sqlTask);
+
+                        for (int i = 0; i < newTasks.length; i++) {
+                            String taskName = newTasks[i];
+                           
+                           System.out.println("TaskName: " + taskName);
+
+                           if (taskName == null || taskName.trim().isEmpty()) { 
+                               break;  
+                           }
+
+                           psTask.setInt(1, 1);
+                           psTask.setString(2, taskName);
+                           psTask.setInt(3, Integer.parseInt(idValue));
+                           psTask.setNull(4, java.sql.Types.NULL);
+                           psTask.addBatch();
+                       }
+
+                    // Execute batch task insertions
+                    if (psTask != null) {
+                        psTask.executeBatch();
+                    } 
+                }
+                
+                if(!(deleteTasks == null)){
+                    String sqlDeleteTask = "DELETE FROM task WHERE taskID = ?";
+                    PreparedStatement psDeleteTask = conn.prepareStatement(sqlDeleteTask);
+
+                    for (int i = 0; i < deleteTasks.length; i++) {
+                        String taskID = deleteTasks[i];
+                        System.out.println(taskID);
+                        psDeleteTask.setInt(1, Integer.parseInt(taskID));
+                        psDeleteTask.addBatch();
+                    }
+
+                    if (psDeleteTask != null) {
+                        psDeleteTask.executeBatch();
+                    }
+                }
+                
+                    }
 
         String message = "The Event Name: " + eventName + " Successfully Updated";
         response.sendRedirect("/CommunityHub/success.jsp?msg=" + URLEncoder.encode(message, "UTF-8"));

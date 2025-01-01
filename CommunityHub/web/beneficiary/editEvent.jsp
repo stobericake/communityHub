@@ -1,10 +1,11 @@
-<%@page import="java.util.ArrayList"%>
 <%@page import="com.cm.model.address"%>
 <%@page import="com.cm.model.events"%>
-<!DOCTYPE html>
 <html>
-<head>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Edit Event</title>
+        
+            <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Bootstrap JS (optional, for responsive functionality) -->
@@ -66,39 +67,29 @@
         }
         
         .upload-wrapper {
-    position: relative;
-}
+            position: relative;
+        }
 
-.image-preview img {
-    transition: all 0.3s ease;
-}
+        .image-preview img {
+            transition: all 0.3s ease;
+        }
 
-.image-preview img.p-2 {
-    opacity: 0.6;
-}
+        .image-preview img.p-2 {
+            opacity: 0.6;
+        }
 
-#removeImage {
-    font-size: 0.875rem;
-    text-decoration: none;
-}
-
-#removeImage:hover {
-    text-decoration: underline;
-}
     </style>
-    
-    
-            <% 
-                events event = (events) request.getAttribute("event"); 
-                address address = (address) request.getAttribute("address"); 
-               
-            %>
-</head>
-<body class="bg-light">
-     <%@ include file="../header.jspf" %>
-     <form action="updateEvent.do" method="POST" enctype="multipart/form-data">
-          <input type="hidden" name="eventID" class="form-control"  value="<%= event.getEventID() %>" />
-    <div class="container py-5">
+        <% 
+            events event = (events) request.getAttribute("event"); 
+            address address = (address) request.getAttribute("address"); 
+        %>
+    </head>
+    <body>
+        <%@ include file="../header.jspf" %>
+
+        <form action="updateEvent.do" method="POST"  enctype="multipart/form-data">
+               <input type="hidden" name="id" class="form-control" value="<%= event.getEventID() %>">
+          <div class="container py-5">
      
              
         <div class="card p-4">
@@ -245,26 +236,6 @@
         <div class="col-md-6">
             <label class="form-label fw-medium">State <span class="text-danger">*</span></label>
             <input type="text" name="state" class="form-control" placeholder="Enter your state" value=<%= address.getState() %>  required />
-            <!-- <select class="form-select" name="state" value=<%= address.getState() %>  required>
-                <option value="" disabled selected>Select your state</option>
-                <optgroup label="Peninsular Malaysia">
-                    <option value="Johor">Johor</option>
-                    <option value="Kedah">Kedah</option>
-                    <option value="Kelantan">Kelantan</option>
-                    <option value="Melaka">Melaka</option>
-                    <option value="Negeri Sembilan">Negeri Sembilan</option>
-                    <option value="Pahang">Pahang</option>
-                    <option value="Penang">Penang</option>
-                    <option value="Perak">Perak</option>
-                    <option value="Perlis">Perlis</option>
-                    <option value="Selangor">Selangor</option>
-                    <option value="Terengganu">Terengganu</option>
-                </optgroup>
-                <optgroup label="East Malaysia">
-                    <option value="Sabah">Sabah</option>
-                    <option value="Sarawak">Sarawak</option>
-                </optgroup>
-            </select> -->
         </div>
 
         <!-- Postal Code and Country - Two Columns -->
@@ -330,12 +301,19 @@
         
          String duration = event.getDuration().toString(); 
 
-    // Split the duration into hours, minutes, and seconds
-    String[] parts = duration.split(":");
+            // Split the duration into hours, minutes, and seconds
+            String[] parts = duration.split(":");
 
-    // Extract hours and minutes
-    String hours = parts[0]; // Hours (HH)
-    String minutes = parts[1]; // Minutes (MM)
+            // Extract hours and minutes
+            String hours = parts[0]; // Hours (HH)
+            String minutes = parts[1]; // Minutes (MM)
+            
+            int hourInt = Integer.parseInt(hours);  
+            int minuteInt = Integer.parseInt(minutes); 
+
+            
+            hours = String.valueOf(hourInt);
+            minutes = String.valueOf(minuteInt);
         
         %>
         <div class="col-12">
@@ -408,7 +386,7 @@
                                     
                                  </td>
                             </tr>
-                            <tr>
+                           
                                 <%
                                             Connection conn = null;
                                             PreparedStatement stmt = null;
@@ -417,35 +395,40 @@
                                             int index = 0;
               
                                          conn = dbconnection.getConnection();
-                                                String sql = "Select * from task where eventID = ?";
+                                                String sql = "select * from task where eventID = ?";
                                                 stmt = conn.prepareStatement(sql);
                                                 stmt.setInt(1, event.getEventID());
                                                 rs = stmt.executeQuery();
                                                 
-                                           if (rs.next()) {
-                                               
+                                           while (rs.next()) {
+                                            
+                                            int id = rs.getInt("taskID");
                                             String desc = rs.getString("description");
                                             count++;
-                                        %>
-                                        
+                                            
+                                %>
+                                       <tr>  
                                    <td class="px-4">  <%= count %> </td>
                                     <td class="px-4"> 
                                         <span class="task-name"> <%= desc %> </span>
-                                        <input type="text" class="form-control d-none edit-input" id="task[<%= index %>]" value="<%= desc %>"> 
+                                        <input type="text" class="form-control d-none edit-input" id="task[<%= index %>]" name="updatedTask" value="<%= desc %>">
+                                        <input type="hidden" class="form-control d-none edit-input" name="taskID" value="<%= id %>">
+                                        
                                     </td> 
                                     <td class="px-4">
                                         <div class="btn-group btn-group-sm">
                                             <button class="btn btn-outline-primary" onclick="editTask(this)">
                                                 <i class="fas fa-edit"></i>
                                             </button> 
-                                            <button class="btn btn-outline-danger" onclick="deleteTask(this)">
+                                            <button class="btn btn-outline-danger" onclick="deleteTask(this)" data-task-id="<%= id %>">
                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
                                     </td>
                                     <% index = index + 1; }  %>
+                                       </tr>
                         <input id="taskCount" type="hidden" value="<%= count %>" >
-                            </tr>
+                         
                         </tbody>
                     </table>
                 </div>
@@ -453,17 +436,33 @@
         </div>
 
     </div>
-
-    
+                        
+                                <div class="form-section" data-step="5">
+                    <h5 class="mb-3">Verification</h5>
+                    <p class="text-muted">Final verification step before submitting the form.</p>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="termsCheck">
+                        <label class="form-check-label" for="termsCheck">
+                            I confirm that all the details provided are correct.
+                        </label>
+                    </div>
+                </div>
+                        
+           <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-secondary" id="prevBtn" onclick="prevStep()">Previous</button>
+                    <button type="button" class="btn btn-success" id="nextBtn" onclick="nextStep()">Next</button>
+                </div>  
+                        
+                        
+                        
             </div>
         </div>
-                            
+                   
                        
         
     </div>
-    <button type="submit" class="btn btn-success">Submit</button>      
-   </form>
-
-   <script src="javascript/editeventJS.js"></script>
-</body>
+             
+              <script src="javascript/editeventJS.js"></script>
+        </form>
+    </body>
 </html>

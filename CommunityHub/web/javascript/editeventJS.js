@@ -21,7 +21,7 @@
                 nextBtn.textContent = 'Next';
                 nextBtn.setAttribute('type', 'button'); 
             }
-                    }
+            }
 
         function updateSteps() {
             // Update progress steps
@@ -99,32 +99,13 @@
 
 
 
-        // Array to store tasks
-        let taskArray = [];
+   
  
         let taskCount = 1;  // Assuming task count starts from 1
         const taskTotal = parseInt(document.getElementById('taskCount').value, 10);
 
         if(taskTotal !== null){
         taskCount = taskTotal + 1; }
- 
-        function addCurrentTask(){
-        for (let i = 0; i < 2; i++) {
-             let taskInputs = document.querySelector('#task\\[' + i + '\\]');
-             let taskName = null;
-            if (taskInputs !== null) {
-                taskName = taskInputs.value.trim(); // Trim whitespace
-                taskArray.push(taskName); // Add task name to the array
-                
-            } 
-        }
-        }
-        
-          window.onload = function() {
-            addCurrentTask();  
-            console.log(taskArray);
-          };
-        
         
 
         function addTask(event) {
@@ -149,7 +130,7 @@
             '<td class="px-4">' + taskCount + '</td>' +
             '<td class="px-4">' +
                 '<span class="task-name">' + taskName + '</span>' +
-                '<input type="text" class="form-control d-none edit-input" value="' + taskName + '">' +
+                '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
             '</td>' +
             '<td class="px-4">' +
                 '<div class="btn-group btn-group-sm">' +
@@ -165,13 +146,12 @@
             // Append the new task to the list
             taskList.appendChild(row);
 
-            // Add the task to the task array
-            taskArray.push(taskName);
+          
 
             // Increment task count and clear the input
             taskCount++;
             taskInput.value = '';
-             console.log(taskArray);
+           
         }
 
             // Edit task
@@ -180,6 +160,7 @@
                 const row = button.closest('tr');
                 const nameSpan = row.querySelector('.task-name');
                 const nameInput = row.querySelector('.edit-input');
+                
 
                 if (nameSpan.classList.contains('d-none')) {
                     // Save changes
@@ -190,11 +171,9 @@
                     nameSpan.textContent = newName;
                     nameSpan.classList.remove('d-none');
                     nameInput.classList.add('d-none');
+                    nameInput.value = newName;
                     button.innerHTML = '<i class="fas fa-edit"></i>';
-
-                    // Update the task in the array
-                    const taskIndex = Array.from(row.parentElement.children).indexOf(row);
-                    taskArray[taskIndex] = newName;  // Update the array with the new task name
+                
                 } else {
                     // Show edit input
                     nameSpan.classList.add('d-none');
@@ -209,14 +188,20 @@
                    event.preventDefault();
                 const row = button.closest('tr');
                 const taskList = document.getElementById('taskList');
+                const taskID = button.getAttribute('data-task-id');
 
                 if (confirm('Are you sure you want to delete this task?')) {
                     row.remove();
                     taskCount = taskCount - 1;
+                    
+                      const rowID = document.createElement('tr');
+                        rowID.innerHTML =
+                      
+                       '<input type="hidden" class="form-control edit-input" name="deleteTask" value="' + taskID + '">';
 
-                    // Remove task from the array
-                    const taskIndex = Array.from(row.parentElement.children).indexOf(row);
-                    taskArray.splice(taskIndex, 1);
+
+                        // Append the new task to the list
+                        taskList.appendChild(rowID);
 
                     // Show empty state if no tasks remain
                     if (taskList.length === 0) {
@@ -225,26 +210,3 @@
                     }
                 }
             }
-            
-                document.addEventListener('DOMContentLoaded', function() {
-                var form = document.querySelector('form[action="test.do"][method="POST"][enctype="multipart/form-data"]');
-
-
-                    form.addEventListener('submit', function(event) {
-                        // Clear any existing hidden task inputs
-                        var existingTaskInputs = this.querySelectorAll('input[name^="task"]');
-                        existingTaskInputs.forEach(function(input) {
-                            input.remove();
-                        });
-
-                        // Add hidden inputs for each task
-                        taskArray.forEach(function(task, index) {
-                            var nameInput = document.createElement('input');
-                            nameInput.type = 'hidden';
-                            nameInput.name = 'task[' + index + '].name';
-                            nameInput.value = task;
-                            console.log(task);
-                            form.appendChild(nameInput);
-                        });
-                    });
-                });
