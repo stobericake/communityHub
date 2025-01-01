@@ -102,17 +102,20 @@
    
  
         let taskCount = 1;  // Assuming task count starts from 1
-        const taskTotal = parseInt(document.getElementById('taskCount').value, 10);
 
-        if(taskTotal !== null){
-        taskCount = taskTotal + 1; }
+        let taskTotal = parseInt(document.getElementById('taskCount').value, 10);
         
+             if(taskTotal !== null){
+            taskCount = taskTotal + 1; 
+        }
+       
 
         function addTask(event) {
         // Prevent the form from submitting (which causes the page redirect)
         event.preventDefault();
 
-
+   
+    
         const taskInput = document.getElementById('taskInput');
         const taskName = taskInput.value.trim();
 
@@ -122,6 +125,13 @@
             return;
         }
 
+            const emptyState = document.getElementById('emptyState');
+                 if (!emptyState) return;
+                 if (taskCount === 0) {
+                     emptyState.classList.add('show');
+                 } else {
+                     emptyState.classList.remove('show');
+                 }
 
         // Create task row
         const taskList = document.getElementById('taskList');
@@ -184,29 +194,39 @@
             }
 
             // Delete task
-            function deleteTask(button) {
-                   event.preventDefault();
-                const row = button.closest('tr');
-                const taskList = document.getElementById('taskList');
-                const taskID = button.getAttribute('data-task-id');
+      function deleteTask(button) {
+    event.preventDefault();
 
-                if (confirm('Are you sure you want to delete this task?')) {
-                    row.remove();
-                    taskCount = taskCount - 1;
-                    
-                      const rowID = document.createElement('tr');
-                        rowID.innerHTML =
-                      
-                       '<input type="hidden" class="form-control edit-input" name="deleteTask" value="' + taskID + '">';
+    const row = button.closest('tr'); // Get the row to delete
+    const taskList = document.getElementById('taskList'); // Get the task list container
 
+    if (confirm('Are you sure you want to delete this task?')) {
+        // Remove the selected row
+        row.remove();
 
-                        // Append the new task to the list
-                        taskList.appendChild(rowID);
-
-                    // Show empty state if no tasks remain
-                    if (taskList.length === 0) {
-                     const emptyState = document.getElementById('emptyState');
-                        emptyState.style.display = "block";  // Hide the element
-                    }
-                }
+        // Renumber all remaining rows starting from 1
+        const rows = taskList.querySelectorAll('tr');
+        rows.forEach((row, index) => {
+            const numberCell = row.querySelector('td:first-child'); // Get the first cell for numbering
+            if (numberCell) {
+                numberCell.textContent = index + 1 ; // Reset the number to be sequential
             }
+        });
+
+        // Update `taskCount` to match the current number of rows
+        taskCount = rows.length + 1;
+
+
+        // Show empty state if no tasks remain
+        const emptyState = document.getElementById('emptyState');
+        if (!emptyState) return;
+        if (taskCount === 0) {
+            emptyState.classList.add('show');
+        } else {
+            emptyState.classList.remove('show');
+        }
+    }
+}
+
+
+

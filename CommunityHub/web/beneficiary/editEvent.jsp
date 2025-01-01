@@ -77,6 +77,14 @@
         .image-preview img.p-2 {
             opacity: 0.6;
         }
+        
+        .empty-state {
+            display: none;
+        }
+
+        .empty-state.show {
+            display: table-row;  /* This maintains proper table structure */
+        }
 
     </style>
         <% 
@@ -377,16 +385,7 @@
                                 <th class="px-4" style="width: 20%">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="taskList">
-                            <!-- Empty state -->
-                            <tr id="emptyState" class="d-none">
-                                <td colspan="3" class="text-center py-5">
-                                    <i class="fas fa-tasks mb-3 text-muted d-none" style="font-size: 2rem;"></i>
-                                    <p class="text-muted mb-0">No tasks added yet</p>
-                                    
-                                 </td>
-                            </tr>
-                           
+                        <tbody id="taskList">           
                                 <%
                                             Connection conn = null;
                                             PreparedStatement stmt = null;
@@ -407,7 +406,7 @@
                                             count++;
                                             
                                 %>
-                                       <tr>  
+                                         <tr> 
                                    <td class="px-4">  <%= count %> </td>
                                     <td class="px-4"> 
                                         <span class="task-name"> <%= desc %> </span>
@@ -429,7 +428,19 @@
                                        </tr>
                         <input id="taskCount" type="hidden" value="<%= count %>" >
                          
+                     
+                            
                         </tbody>
+                        
+                             <tr id="emptyState" class="empty-state">
+                            <td colspan="3" class="text-center py-5 w-full">
+                                <div class="w-full">
+                                    <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
+                                    <p class="text-muted mb-0">No tasks added yet</p>
+                                </div>
+                            </td>
+                        </tr>
+                        
                     </table>
                 </div>
             </div>
