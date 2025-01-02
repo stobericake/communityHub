@@ -6,6 +6,7 @@
 <%@ page import="java.time.LocalTime" %>
 <%@ page import="java.time.temporal.ChronoUnit" %>
 <%@ page import="java.time.ZoneId" %>
+<%@ page import="com.cm.model.task" %>
 
 <!DOCTYPE html>
 <html>
@@ -132,15 +133,16 @@
                         long daysLeft = ChronoUnit.DAYS.between(currentDate, eventLocalDate);
 
                         // Fetch tasks
-                        List<String> tasks = new ArrayList<String>();
-                        String taskSql = "SELECT description FROM task WHERE eventID = ?";
+                        List<task> tasks = new ArrayList<task>();
+                        String taskSql = "SELECT * FROM task WHERE eventID = ?";
                         taskStmt = conn.prepareStatement(taskSql);
                         taskStmt.setInt(1, Integer.parseInt(eventID));
                         taskRs = taskStmt.executeQuery();
                         while (taskRs.next()) {
-                            tasks.add(taskRs.getString("description"));
+                            int taskId = taskRs.getInt("taskID");
+                            String taskDescription = taskRs.getString("description");
+                            tasks.add(new task(taskId, taskDescription));
                         }
-
                         // Fetch donation details
                         double totalDonation = 0;
                         String donationSql = "SELECT SUM(amount) AS totalDonation FROM donation WHERE eventID = ?";
@@ -227,11 +229,15 @@
                 <p><strong>Tasks Required:</strong></p>
                 <form action="volunteer_servlet.do" method="POST">
                 <input type="hidden" name="eventID" value="<%= eventID %>">
-                <% for (int i = 0; i < tasks.size(); i++) { %>
+                <% int i = 0; %>
+                <% for (task task : tasks) { %>
                     <div class="form-check form-check-inline mb-3">
-                        <input type="radio" class="form-check-input" name="task" id="task<%= i %>" value="<%= tasks.get(i) %>" <%= i == 0 ? "checked" : "" %>>
-                        <label class="form-check-label" for="task<%= i %>"><%= tasks.get(i) %></label>
+                        <input type="hidden" name="taskID" value="<%= task.getTaskID() %>">
+                        <input type="radio" class="form-check-input" name="task" id="task<%= i %>" 
+                               value="<%= task.getDescription() %>" <%= i == 0 ? "checked" : "" %>>
+                        <label class="form-check-label" for="task<%= i %>"><%= task.getDescription() %></label>
                     </div>
+                    <% i++; %>
                 <% } %>
                 <%
                     if (!isLoggedIn) {

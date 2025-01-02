@@ -21,6 +21,11 @@ public class task implements Serializable  {
         this.volunteerID = volunteerID;
         this.connection = connection; // Set the connection from outside
     }
+        // Constructor that initializes the Task object and the database connection
+    public task(int taskID, String description) {
+        this.taskID = taskID;
+        this.description = description;
+    }
 
     // Getters and setters for the attributes
     public int getTaskID() {
