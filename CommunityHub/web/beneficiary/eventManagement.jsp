@@ -42,7 +42,7 @@
                                 PreparedStatement stmt = null;
                                 ResultSet rs = null;
 
-                             session = request.getSession();
+                                session = request.getSession();
                                 String beneficiaryID = session.getAttribute("beneficiary").toString();
                                 try {
                                     conn = dbconnection.getConnection();

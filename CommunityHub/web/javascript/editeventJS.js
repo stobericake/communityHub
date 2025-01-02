@@ -111,7 +111,6 @@
        
 
         function addTask(event) {
-        // Prevent the form from submitting (which causes the page redirect)
         event.preventDefault();
 
    
@@ -193,38 +192,42 @@
                 }
             }
 
-            // Delete task
-      function deleteTask(button) {
+    // Delete task
+    function deleteTask(event, button) {
+    // Prevent the form from submitting
     event.preventDefault();
 
-    const row = button.closest('tr'); // Get the row to delete
-    const taskList = document.getElementById('taskList'); // Get the task list container
+    const row = button.closest('tr'); 
+    const taskList = document.getElementById('taskList'); 
+    const taskId = button.getAttribute('data-task-id');
 
     if (confirm('Are you sure you want to delete this task?')) {
         // Remove the selected row
+        if (taskId !== null) {
+            const inputTask = document.createElement('tr');
+            inputTask.innerHTML =
+                '<input type="hidden" class="form-control" name="deleteTasks" value="' + taskId + '">';
+                
+            taskList.appendChild(inputTask);
+        }
+        
         row.remove();
 
-        // Renumber all remaining rows starting from 1
         const rows = taskList.querySelectorAll('tr');
         rows.forEach((row, index) => {
-            const numberCell = row.querySelector('td:first-child'); // Get the first cell for numbering
+            const numberCell = row.querySelector('td:first-child'); 
             if (numberCell) {
-                numberCell.textContent = index + 1 ; // Reset the number to be sequential
+                numberCell.textContent = index + 1;
             }
         });
 
-        // Update `taskCount` to match the current number of rows
-        taskCount = rows.length + 1;
-        check = rows.length;
-
-
-        // Show empty state if no tasks remain
         const emptyState = document.getElementById('emptyState');
-        if (!emptyState) return;
-        if (check === 0) {
-            emptyState.classList.add('show');
-        } else {
-            emptyState.classList.remove('show');
+        if (emptyState) {
+            if (rows.length === 0) {
+                emptyState.classList.add('show');
+            } else {
+                emptyState.classList.remove('show');
+            }
         }
     }
 }

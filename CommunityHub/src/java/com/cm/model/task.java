@@ -12,10 +12,13 @@ public class task implements Serializable  {
     private Connection connection; // Database connection object
 
     // Constructor that initializes the Task object and the database connection
-    public task(int taskID, String description, String status, Connection connection) {
+    public task(int taskID, String description, String status, int eventID, int volunteerID,
+            Connection connection) {
         this.taskID = taskID;
         this.description = description;
         this.status = status;
+        this.eventID = eventID;
+        this.volunteerID = volunteerID;
         this.connection = connection; // Set the connection from outside
     }
 
