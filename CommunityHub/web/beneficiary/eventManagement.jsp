@@ -75,32 +75,32 @@
             </div>
 
             <!-- Pagination Controls -->
-        <div class="d-flex justify-content-between align-items-center mt-4">
-    <div>
-        <% 
-            Integer currentPage = (Integer) request.getAttribute("currentPage");
-            Integer totalPages = (Integer) request.getAttribute("totalPages");
-        %>
-        <span>Page <%= currentPage %> of <%= totalPages %></span>
-    </div>
-    <div>
-        <nav>
-            <ul class="pagination">
-                <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
-                    <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
-                </li>
-                <% for (int i = 1; i <= totalPages; i++) { %>
-                    <li class="page-item <%= i == currentPage ? "active" : "" %>">
-                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                    </li>
-                <% } %>
-                <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
-                    <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-</div>
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div>
+                    <%
+                        Integer currentPage = (Integer) request.getAttribute("currentPage");
+                        Integer totalPages = (Integer) request.getAttribute("totalPages");
+                    %>
+                    <span>Page <%= currentPage%> of <%= totalPages%></span>
+                </div>
+                <div>
+                    <nav>
+                        <ul class="pagination">
+                            <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
+                                <a class="page-link" href="?page=<%= currentPage - 1%>">Previous</a>
+                            </li>
+                            <% for (int i = 1; i <= totalPages; i++) {%>
+                            <li class="page-item <%= i == currentPage ? "active" : ""%>">
+                                <a class="page-link" href="?page=<%= i%>"><%= i%></a>
+                            </li>
+                            <% }%>
+                            <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
+                                <a class="page-link" href="?page=<%= currentPage + 1%>">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
 
 
         </div>

@@ -140,7 +140,7 @@ public class listEventMgmt extends HttpServlet {
         // Calculate start index for slicing
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, eventList.size());
-        
+
         // Slice the eventList and addressList based on the current page
         List<events> paginatedEventList = eventList.subList(startIndex, endIndex);
         List<address> paginatedAddressList = addressList.subList(startIndex, endIndex);
@@ -149,10 +149,10 @@ public class listEventMgmt extends HttpServlet {
         int totalEvents = eventList.size();
         int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
 
-request.setAttribute("event", paginatedEventList);
-request.setAttribute("address", paginatedAddressList);
-request.setAttribute("totalPages", totalPages);
-request.setAttribute("currentPage", page);
+        request.setAttribute("event", paginatedEventList);
+        request.setAttribute("address", paginatedAddressList);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("currentPage", page);
         request.getRequestDispatcher("beneficiary/eventManagement.jsp").forward(request, response);
     }
 
