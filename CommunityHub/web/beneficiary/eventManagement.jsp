@@ -1,3 +1,6 @@
+<%@page import="com.cm.model.address"%>
+<%@page import="com.cm.model.events"%>
+<%@page import="java.util.List"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,41 +41,24 @@
                             </thead>
                            
                             <% 
-                                Connection conn = null;
-                                PreparedStatement stmt = null;
-                                ResultSet rs = null;
-
-                                session = request.getSession();
-                                String beneficiaryID = session.getAttribute("beneficiary").toString();
-                                try {
-                                    conn = dbconnection.getConnection();
-                                    String sql = "SELECT * from events e, address a WHERE e.addressID = a.addressID && beneficiaryID = ?";
-                                    stmt = conn.prepareStatement(sql);
-                                    stmt.setInt(1, Integer.parseInt(beneficiaryID));
-                                    rs = stmt.executeQuery();
-                                    int count=1;
-                          
-                                    while (rs.next()) {
-                                        int id = rs.getInt("e.eventID");
-                                        String title = rs.getString("e.name");
-                                        Date date = rs.getDate("date");
-                                        Time time = rs.getTime("e.time");
-                                        String location = rs.getString("a.state");
+                               List<events> eventList = (List) request.getAttribute("event");
+                               List<address> addressList = (List) request.getAttribute("address");
+                               for (int i=0; i<eventList.size(); i++) {
                             %>
                             <tbody>
                                 <tr>
-                                    <td><%= count++ %></td>
-                                    <td class="fw-medium"><%= title %></td>
-                                    <td><%= date %></td>
-                                    <td><%= time %></td>
-                                    <td><%= location %></td>
+                                    <td><%= i + 1 %></td>
+                                    <td class="fw-medium"><%= eventList.get(i).getName() %></td>
+                                    <td><%= eventList.get(i).getDate() %></td>
+                                    <td><%= eventList.get(i).getTime() %></td>
+                                    <td><%= addressList.get(i).getState() %></td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group">
-                                            <a href="../updateEvent.do?editEventId=<%= id %>" 
+                                            <a href="updateEvent.do?editEventId=<%= eventList.get(i).getEventID() %>" 
                                                class="btn btn-outline-primary btn-sm">
                                                 <i class="bi bi-pencil"></i> Edit
                                             </a>
-                                            <a href="../updateEvent.do?eventDeleteId=<%= id %>" 
+                                            <a href="updateEvent.do?eventDeleteId=<%= eventList.get(i).getEventID() %>" 
                                                class="btn btn-outline-danger btn-sm">
                                                 <i class="bi bi-trash"></i> Delete
                                             </a>
@@ -82,13 +68,6 @@
                             </tbody>
                             <% 
                                     }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-                                    try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                                    try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-                                }
                             %>
                         </table>
                     </div>

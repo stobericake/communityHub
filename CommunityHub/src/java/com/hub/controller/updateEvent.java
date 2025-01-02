@@ -178,7 +178,7 @@ public class updateEvent extends HttpServlet {
 
                 if (rowsDeleted > 0) {
                     // Redirect back to the event list
-                    response.sendRedirect("beneficiary/eventManagement.jsp"); // You may need to adjust the redirect
+                    response.sendRedirect("listEventMgmt.do"); // You may need to adjust the redirect
                 } else {
                     // Handle the case where the event ID was not found
                     request.setAttribute("error", "Event not found.");
@@ -300,9 +300,11 @@ public class updateEvent extends HttpServlet {
                 stmt.setInt(13, Integer.parseInt(idValue));
 
                 stmt.executeUpdate();
-
-                PreparedStatement psTask;
-                String sqlTask = "UPDATE task SET status = ?, description = ?, eventID = ? WHERE taskID = ?";
+                PreparedStatement psTask = null;
+                String sqlTask = null;
+                if(updatedTask != null){
+           
+                sqlTask = "UPDATE task SET status = ?, description = ?, eventID = ? WHERE taskID = ?";
                 psTask = conn.prepareStatement(sqlTask);
 
                 for (int i = 0; i < updatedTask.length; i++) {
@@ -318,6 +320,7 @@ public class updateEvent extends HttpServlet {
 
                 if (psTask != null) {
                     psTask.executeBatch();
+                }
                 }
 
                 if (!(newTasks == null)) {
