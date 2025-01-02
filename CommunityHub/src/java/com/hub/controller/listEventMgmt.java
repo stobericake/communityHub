@@ -129,8 +129,30 @@ public class listEventMgmt extends HttpServlet {
             return;
         }
 
-        request.setAttribute("event", eventList);
-        request.setAttribute("address", addressList);
+        // Set the pagination parameters
+        int pageSize = 8;  // Limit of data per page
+        int page = 1; // Default to first page
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            page = Integer.parseInt(pageParam);
+        }
+
+        // Calculate start index for slicing
+        int startIndex = (page - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, eventList.size());
+        
+        // Slice the eventList and addressList based on the current page
+        List<events> paginatedEventList = eventList.subList(startIndex, endIndex);
+        List<address> paginatedAddressList = addressList.subList(startIndex, endIndex);
+
+        // Get the total number of events for pagination controls
+        int totalEvents = eventList.size();
+        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+
+request.setAttribute("event", paginatedEventList);
+request.setAttribute("address", paginatedAddressList);
+request.setAttribute("totalPages", totalPages);
+request.setAttribute("currentPage", page);
         request.getRequestDispatcher("beneficiary/eventManagement.jsp").forward(request, response);
     }
 
