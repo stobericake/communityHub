@@ -118,7 +118,7 @@ public class loginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("userRole", "admin");
                 session.setAttribute("admin", adminID);
-                response.sendRedirect(request.getContextPath() + "/admin/adminListing.jsp");
+                response.sendRedirect(request.getContextPath() + "/adminList.do");
                 return;
             }
 
