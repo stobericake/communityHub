@@ -59,113 +59,113 @@ public class vEventList extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     
- @Override
-protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
-    if (volunteerId == 0) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
-    
-    List<events> eventList = new ArrayList<>();
-    List<address> addressList = new ArrayList<>();
-    
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-        conn = dbconnection.getConnection();
-            if (conn == null) {
-                System.out.println("DB Connection: " + (conn != null));
-                return;
-            }
-
-        // Fetch postal code for volunteer
-        String postalCodeQuery = "SELECT a.postalCode FROM volunteer v JOIN address a ON v.addressID = a.addressID WHERE v.volunteerID = ?";
-        stmt = conn.prepareStatement(postalCodeQuery);
-        stmt.setInt(1, volunteerId);
-        rs = stmt.executeQuery();
-
-        int postalCode = 0;
-        
-        if(rs.next()){
-        postalCode = rs.getInt("postalCode");
-        System.out.println(postalCode);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
+        if (volunteerId == 0) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
         }
-        rs.close();
-        stmt.close();
 
-        if (postalCode != 0) {
-            // Count total events for pagination
-            String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ?";
-            PreparedStatement countStmt = conn.prepareStatement(countSql);
-            countStmt.setInt(1, postalCode);
-            ResultSet countRs = countStmt.executeQuery();
-            countRs.next();
-            int totalEvents = countRs.getInt("total");
-            countRs.close();
-            countStmt.close();
+        List<events> eventList = new ArrayList<>();
+        List<address> addressList = new ArrayList<>();
 
-            int eventsPerPage = 4;
-            int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-            int offset = (currentPage - 1) * eventsPerPage;
-            int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
 
-            // Fetch events for the current page
-            String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? ";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, postalCode);
+        try {
+            conn = dbconnection.getConnection();
+                if (conn == null) {
+                    System.out.println("DB Connection: " + (conn != null));
+                    return;
+                }
+
+            // Fetch postal code for volunteer
+            String postalCodeQuery = "SELECT a.postalCode FROM volunteer v JOIN address a ON v.addressID = a.addressID WHERE v.volunteerID = ?";
+            stmt = conn.prepareStatement(postalCodeQuery);
+            stmt.setInt(1, volunteerId);
             rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                address address = new address(
-                        rs.getInt("addressID"),
-                        rs.getString("country"),
-                        rs.getInt("postalCode"),
-                        rs.getString("street"),
-                        rs.getString("city"),
-                        rs.getString("state")
-                );
-                
-                addressList.add(address);
+            int postalCode = 0;
 
-                events event = new events(
-                        rs.getInt("eventID"),
-                        rs.getString("name"),
-                        rs.getDate("date"),
-                        rs.getTime("time"),
-                        rs.getTime("duration"),
-                        rs.getString("description"),
-                        rs.getInt("volunteerNeeded"),
-                        rs.getString("status"),
-                        rs.getBlob("image"),
-                        rs.getDouble("donationLimit"),
-                        rs.getInt("addressID")
-                );
-                eventList.add(event);
+            if(rs.next()){
+            postalCode = rs.getInt("postalCode");
+            System.out.println(postalCode);
             }
+            rs.close();
+            stmt.close();
 
-            request.setAttribute("events", eventList);
-            request.setAttribute("address", addressList);
-            request.setAttribute("totalPages", totalPages);
-            request.setAttribute("currentPage", currentPage);
+            if (postalCode != 0) {
+                // Count total events for pagination
+                String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ?";
+                PreparedStatement countStmt = conn.prepareStatement(countSql);
+                countStmt.setInt(1, postalCode);
+                ResultSet countRs = countStmt.executeQuery();
+                countRs.next();
+                int totalEvents = countRs.getInt("total");
+                countRs.close();
+                countStmt.close();
 
-            request.getRequestDispatcher("/volunteer/newListingEvent.jsp").forward(request, response);
-        } else {
-            request.setAttribute("errorMessage", "No postal code found for the volunteer.");
+                int eventsPerPage = 4;
+                int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+                int offset = (currentPage - 1) * eventsPerPage;
+                int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
+
+                // Fetch events for the current page
+                String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? ";
+                stmt = conn.prepareStatement(sql);
+                stmt.setInt(1, postalCode);
+                rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    address address = new address(
+                            rs.getInt("addressID"),
+                            rs.getString("country"),
+                            rs.getInt("postalCode"),
+                            rs.getString("street"),
+                            rs.getString("city"),
+                            rs.getString("state")
+                    );
+
+                    addressList.add(address);
+
+                    events event = new events(
+                            rs.getInt("eventID"),
+                            rs.getString("name"),
+                            rs.getDate("date"),
+                            rs.getTime("time"),
+                            rs.getTime("duration"),
+                            rs.getString("description"),
+                            rs.getInt("volunteerNeeded"),
+                            rs.getString("status"),
+                            rs.getBlob("image"),
+                            rs.getDouble("donationLimit"),
+                            rs.getInt("addressID")
+                    );
+                    eventList.add(event);
+                }
+
+                request.setAttribute("events", eventList);
+                request.setAttribute("address", addressList);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("currentPage", currentPage);
+
+                request.getRequestDispatcher("/volunteer/newListingEvent.jsp").forward(request, response);
+            } else {
+                request.setAttribute("errorMessage", "No postal code found for the volunteer.");
+                request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred while fetching events.");
             request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
+        } finally {
+            try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("errorMessage", "An error occurred while fetching events.");
-        request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
-    } finally {
-        try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-        try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-        try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
     }
-}
 
     /**
      * Handles the HTTP <code>POST</code> method.

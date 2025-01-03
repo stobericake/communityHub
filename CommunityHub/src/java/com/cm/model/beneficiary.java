@@ -12,6 +12,12 @@ public class beneficiary {
     private String password;
     private int addressID;
     private Blob image;
+    
+        // Constructor
+    public beneficiary(int beneficiaryID, String name) {
+        this.beneficiaryID = beneficiaryID;
+        this.name = name;
+    }
 
     /**
      * @return the beneficiaryID

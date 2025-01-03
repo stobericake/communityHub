@@ -4,16 +4,14 @@
  * and open the template in the editor.
  */
 package com.hub.controller;
-
-import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.sql.*;
-import java.util.*;
 import javax.servlet.http.HttpSession;
 /**
  *
@@ -58,9 +56,8 @@ public class volunteerServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        
     }
 
     /**
@@ -71,7 +68,7 @@ public class volunteerServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-       @Override
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         String volunteerID = (String) session.getAttribute("volunteerID");
@@ -105,14 +102,14 @@ public class volunteerServlet extends HttpServlet {
             
             int rowsInserted = insertStmt.executeUpdate();
             if (rowsInserted > 0) {
-                response.sendRedirect("success.jsp");
+                response.sendRedirect("../success.jsp");
             } else {
-                response.sendRedirect("success.jsp");
+                response.sendRedirect("../error.jsp");
             }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("success.jsp");
+            response.sendRedirect("../error.jsp");
         } finally {
             try { if (insertStmt != null) insertStmt.close(); } catch (Exception e) { e.printStackTrace(); }
             try { if (updateStmt != null) updateStmt.close(); } catch (Exception e) { e.printStackTrace(); }

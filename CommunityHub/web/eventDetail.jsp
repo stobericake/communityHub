@@ -1,3 +1,6 @@
+<%@page import="com.cm.model.beneficiary"%>
+<%@page import="com.cm.model.address"%>
+<%@page import="com.cm.model.events"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.*" %>
@@ -74,105 +77,30 @@
     <body>
         <%@ include file="header.jspf" %>
         <%
-            String eventID = request.getParameter("eventID");
-            String loggedInUser = (String) session.getAttribute("volunteer");
-
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-            PreparedStatement taskStmt = null;
-            ResultSet taskRs = null;
-            PreparedStatement donationStmt = null;
-            ResultSet donationRs = null;
-            boolean isLoggedIn = loggedInUser != null;
-
-            if (eventID != null && !eventID.isEmpty()) {
-                try {
-                    conn = dbconnection.getConnection();
-                    String sql = "SELECT e.eventID, e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration, e.description, a.state AS location, b.name AS beneficiary, e.donationLimit FROM events e " +
-                                 "INNER JOIN address a ON e.addressID = a.addressID " +
-                                 "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
-                    stmt = conn.prepareStatement(sql);
-                    stmt.setInt(1, Integer.parseInt(eventID));
-                    rs = stmt.executeQuery();
-
-                    if (rs.next()) {
-                        int id = rs.getInt("eventID");
-                        String eventName = rs.getString("eventName");
-                        Date eventDate = rs.getDate("eventDate");
-                        Time eventTime = rs.getTime("eventTime");
-                        Time eventDuration = rs.getTime("duration");
-                        String description = rs.getString("description");
-                        String location = rs.getString("location");
-                        String beneficiary = rs.getString("beneficiary");
-                        double donationLimit = rs.getDouble("donationLimit");
-                        // Formatting setup
-                        SimpleDateFormat outputFormat = new SimpleDateFormat("MM/dd/yyyy - hh:mma");
-                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-                        // Convert `eventDate` to LocalDate (compatible approach)
-                        LocalDate eventLocalDate = new java.util.Date(eventDate.getTime())
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate();
-
-                        // Convert SQL Time to LocalTime
-                        LocalTime startTime = eventTime.toLocalTime();
-                        LocalTime duration = eventDuration.toLocalTime();
-
-                        // Calculate the event's end time
-                        LocalTime endTime = startTime.plusHours(duration.getHour()).plusMinutes(duration.getMinute());
-
-                        // Format the date and time for display
-                        String formattedDate = inputDateFormat.format(eventDate);
-                        String formattedStartTime = outputFormat.format(eventTime);
-                        String formattedEndTime = outputFormat.format(Time.valueOf(endTime));
-
-                        // Calculate days left from the current date to the event date
-                        LocalDate currentDate = LocalDate.now();
-                        long daysLeft = ChronoUnit.DAYS.between(currentDate, eventLocalDate);
-
-                        // Fetch tasks
-                        List<task> tasks = new ArrayList<task>();
-                        String taskSql = "SELECT * FROM task WHERE eventID = ?";
-                        taskStmt = conn.prepareStatement(taskSql);
-                        taskStmt.setInt(1, Integer.parseInt(eventID));
-                        taskRs = taskStmt.executeQuery();
-                        while (taskRs.next()) {
-                            int taskId = taskRs.getInt("taskID");
-                            String taskDescription = taskRs.getString("description");
-                            tasks.add(new task(taskId, taskDescription));
-                        }
-                        // Fetch donation details
-                        double totalDonation = 0;
-                        String donationSql = "SELECT SUM(amount) AS totalDonation FROM donation WHERE eventID = ?";
-                        donationStmt = conn.prepareStatement(donationSql);
-                        donationStmt.setInt(1, Integer.parseInt(eventID));
-                        donationRs = donationStmt.executeQuery();
-                        if (donationRs.next()) {
-                            totalDonation = donationRs.getDouble("totalDonation");
-                        }
-                        
-                            // Fetch the total number of contributors (donors)
-                        String contributorsQuery = "SELECT COUNT(DISTINCT donorID) AS totalContributors FROM donation WHERE eventID = ?";
-                        PreparedStatement contributorsStmt = conn.prepareStatement(contributorsQuery);
-                        contributorsStmt.setInt(1, Integer.parseInt(eventID));
-                        ResultSet contributorsRs = contributorsStmt.executeQuery();
-                        int totalContributors = 0;
-                        if (contributorsRs.next()) {
-                            totalContributors = contributorsRs.getInt("totalContributors");
-                        }
-                        double remainingAmount = donationLimit - totalDonation;
-                        double progress = (totalDonation / donationLimit) * 100;
-
+            String user = (String) session.getAttribute("userRole");
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
+                return;
+            }
+             int eventID = Integer.parseInt(request.getParameter("eventID"));
+            // Access the attributes set by the servlet
+            events event = (events) request.getAttribute("events");
+            address addressObj = (address) request.getAttribute("address");
+            beneficiary beneficiaryObj = (beneficiary) request.getAttribute("beneficiary");
+            List<task> tasks = (List) request.getAttribute("taskList");
+            
+            int totalContributors = Integer.parseInt(request.getAttribute("totalContributors").toString());
+            double totalDonation = Double.parseDouble(request.getAttribute("totalDonation").toString());
+            double remainingAmount = Double.parseDouble(request.getAttribute("remainingAmount").toString());
+            double progress = Double.parseDouble(request.getAttribute("progress").toString());
         %>
-            <img src="getImage.do?type=events&id=<%= id%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <img src="getImage.do?type=events&id=<%= event.getEventID()%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
-                    <p class="h6"><%= eventName %></p>
+                    <p class="h6"><%= event.getName() %></p>
                 </blockquote>
                 <figcaption class="blockquote-footer">
-                    BY <cite title="Beneficiary Name">@<%= beneficiary %></cite>
+                    BY <cite title="Beneficiary Name">@<%= beneficiaryObj.getName() %></cite>
                 </figcaption>
             </figure>
             <div class="divider"></div>
@@ -185,12 +113,12 @@
                             <div class="progress-bar" role="progressbar" style="width: <%= progress %>%;" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
-                            <small class="text-muted text-start">Goal<br>RM<%= donationLimit %></small>
+                            <small class="text-muted text-start">Goal<br>RM<%= event.getDonationLimit() %></small>
                             <small class="text-muted text-end">Remaining<br>RM<%= remainingAmount %></small>
                         </div>
                         <div class="d-flex align-items-start justify-content-start">
                         <i class="bi bi-clock me-2"></i>
-                        <small class="text-muted"><%= daysLeft %> days </small>
+                        <small class="text-muted"> ${daysLeft} days </small>
                     </div>
                     <div class="d-flex align-items-start justify-content-start">
                         <i class="bi bi-heart-fill text-danger me-2"></i>
@@ -204,11 +132,11 @@
                     </div>
        
             <p><strong>About.</strong></p>
-            <p><%= description %></p>
+            <p><%= event.getDescription() %></p>
             <p><strong>Location.</strong></p>
             <div class="d-flex align-items-start justify-content-start">
                 <i class="bi bi-geo-alt me-2"></i>
-                <p class="text-muted"><%= location %></p>
+                <p class="text-muted"><%= addressObj.getState() %></p>
             </div>
             <p><strong>Event Date.</strong></p>
             <div class="d-flex justify-content-between mb-3">
@@ -216,19 +144,19 @@
             
                 <br><div class="d-flex align-items-start justify-content-start">
                 <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"><%= formattedStartTime %></p>
+                <p class="text-muted">${formattedStartTime}</p>
             </div>
             </small>
             <small>End Date
                 <br><div class="d-flex align-items-start justify-content-start">
                 <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"><%= formattedEndTime %></p>
+                <p class="text-muted">${formattedStartTime}</p>
             </div>
             </small>
             </div>
                 <p><strong>Tasks Required:</strong></p>
                 <form action="volunteer_servlet.do" method="POST">
-                <input type="hidden" name="eventID" value="<%= eventID %>">
+                <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
                 <% int i = 0; %>
                 <% for (task task : tasks) { %>
                     <div class="form-check form-check-inline mb-3">
@@ -240,7 +168,7 @@
                     <% i++; %>
                 <% } %>
                 <%
-                    if (!isLoggedIn) {
+                   if (user == null) {
                 %>
                 <p class="text-danger">Please log in to volunteer for this event.</p>
                 <a href="../login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
@@ -258,34 +186,5 @@
             </form>
             </div>
         </div>
-        <% 
-                    } else { 
-        %>
-        <div class="container">
-            <p>Event not found.</p>
-        </div>
-        <%  }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Close resources manually
-            try {
-                if (taskRs != null) taskRs.close();
-                if (taskStmt != null) taskStmt.close();
-                if (donationRs != null) donationRs.close();
-                if (donationStmt != null) donationStmt.close();
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    } else { 
-    %>
-    <div class="container">
-        <p>Invalid Event ID.</p>
-    </div>
-    <% } %>
     </body>
 </html>

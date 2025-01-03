@@ -60,6 +60,10 @@
         <servlet-name>vEventList</servlet-name>
         <servlet-class>com.hub.controller.vEventList</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>vEventDetail</servlet-name>
+        <servlet-class>com.hub.controller.vEventDetail</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -143,6 +147,10 @@
     <servlet-mapping>
         <servlet-name>vEventList</servlet-name>
         <url-pattern>/vEventList.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>vEventDetail</servlet-name>
+        <url-pattern>/vEvent.do</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
