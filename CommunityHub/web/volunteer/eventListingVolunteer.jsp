@@ -7,6 +7,23 @@
 <%@page import="java.util.Base64"%>
 <%@page import="java.io.ByteArrayOutputStream"%>
 <%@page import="java.io.InputStream"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="com.cm.model.address"%>
+<%@ page import="java.util.ArrayList" %>
+<%@page import="com.cm.model.events"%>
+<%
+    ArrayList<events> events = (ArrayList) request.getAttribute("events");
+    ArrayList<address> addresses = (ArrayList) request.getAttribute("addresses");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+%>
+<%
+    String volunteerId = (String) request.getSession().getAttribute("volunteer");
+    if (volunteerId == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,97 +133,57 @@
         <!-- Events Grid -->
         <div class="row g-4">
             <%
-                String user = (String) session.getAttribute("userRole");
-
-                if (user == null) {
-                    response.sendRedirect(request.getContextPath()+"/login.jsp");
-                    return; 
-                }
-                String volunteerID = (String) session.getAttribute("volunteer");
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-
-            try {
-                conn = dbconnection.getConnection();
-
-                String query = "SELECT a.postalCode FROM volunteer v JOIN address a ON v.addressID = a.addressID WHERE v.volunteerID = ?";
-                stmt = conn.prepareStatement(query);
-                stmt.setString(1, volunteerID);
-                rs = stmt.executeQuery();
-
-                String postalCode = null;
-                if (rs.next()) {
-                    postalCode = rs.getString("postalCode");
-                }
-                rs.close();
-                stmt.close();
-
-                if (postalCode != null) {
-                    String countSql = "SELECT COUNT(*) as total FROM Events e JOIN Address a ON e.addressID = a.addressID WHERE a.postalCode = ?";
-                    PreparedStatement countStmt = conn.prepareStatement(countSql);
-                    countStmt.setString(1, postalCode);
-                    ResultSet countRs = countStmt.executeQuery();
-                    countRs.next();
-                    int totalEvents = countRs.getInt("total");
-                    countRs.close();
-                    countStmt.close();
-
-
-                    int eventsPerPage = 4;
-                    int currentPage = request.getParameter("page") != null ? 
-                    Integer.parseInt(request.getParameter("page")) : 1;
-                    int offset = (currentPage - 1) * eventsPerPage;
-                    int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
-
-                    String sql = "SELECT * FROM Events e JOIN Address a ON e.addressID = a.addressID WHERE a.postalCode = ? LIMIT ? OFFSET ?";
-                    stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, postalCode);
-                    stmt.setInt(2, eventsPerPage);
-                    stmt.setInt(3, offset);
-                    rs = stmt.executeQuery();
-
-                    while (rs.next()) {
-                        int id = rs.getInt("e.eventID");
-                        String title = rs.getString("name");
-                        String desc = rs.getString("description");
-                        String location = rs.getString("city");
-                        
-                            
-                        Date date = rs.getDate("date");
-                        Time time = rs.getTime("time");
-            %>
+                if (events != null && !events.isEmpty()) {
+                                        int num = (currentPage - 1) * 4 + 1; // Start number for pagination
+                                        for (events event : events) {
+                                            int eventID = event.getEventID();
+                                            String name = event.getName();
+                                            String desc = event.getDescription();
+                                            String city = "";
+                                            for (address addr : addresses) {
+                                                if (addr.getAddressID() == event.getAddressID()) {
+                                                    city = addr.getCity();
+                                                    break; // Exit the loop once the match is found
+                                                }
+                                            }
+                                            String formattedDate = new SimpleDateFormat("dd/MM E").format(event.getDate());
+                                            String formattedTime = new SimpleDateFormat("HH:mm").format(event.getTime());
+            %>           
             <div class="col-md-3">
-                <div class="card h-100 event-card" data-title="<%= title %>" 
-                     data-description="<%= desc %>" data-location="<%= location %>">
+                <div class="card h-100 event-card" data-title="<%= name%>" 
+                     data-description="<%= desc %>" data-location="<%= city%>">
                     <div class="position-relative">
-                        <img src="../getImage.do?type=events&id=<%= id%>" alt="Image" class="w-100 h-100" style="object-fit: cover;">
+                        <img src="getImage.do?id=<%= eventID %>" alt="Image" class="w-100 h-100" style="object-fit: cover;">
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title styl"><%= title %></h5>
+                        <h5 class="card-title styl"><%= name %></h5>
                         <p class="card-text text-truncate"><%= desc %></p>
                         
                         <div class="mb-3">
                             <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-geo-alt-fill me-2"></i>
-                                <small><%= location %></small>
+                                <small><%= city %></small>
                             </div>
                             <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-calendar-date me-2"></i>
-                                <small><%= date %> <%= time %></small>
+                                <small><%= formattedDate %> <%= formattedTime %> %></small>
                             </div>
                         </div>
 
                         <div class="d-flex justify-content-end align-items-center">                     
                             <a href="#" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
-                            <a href="../eventDetail.jsp?eventID=<%= id %>" class="volunteer-button">View Details</a>      
+                            <a href="eventDetail.jsp?eventID=<%= eventID %>" class="volunteer-button">View Details</a>      
                         </div>
                     </div>
                 </div>
             </div>
-            <% 
-                    }
-            %>
+                <% }
+                                } else {
+                %>
+            <div> No events found.</div>
+                               
+                <% }%>
+          
             
             <!-- Pagination -->
             <div class="col-12">
@@ -232,18 +209,9 @@
                     </ul>
                 </nav>
             </div>
-            <% } else { %>             
-            <div class="error-message">Invalid Volunteer ID. Please try again.</div>
-            <%                
-                     }      
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-                }
-            %>
+             <div class="error-message">Invalid Volunteer ID. Please try again.</div>
+            
+            
         </div>
     </div>
     <!-- Keep your existing filterEvents() function -->
