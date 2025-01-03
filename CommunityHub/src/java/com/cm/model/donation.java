@@ -23,8 +23,25 @@ public class donation implements Serializable {
     private int donorID;
     private int volunteerID;
     private double amount;
-    private LocalDate date;
+    private Date date;
     private Blob receiptImage;
+
+    public donation(int donationID, double amount, Date date, Blob receiptImage) {
+        this.donationID = donationID;
+        this.amount = amount;
+        this.date = date;
+        this.receiptImage = receiptImage;
+    }
+
+    public donation(int donationID, int eventID, int donorID, int volunteerID, double amount, Date date, Blob receiptImage) {
+        this.donationID = donationID;
+        this.eventID = eventID;
+        this.donorID = donorID;
+        this.volunteerID = volunteerID;
+        this.amount = amount;
+        this.date = date;
+        this.receiptImage = receiptImage;
+    }
     
      public static Map<String, Object> getDonationDetails(int donationID, Connection conn) throws SQLException {
         String sql = "SELECT * FROM donations WHERE donationID = ?";
@@ -110,14 +127,14 @@ public class donation implements Serializable {
     /**
      * @return the date
      */
-    public LocalDate getDate() {
+    public Date getDate() {
         return date;
     }
 
     /**
      * @param date the date to set
      */
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

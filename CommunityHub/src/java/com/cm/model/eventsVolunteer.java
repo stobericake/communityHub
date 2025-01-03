@@ -12,6 +12,12 @@ import java.io.Serializable;
  * @author Ipah
  */
 public class eventsVolunteer implements Serializable{
+
+    public eventsVolunteer(int eventsVolunteerID, int eventID, int volunteerID) {
+        this.eventsVolunteerID = eventsVolunteerID;
+        this.eventID = eventID;
+        this.volunteerID = volunteerID;
+    }
     private int eventsVolunteerID;
     private int eventID;
     private int volunteerID;
