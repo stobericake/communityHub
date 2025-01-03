@@ -88,8 +88,8 @@ public class vEventDetail extends HttpServlet {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         events event = null;
-        address addressObj = null;
-        beneficiary beneficiaryObj = null;
+        address address = null;
+        beneficiary beneficiary = null;
         double donationLimit  = 0.0;
         PreparedStatement donationStmt = null;
         ResultSet donationRs = null;
@@ -138,35 +138,32 @@ public class vEventDetail extends HttpServlet {
             
 
             if (rs.next()) {
-            // Populate the event object
-            int eventIDFromDB = rs.getInt("eventID");
-            String eventName = rs.getString("name");
-            Date eventDate = rs.getDate("date");
-            Time eventTime = rs.getTime("time");
-            Time eventDuration = rs.getTime("duration");
-            String description = rs.getString("description");
-            int volunteersNeeded = rs.getInt("volunteersNeeded");
-            String status = rs.getString("status");
-            Blob image = rs.getBlob("image");
-            donationLimit = rs.getDouble("donationLimit");
-            int addressIdFromDB = rs.getInt("addressID");
-
-            // Create the events object
-            event = new events(eventIDFromDB, eventName, eventDate, eventTime, eventDuration,
-                               description, volunteersNeeded, status, image, donationLimit, addressIdFromDB);
-            // Populate the address object
-            int addressID = rs.getInt("addressID");
-            String country = rs.getString("country");
-            int postalCode = rs.getInt("postalCode");
-            String street = rs.getString("street");
-            String city = rs.getString("city");
-            String state = rs.getString("state");
-            addressObj = new address(addressID, country, postalCode, street, city, state);
-
-            // Populate the beneficiary object
-            int beneficiaryID = rs.getInt("beneficiaryID");
-            String beneficiaryName = rs.getString("name");
-            beneficiaryObj = new beneficiary(beneficiaryID, beneficiaryName);
+            event = new events(
+                            rs.getInt("eventID"),
+                            rs.getString("e.name"),
+                            rs.getDate("date"),
+                            rs.getTime("time"),
+                            rs.getTime("duration"),
+                            rs.getString("description"),
+                            rs.getInt("volunteerNeeded"),
+                            rs.getString("status"),
+                            rs.getBlob("image"),
+                            rs.getDouble("donationLimit"),
+                            rs.getInt("addressID")
+                    );
+            address = new address(
+                            rs.getInt("addressID"),
+                            rs.getString("country"),
+                            rs.getInt("postalCode"),
+                            rs.getString("street"),
+                            rs.getString("city"),
+                            rs.getString("state")
+                    );
+            
+            beneficiary = new beneficiary(
+                    rs.getInt("beneficiaryID"), 
+                    rs.getString("b.name")
+            );
 
         }
             List<task> taskList = new ArrayList<>();
@@ -179,9 +176,9 @@ public class vEventDetail extends HttpServlet {
                 String taskDescription = taskRs.getString("description");
                 taskList.add(new task(taskId, taskDescription));
             }
-            request.setAttribute("events", event);
-            request.setAttribute("address", addressObj);
-            request.setAttribute("beneficiary", beneficiaryObj);
+            request.setAttribute("event", event);
+            request.setAttribute("address", address);
+            request.setAttribute("beneficiary", beneficiary);
             request.setAttribute("tasks", taskList);
             request.setAttribute("formattedDate", formattedDate);
             request.setAttribute("formattedStartTime", formattedStartTime);

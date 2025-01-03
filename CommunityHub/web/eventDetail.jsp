@@ -82,9 +82,9 @@
                 response.sendRedirect(request.getContextPath() + "/login.jsp");
                 return;
             }
-             int eventID = Integer.parseInt(request.getParameter("eventID"));
+            int eventID = Integer.parseInt(request.getParameter("eventID"));
             // Access the attributes set by the servlet
-            events event = (events) request.getAttribute("events");
+            events event = (events) request.getAttribute("event");
             address addressObj = (address) request.getAttribute("address");
             beneficiary beneficiaryObj = (beneficiary) request.getAttribute("beneficiary");
             List<task> tasks = (List) request.getAttribute("taskList");
@@ -94,7 +94,7 @@
             double remainingAmount = Double.parseDouble(request.getAttribute("remainingAmount").toString());
             double progress = Double.parseDouble(request.getAttribute("progress").toString());
         %>
-            <img src="getImage.do?type=events&id=<%= event.getEventID()%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <img src="getImage.do?type=events&id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
                     <p class="h6"><%= event.getName() %></p>
