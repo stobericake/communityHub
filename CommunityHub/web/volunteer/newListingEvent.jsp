@@ -1,8 +1,8 @@
-<!--
+<%--
     Document   : EventListing
     Created on : Dec 25, 2024, 1:43:16 AM
-    Author     : Rina-->
-
+    Author     : Rina
+--%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.cm.model.address"%>
 <%@ page import="java.util.ArrayList" %>
@@ -12,19 +12,7 @@
 <%@page import="java.util.Base64"%>
 <%@page import="java.io.ByteArrayOutputStream"%>
 <%@page import="java.io.InputStream"%>
-<%
-    ArrayList<events> events = (ArrayList) request.getAttribute("events");
-    ArrayList<address> addresses = (ArrayList) request.getAttribute("addresses");
-    Integer totalPages = (Integer) request.getAttribute("totalPages");
-    Integer currentPage = (Integer) request.getAttribute("currentPage");
-%>
-<%
-    String volunteerId = (String) request.getSession().getAttribute("volunteerID");
-    if (volunteerId == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
-        return;
-    }
-%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,7 +107,19 @@
     </style>
 </head>
 <body>
-    <%@ include file="header.jspf" %>
+    <%
+    List<events> events = (List) request.getAttribute("events");
+    List<address> addresses = (List) request.getAttribute("address");
+    int totalPages = Integer.parseInt(request.getAttribute("totalPages").toString());
+    int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
+
+    String volunteerId = request.getSession().getAttribute("volunteer").toString();
+    if (volunteerId == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
+<%@ include file="../header.jspf" %>
     <div class="container mt-4">
         <!-- Header Section -->
         <div class="row align-items-center mb-4">
@@ -171,8 +171,7 @@
                                 <small><%= formattedDate %> <%= formattedTime %> %></small>
                             </div>
                         </div>
-
-                        <div class="d-flex justify-content-end align-items-center">                     
+<div class="d-flex justify-content-end align-items-center">                     
                             <a href="#" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
                             <a href="eventDetail.jsp?eventID=<%= eventID %>" class="volunteer-button">View Details</a>      
                         </div>
@@ -226,7 +225,7 @@
                 var description = card.getAttribute('data-description').toLowerCase();
                 var location = card.getAttribute('data-location').toLowerCase();
 
-                if (title.includes(input) || description.includes(input) || location.includes(input)) {
+                if (title.includes(input)  description.includes(input)  location.includes(input)) {
                     card.closest('.col-md-3').style.display = '';
                 } else {
                     card.closest('.col-md-3').style.display = 'none';
