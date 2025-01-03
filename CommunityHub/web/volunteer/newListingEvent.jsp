@@ -209,8 +209,6 @@
                     </ul>
                 </nav>
             </div> 
-            <div class="error-message">Invalid Volunteer ID. Please try again.</div>
-            
             
         </div>
     </div>
