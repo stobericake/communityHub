@@ -6,13 +6,13 @@ import java.sql.*;
 public class task implements Serializable  {
     private int taskID;
     private String description;
-    private String status;
+    private int status;
     private int eventID;
     private int volunteerID;
     private Connection connection; // Database connection object
 
     // Constructor that initializes the Task object and the database connection
-    public task(int taskID, String description, String status, int eventID, int volunteerID,
+    public task(int taskID, String description, int status, int eventID, int volunteerID,
             Connection connection) {
         this.taskID = taskID;
         this.description = description;
@@ -36,7 +36,7 @@ public class task implements Serializable  {
         return description;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -48,7 +48,7 @@ public class task implements Serializable  {
         this.description = description;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 
@@ -79,11 +79,11 @@ public class task implements Serializable  {
     }
 
     // Method to update the status of the task
-    public void updateStatus(String newStatus) {
+    public void updateStatus(int newStatus) {
         this.status = newStatus; // Update the status in the object
         String sql = "UPDATE tasks SET status = ? WHERE task_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, newStatus);  // Set the new status
+            stmt.setInt(1, newStatus);  // Set the new status
             stmt.setInt(2, this.taskID);   // Specify the task ID to update
             stmt.executeUpdate();          // Execute the update
         } catch (SQLException e) {
