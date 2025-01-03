@@ -38,11 +38,19 @@ public class events implements Serializable{
         this.addressID = addressID;
     }
     
+    public events(String name, Date date, Time time, Time duration) {
+        this.name = name;
+        this.date = date ;
+        this.time = time;
+        this.duration = duration;
+    }
+    
     public events(int id, String name, Date date) {
         this.eventID = id;
         this.name = name;
         this.date = date ;
     }
+    
     
     // Getters
     public int getEventID() {

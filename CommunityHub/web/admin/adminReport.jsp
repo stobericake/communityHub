@@ -187,7 +187,7 @@
                                     <td><%=vol.getName()%></td>
                                     <td class="text-center"><%=vol.getContactInfo()%></td>
                                     <td class="text-center">
-                                        <a class="btn btn-info bg-purple rounded-4" href="reportVolunteer.jsp?volunteerID=<%=vol.getVolunteerID()%>">Generate</a>
+                                        <a class="btn btn-info bg-purple rounded-4" href="<%= request.getContextPath() %>/AdminVolunteer?volunteerID=<%= vol.getVolunteerID() %>">Generate</a>
                                     </td>
                                 </tr>
                                 <% }
