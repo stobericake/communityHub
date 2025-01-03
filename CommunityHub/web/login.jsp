@@ -7,7 +7,7 @@
         if (userRole != null) {
             // Redirect based on the user role
             if (userRole.equals("volunteer")) {
-                response.sendRedirect(request.getContextPath()+ "/volunteer/eventListingVolunteer.jsp"); // Redirect to volunteer page
+                response.sendRedirect(request.getContextPath()+ "/volunteer/newListingEvent.jsp"); // Redirect to volunteer page
                 return;
             } else if (userRole.equals("admin")) {
                 response.sendRedirect(request.getContextPath()+ "/admin/adminListing.jsp"); // Redirect to admin page

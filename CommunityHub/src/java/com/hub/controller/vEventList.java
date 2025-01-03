@@ -61,8 +61,8 @@ public class vEventList extends HttpServlet {
     
  @Override
 protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    String volunteerId = (String) request.getSession().getAttribute("volunteerID");
-    if (volunteerId == null) {
+    int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
+    if (volunteerId == 0) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
@@ -84,21 +84,23 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
         // Fetch postal code for volunteer
         String postalCodeQuery = "SELECT a.postalCode FROM volunteer v JOIN address a ON v.addressID = a.addressID WHERE v.volunteerID = ?";
         stmt = conn.prepareStatement(postalCodeQuery);
-        stmt.setString(1, volunteerId);
+        stmt.setInt(1, volunteerId);
         rs = stmt.executeQuery();
 
-        String postalCode = null;
-        if (rs.next()) {
-            postalCode = rs.getString("postalCode");
+        int postalCode = 0;
+        
+        if(rs.next()){
+        postalCode = rs.getInt("postalCode");
+        System.out.println(postalCode);
         }
         rs.close();
         stmt.close();
 
-        if (postalCode != null) {
+        if (postalCode != 0) {
             // Count total events for pagination
-            String countSql = "SELECT COUNT(*) as total FROM Events e JOIN Address a ON e.addressID = a.addressID WHERE a.postalCode = ?";
+            String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ?";
             PreparedStatement countStmt = conn.prepareStatement(countSql);
-            countStmt.setString(1, postalCode);
+            countStmt.setInt(1, postalCode);
             ResultSet countRs = countStmt.executeQuery();
             countRs.next();
             int totalEvents = countRs.getInt("total");
@@ -111,11 +113,9 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
             int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
 
             // Fetch events for the current page
-            String sql = "SELECT * FROM Events e JOIN Address a ON e.addressID = a.addressID WHERE a.postalCode = ? LIMIT ? OFFSET ?";
+            String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? ";
             stmt = conn.prepareStatement(sql);
-            stmt.setString(1, postalCode);
-            stmt.setInt(2, eventsPerPage);
-            stmt.setInt(3, offset);
+            stmt.setInt(1, postalCode);
             rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -147,7 +147,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
             }
 
             request.setAttribute("events", eventList);
-            request.setAttribute("addresses", addressList);
+            request.setAttribute("address", addressList);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("currentPage", currentPage);
 

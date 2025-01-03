@@ -95,11 +95,11 @@ public class loginServlet extends HttpServlet {
 
             if (resultSet.next()) {
                 // User is a volunteer
-                String volunteerID = resultSet.getString("volunteerID");
+                int volunteerID = resultSet.getInt("volunteerID");
                 HttpSession session = request.getSession();
-                session.setAttribute("userRole", "volunteer");
+                session.setAttribute("userRole", "volunteer"); 
                 session.setAttribute("volunteer", volunteerID);
-                response.sendRedirect(request.getContextPath() + "/volunteer/eventListingVolunteer.jsp");
+                response.sendRedirect(request.getContextPath() + "/vEventList.do");
 //                RequestDispatcher view = request.getRequestDispatcher(request.getContextPath() + "/volunteer/eventListingVolunteer.jsp");
 //                view.forward(request, response);
                 return;
