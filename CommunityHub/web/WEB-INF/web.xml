@@ -56,6 +56,10 @@
         <servlet-name>GenerateCertificate</servlet-name>
         <servlet-class>com.hub.controller.GenerateCertificate</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>vEventList</servlet-name>
+        <servlet-class>com.hub.controller.vEventList</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -135,6 +139,10 @@
     <servlet-mapping>
         <servlet-name>GenerateCertificate</servlet-name>
         <url-pattern>/certificate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>vEventList</servlet-name>
+        <url-pattern>/vEventList.do</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
