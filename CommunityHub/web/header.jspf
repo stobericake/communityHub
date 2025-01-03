@@ -178,9 +178,9 @@
                                 Menu
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminListing.jsp" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminReport.jsp" onclick="updateDropdownText('Generate Report')">Generate Report</a></li>
+<!--                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>-->
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/adminList.do" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/reportList" onclick="updateDropdownText('Generate Report')">Generate Report</a></li>
                             </ul>
                         </li>
 
@@ -216,11 +216,11 @@
                             String profileImageUrl = "";
                             if (session != null) {
                                 if (session.getAttribute("volunteer") != null) {
-                                    profileImageUrl = "../getImage.do?type=volunteer&id=" + session.getAttribute("volunteer");
+                                    profileImageUrl = "getImage.do?type=volunteer&id=" + session.getAttribute("volunteer");
                                 } else if (session.getAttribute("admin") != null) {
-                                    profileImageUrl = "../getImage.do?type=admin&id=" + session.getAttribute("admin");
+                                    profileImageUrl = "getImage.do?type=admin&id=" + session.getAttribute("admin");
                                 } else if (session.getAttribute("beneficiary") != null) {
-                                    profileImageUrl = "../getImage.do?type=beneficiary&id=" + session.getAttribute("beneficiary");
+                                    profileImageUrl = "getImage.do?type=beneficiary&id=" + session.getAttribute("beneficiary");
                                 }
                             }
                         %>

@@ -37,6 +37,13 @@ public class events implements Serializable{
         this.donationLimit = donationLimit;
         this.addressID = addressID;
     }
+    
+    public events(int id, String name, Date date) {
+        this.eventID = id;
+        this.name = name;
+        this.date = date ;
+    }
+    
     // Getters
     public int getEventID() {
         return eventID;

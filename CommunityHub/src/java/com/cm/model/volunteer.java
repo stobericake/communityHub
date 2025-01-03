@@ -20,7 +20,22 @@ public class volunteer implements Serializable {
     private String password;
     private int addressID;
     private Blob image;
-
+    
+    public volunteer(int id, String name, int contact, String username, String password, int addressID, Blob image){
+        this.volunteerID = id;
+        this.name = name;
+        this.contactInfo = contact;
+        this.username = username;
+        this.password = password;
+        this.addressID = addressID;
+        this.image = image;
+    }
+    
+    public volunteer(int id, String name, int contact){
+        this.volunteerID = id;
+        this.name = name;
+        this.contactInfo = contact;
+    }
     /**
      * @return the volunteerID
      */
@@ -103,6 +118,20 @@ public class volunteer implements Serializable {
      */
     public void setAddressID(int addressID) {
         this.addressID = addressID;
+    }
+    
+    /**
+     * @return the image
+     */
+    public Blob getImage() {
+        return image;
+    }
+
+    /**
+     * @param addressID the addressID to set
+     */
+    public void setImage(Blob Image) {
+        this.image = Image;
     }
 
     @Override
