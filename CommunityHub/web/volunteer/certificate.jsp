@@ -1,3 +1,15 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="java.util.*" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.LocalTime" %>
+<%@ page import="java.time.temporal.ChronoUnit" %>
+<%@ page import="java.time.ZoneId" %>
+<%@ page import="com.cm.model.task" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="com.hub.controller.dbconnection" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -174,70 +186,125 @@
                 padding: 1rem !important;
             }
         }
+        
     </style>
 </head>
 <body>
-    <div class="certificate-container d-flex align-items-center justify-content-center p-3">
-        <div class="certificate container p-4 my-4">
-            <div class="top-wave"></div>
-            <i class="badge-icon fas fa-award"></i>
-            
-            <!-- Header -->
-            <div class="text-center mb-4 position-relative">
-                <div class="company-logo">
-                    <i class="fas fa-hands-helping"></i>
-                </div>
-                <h6 class="text-uppercase mb-2 fw-light">Company Name</h6>
-                <h1 class="certificate-title mb-0">Certificate</h1>
-                <p class="text-uppercase">of Achievement</p>
+   <%     
+    String eventID = request.getParameter("eventID");
+    String volunteerID = (String) session.getAttribute("volunteer");
+
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+
+    if (eventID != null && !eventID.isEmpty()) {
+        try {
+            conn = dbconnection.getConnection();
+            String sql = "SELECT e.name, e.date, e.time, e.duration, " +
+                         "e.description, b.name, v.name " +
+                         "FROM events e " +
+                         "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID " +
+                         "INNER JOIN volunteer v ON v.volunteerID = ? " +
+                         "WHERE e.eventID = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, volunteerID);
+            stmt.setString(2, eventID);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String eventName = rs.getString("e.name");
+                Date eventDate = rs.getDate("e.date");
+                Time eventTime = rs.getTime("e.time");
+                Time eventDuration = rs.getTime("e.duration");
+                String description = rs.getString("e.description");
+                String beneficiaryName = rs.getString("b.name");
+                String volunteerName = rs.getString("v.name");
+
+            // Convert java.sql.Date to java.util.Date
+                java.util.Date utilEventDate = new java.util.Date(eventDate.getTime());
+
+                // Format eventStartDate
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+                String formattedStartDate = dateFormat.format(utilEventDate);
+
+                // Calculate and format endDate
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(utilEventDate);
+                calendar.add(Calendar.DATE, 1); // Add 1 day
+                String formattedEndDate = dateFormat.format(calendar.getTime());
+%>
+<div class="certificate-container d-flex align-items-center justify-content-center p-3">
+    <div class="certificate container p-4 my-4">
+        <div class="top-wave"></div>
+        <i class="badge-icon fas fa-award"></i>
+        
+        <!-- Header -->
+        <div class="text-center mb-4 position-relative">
+            <div class="company-logo">
+                <i class="fas fa-hands-helping"></i>
             </div>
+            <h6 class="text-uppercase mb-2 fw-light">BY CommUNITYHub</h6>
+            <h1 class="certificate-title mb-0">Certificate</h1>
+            <p class="text-uppercase">of Appreciation</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="text-center mb-3">
+            <h5 class="text-uppercase mb-2 fw-light">Presented To</h5>
+            <h2 class="recipient-name mb-3"><%= volunteerName %></h2>
             
-            <!-- Content -->
-            <div class="text-center mb-3">
-                <h5 class="text-uppercase mb-3 fw-light">Presented To</h5>
-                <h2 class="recipient-name mb-3">Name Surname</h2>
-                
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <p class="description mb-3">
-                          In recognition of your outstanding contributions as a volunteer during the [Event Name], 
-                          your dedication and hard work played a vital role in ensuring the success of this event. 
-                          Your efforts have left a lasting positive impact on our community and all those who attended.
-                        </p>
-                        <p class="certificate-date">
-                            <i class="far fa-calendar-alt me-2"></i>
-                            Awarded on December 23, 2024
-                        </p>
-                    </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <p class="description mb-2">
+                        In recognition of your outstanding contributions as a volunteer during the event <b><%= eventName %></b>, 
+                        held on <b><%= formattedStartDate %></b>, your dedication and hard work played a vital role in ensuring the success of this event. 
+                        Your efforts have left a lasting positive impact on our community and all those who attended.
+                    </p>
+                    <p class="certificate-date">
+                        <i class="far fa-calendar-alt me-2"></i>
+                        Awarded on <%= formattedEndDate %>
+                    </p>
                 </div>
             </div>
-            
-            <!-- Signatures -->
-            <div class="row justify-content-center mt-4 pt-4">
+        </div>
+        
+        <!-- Signatures -->
+            <div class="row justify-content-center mt-2 pt-2">
                 <div class="col-5 col-md-4 text-center">
-                    <div class="signature-text">Anaqi</div>
-                    <div class="signature-line"></div>
-                    <p class="mb-0">Director Name</p>
-                    <p class="signature-title">Director</p>
                 </div>
                 <div class="col-5 col-md-4 text-center">
-                    <div class="signature-text">Anaqi</div>
+                    <div class="signature-text"><%= beneficiaryName %></div>
                     <div class="signature-line"></div>
-                    <p class="mb-0">Manager Name</p>
+                    <p class="mb-0"><%= beneficiaryName %></p>
                     <p class="signature-title">Manager</p>
                 </div>
             </div>
 
-            <div class="seal">
-                <i class="fas fa-certificate"></i>
-            </div>
-            
-            <div class="bottom-chevron"></div>
-
-            <div class="text-center certificate-footer mt-4"></div>
+        <div class="seal">
+            <i class="fas fa-certificate"></i>
         </div>
-    </div>
+        
+        <div class="bottom-chevron"></div>
 
+        <div class="text-center certificate-footer mt-4"></div>
+    </div>
+</div>
+<% 
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+%>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -116,8 +116,6 @@
         <!-- Events Grid -->
         <div class="row g-4">
             <%
-            
-
                 String user = (String) session.getAttribute("userRole");
 
                 if (user == null) {

@@ -219,14 +219,16 @@
                         <img src="../assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
                         <p><strong>DOWNLOAD CERTIFICATE</strong></p>
                     </div>
-                    <button class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;" type="button" data-bs-toggle="modal" data-bs-target="#certificateOverlay">
-                        DOWNLOAD <i class="bi bi-download"></i>
-                    </button>
+                    <a href="certificate.jsp?eventID=<%= eventID %>&volunteerID=<%= loggedInUser %>" 
+                        class="btn w-100 py-2" 
+                        style="background-color: #000; color: #fff; border-radius: 30px;">
+                         DOWNLOAD <i class="bi bi-download"></i>
+                     </a>
                 </div>
             </div>
 
             <!-- Fullscreen Overlay -->
-            <div class="modal fade" id="certificateOverlay" tabindex="-1" aria-labelledby="certificateOverlayLabel" aria-hidden="true">
+<!--            <div class="modal fade" id="certificateOverlay" tabindex="-1" aria-labelledby="certificateOverlayLabel" aria-hidden="true">
                 <div class="modal-dialog modal-fullscreen">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -234,9 +236,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <!-- Wrap the certificate content with a specific class -->
+                             Wrap the certificate content with a specific class 
                             <div class="certificate-content">
-                                <%@ include file="certificate.jsp" %>
+                                <%//@ include file="certificate.jsp" %>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -245,7 +247,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
 
 
             <!-- Second Card -->

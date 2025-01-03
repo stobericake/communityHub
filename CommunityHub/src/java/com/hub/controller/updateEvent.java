@@ -84,7 +84,7 @@ public class updateEvent extends HttpServlet {
                     while (rsTask.next()) {
                         int taskID = rsTask.getInt("taskID");
                         String desc = rsTask.getString("description");
-                        String statusTask = rsTask.getString("status");
+                        int statusTask = rsTask.getInt("status");
                         int eventIDTask = rsTask.getInt("eventID");
                         int volunteerIDTask = rsTask.getInt("volunteerID");
 
