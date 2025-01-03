@@ -75,11 +75,10 @@
             } else if (role.equals("admin")) {
                h = "admin/adminListing.jsp";
             } else if (role.equals("beneficiary")) {
-                h = "beneficiary/eventManagement.jsp";
+                h = "listEventMgmt.do";
             }
         }
-         
-        
+
             String message = request.getParameter("msg");
         %>
         
