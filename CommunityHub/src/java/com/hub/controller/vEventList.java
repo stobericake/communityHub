@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import com.hub.controller.dbconnection;
 import com.cm.model.address;
 import com.cm.model.events;
 import javax.servlet.RequestDispatcher;
@@ -22,8 +21,7 @@ import javax.servlet.RequestDispatcher;
  *
  * @author Rina
  */
-@WebServlet(name = "volunteerEventListing", urlPatterns = {"/volunteer_event_list.do"})
-public class volunteerEventListing extends HttpServlet {
+public class vEventList extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -63,7 +61,7 @@ public class volunteerEventListing extends HttpServlet {
     
  @Override
 protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    String volunteerId = (String) request.getSession().getAttribute("volunteer");
+    String volunteerId = (String) request.getSession().getAttribute("volunteerID");
     if (volunteerId == null) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
@@ -129,6 +127,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
                         rs.getString("city"),
                         rs.getString("state")
                 );
+                
                 addressList.add(address);
 
                 events event = new events(
@@ -152,7 +151,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("currentPage", currentPage);
 
-            request.getRequestDispatcher("/newListing.jsp").forward(request, response);
+            request.getRequestDispatcher("/volunteer/newListingEvent.jsp").forward(request, response);
         } else {
             request.setAttribute("errorMessage", "No postal code found for the volunteer.");
             request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
