@@ -48,6 +48,10 @@
         <servlet-name>AdminVolunteerReport</servlet-name>
         <servlet-class>com.hub.controller.AdminVolunteerReport</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminEventReport</servlet-name>
+        <servlet-class>com.hub.controller.AdminEventReport</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -119,6 +123,10 @@
     <servlet-mapping>
         <servlet-name>AdminVolunteerReport</servlet-name>
         <url-pattern>/AdminVolunteer</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminEventReport</servlet-name>
+        <url-pattern>/AdminEvent</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

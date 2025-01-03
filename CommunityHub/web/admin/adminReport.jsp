@@ -13,7 +13,14 @@
     String status = (String) request.getAttribute("status");
     String activeTab = (String) request.getAttribute("activeTab");
 %>  
+<%
+    String user = (String) session.getAttribute("userRole");
 
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -109,7 +116,7 @@
                                     <td><%=event.getName()%></td>
                                     <td class="text-center"><%=formattedDate%></td>
                                     <td class="text-center">
-                                        <a class="btn btn-info bg-purple rounded-4" href="reportEvent.jsp?eventID=<%=event.getEventID()%>">Generate</a>
+                                        <a class="btn btn-info bg-purple rounded-4" href="<%= request.getContextPath() %>/AdminEvent?eventID=<%= event.getEventID() %>">Generate</a>
                                     </td>
                                 </tr>
                                 <% }

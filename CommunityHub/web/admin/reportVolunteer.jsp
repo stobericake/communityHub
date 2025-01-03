@@ -8,7 +8,14 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="com.cm.model.events" %>
 <%@ page import="java.text.DecimalFormat" %>
+<%
+    String user = (String) session.getAttribute("userRole");
 
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 <%
     ArrayList<events> events = (ArrayList) request.getAttribute("events");
     ArrayList<String> tasks = (ArrayList) request.getAttribute("tasks");
