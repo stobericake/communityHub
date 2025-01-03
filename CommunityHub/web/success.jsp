@@ -73,7 +73,7 @@
             if (role.equals("volunteer")) {
                 h = "volunteer/eventListingVolunteer.jsp";
             } else if (role.equals("admin")) {
-               h = "admin/adminListing.jsp";
+               h = "adminList.do";
             } else if (role.equals("beneficiary")) {
                 h = "listEventMgmt.do";
             }
