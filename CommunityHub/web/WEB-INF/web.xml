@@ -36,6 +36,10 @@
         <servlet-name>listGuestEvent</servlet-name>
         <servlet-class>com.hub.controller.listGuestEvent</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>adminList</servlet-name>
+        <servlet-class>com.hub.controller.AdminList</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -95,6 +99,10 @@
     <servlet-mapping>
         <servlet-name>listGuestEvent</servlet-name>
         <url-pattern>/listGuestEvent.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>adminList</servlet-name>
+        <url-pattern>/adminList</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
