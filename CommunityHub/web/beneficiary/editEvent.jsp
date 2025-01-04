@@ -650,6 +650,34 @@
 
                 taskInput.value = '';
             }
+            
+            // Edit Task Function
+function editTask(button) {
+    event.preventDefault();
+    const row = button.closest('tr');
+    const nameSpan = row.querySelector('.task-name');
+    const nameInput = row.querySelector('.edit-input');
+
+    if (nameSpan.classList.contains('d-none')) {
+        // Save changes
+        const newName = nameInput.value.trim();
+        if (!newName) {
+            return;
+        }
+        nameSpan.textContent = newName;
+        nameSpan.classList.remove('d-none');
+        nameInput.classList.add('d-none');
+        nameInput.value = newName;
+        button.innerHTML = '<i class="fas fa-edit"></i>';
+
+    } else {
+        // Show edit input
+        nameSpan.classList.add('d-none');
+        nameInput.classList.remove('d-none');
+        nameInput.focus();
+        button.innerHTML = '<i class="fas fa-save"></i>';
+    }
+}
 
             // Delete Task Function
             function deleteTask(event, button) {
@@ -661,17 +689,24 @@
                 const taskId = button.getAttribute('data-task-id');
 
                 if (confirm('Are you sure you want to delete this task?')) {
+                    
+                
+                    
                     row.remove();
-
+                    
                     // Update row numbering
                     updateRowNumbers();
 
                     // Show empty state if no tasks remain
                     toggleEmptyState();
+                    
+                    if(taskId){
+                    deleteTaskDB(taskId);
+                }
                 }
             }
 
-// Update Row Numbers Function
+            // Update Row Numbers Function
             function updateRowNumbers() {
                 const taskList = document.getElementById('taskList');
                 const rows = taskList.querySelectorAll('tr');
@@ -687,6 +722,18 @@
                         }
                     }
                 });
+            }
+            
+            function deleteTaskDB(taskId){
+                    id = taskId;
+                    const taskList = document.getElementById('taskList');
+                    if (id !== null) {
+                        const inputTask = document.createElement('tr');
+                        inputTask.innerHTML =
+                                '<input type="hidden" class="form-control" name="deleteTasks" value="' + id + '">';
+
+                        taskList.appendChild(inputTask);
+                    }
             }
 
 
