@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*" %>
-<%@ page import="com.hub.controller.dbconnection" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.cm.model.eventsVolunteer" %>
+<%@ page import="com.cm.model.volunteer" %>
+<%@ page import="com.cm.model.events" %>
 
 <!DOCTYPE html>
 <html>
@@ -81,7 +83,7 @@
     </script>
 </head>
 <body>
-    <%@ include file="../header.jspf" %>
+    <%@ include file="header2.jspf" %>
     <div class="container my-4">
         <!-- Volunteer List Overview Header -->
         <div class="row align-items-center mb-4">
@@ -97,75 +99,6 @@
             </div>
         </div>
 
-        <% 
-            String searchName = request.getParameter("searchName");
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-
-            try {
-                conn = dbconnection.getConnection();
-
-                // Count the total volunteers
-                String countSql = "SELECT COUNT(*) as total FROM Volunteer v " +
-                                  "INNER JOIN eventsVolunteer ev ON v.volunteerID = ev.volunteerID " +
-                                  "INNER JOIN events e ON ev.eventID = e.eventID " +
-                                  "WHERE 1=1";
-
-                if (searchName != null && !searchName.isEmpty()) {
-                    countSql += " AND (v.volunteerID LIKE ? OR v.name LIKE ? OR v.contactInfo LIKE ? " + 
-                                "OR v.username LIKE ? OR e.name LIKE ? OR e.date LIKE ?)";
-                }
-
-                stmt = conn.prepareStatement(countSql);
-
-                if (searchName != null && !searchName.isEmpty()) {
-                    String likePattern = "%" + searchName + "%";
-                    for (int i = 1; i <= 6; i++) {
-                        stmt.setString(i, likePattern);
-                    }
-                }
-
-                rs = stmt.executeQuery();
-                rs.next();
-                int totalVolunteers = rs.getInt("total");
-
-                // Pagination parameters
-                int volunteersPerPage = 10;
-                int currentPage = request.getParameter("page") != null ? 
-                                  Integer.parseInt(request.getParameter("page")) : 1;
-                int offset = (currentPage - 1) * volunteersPerPage;
-                int totalPages = (int) Math.ceil((double) totalVolunteers / volunteersPerPage);
-
-                // Fetch volunteers
-                String sql = "SELECT v.volunteerID, v.name, v.contactInfo, v.username, e.name AS eventName, e.date AS dateJoined " +
-                             "FROM Volunteer v " +
-                             "INNER JOIN eventsVolunteer ev ON v.volunteerID = ev.volunteerID " +
-                             "INNER JOIN events e ON ev.eventID = e.eventID " +
-                             "WHERE 1=1";
-
-                if (searchName != null && !searchName.isEmpty()) {
-                    sql += " AND (v.volunteerID LIKE ? OR v.name LIKE ? OR v.contactInfo LIKE ? " + 
-                            "OR v.username LIKE ? OR e.name LIKE ? OR e.date LIKE ?)";
-                }
-
-                sql += " LIMIT ? OFFSET ?";
-                stmt = conn.prepareStatement(sql);
-
-                int paramIndex = 1;
-                if (searchName != null && !searchName.isEmpty()) {
-                    String likePattern = "%" + searchName + "%";
-                    for (int i = 0; i < 6; i++) {
-                        stmt.setString(paramIndex++, likePattern);
-                    }
-                }
-
-                stmt.setInt(paramIndex++, volunteersPerPage);
-                stmt.setInt(paramIndex++, offset);
-
-                rs = stmt.executeQuery();
-        %>
-
         <div class="table-spacing table-responsive">
             <table id="volunteerTable" class="table table-bordered table-striped">
                 <thead class="table-dark">
@@ -179,16 +112,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                <% while (rs.next()) { %>
+                <c:forEach var="eventsVolunteer" items="${eventsVolunteers}">
                     <tr>
-                        <td><%= rs.getInt("volunteerID") %></td>
-                        <td><%= rs.getString("name") %></td>
-                        <td><%= rs.getString("contactInfo") %></td>
-                        <td><%= rs.getString("username") %></td>
-                        <td><%= rs.getString("eventName") %></td>
-                        <td><%= rs.getDate("dateJoined") %></td>
+                        <td>${eventsVolunteer.volunteerID}</td>
+                        <td>${eventsVolunteer.name}</td>
+                        <td>${eventsVolunteer.contactInfo}</td>
+                        <td>${eventsVolunteer.username}</td>
+                        <td>${eventsVolunteer.eventName}</td>
+                        <td>${eventsVolunteer.dateJoined}</td>
                     </tr>
-                <% } %>
+                </c:forEach>
                 </tbody>
             </table>
         </div>
@@ -197,34 +130,24 @@
         <div class="pagination-container">
             <nav aria-label="Page navigation">
                 <ul class="pagination">
-                    <!-- Previous -->
-                    <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
-                        <a class="page-link" href="?page=<%= currentPage - 1 %>&searchName=<%= searchName != null ? searchName : "" %>">&laquo;</a>
+                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="?page=${currentPage - 1}&searchName=${searchName}" aria-label="Previous">
+                            &laquo;
+                        </a>
                     </li>
-
-                    <% for (int i = 1; i <= totalPages; i++) { %>
-                        <li class="page-item <%= currentPage == i ? "active" : "" %>">
-                            <a class="page-link" href="?page=<%= i %>&searchName=<%= searchName != null ? searchName : "" %>"><%= i %></a>
+                    <c:forEach begin="1" end="${totalPages}" var="page">
+                        <li class="page-item ${currentPage == page ? 'active' : ''}">
+                            <a class="page-link" href="?page=${page}&searchName=${searchName}">${page}</a>
                         </li>
-                    <% } %>
-
-                    <!-- Next -->
-                    <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
-                        <a class="page-link" href="?page=<%= currentPage + 1 %>&searchName=<%= searchName != null ? searchName : "" %>">&raquo;</a>
+                    </c:forEach>
+                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="?page=${currentPage + 1}&searchName=${searchName}" aria-label="Next">
+                            &raquo;
+                        </a>
                     </li>
                 </ul>
             </nav>
         </div>
-
-        <% 
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (rs != null) try { rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-                if (stmt != null) try { stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                if (conn != null) try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-            }
-        %>
     </div>
 </body>
 </html>

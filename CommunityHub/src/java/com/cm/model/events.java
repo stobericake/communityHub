@@ -8,6 +8,10 @@ import java.sql.Time;
 import java.sql.Blob;
 
 public class events implements Serializable{
+
+    public static void add(events ev) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     private int eventID;
     private String name;
     private Blob image;

@@ -18,6 +18,10 @@ import java.time.LocalDate;
 import java.sql.Blob;
 
 public class donation implements Serializable {
+
+    public static void add(donation dn) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     private int donationID;
     private int eventID;
     private int donorID;
