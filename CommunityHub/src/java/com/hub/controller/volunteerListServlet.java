@@ -3,7 +3,7 @@ package com.hub.controller;
 import com.cm.model.volunteer;
 import com.cm.model.eventsVolunteer;
 import com.cm.model.events;
-import com.cm.controller.dbconnection;
+import com.hub.controller.dbconnection;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

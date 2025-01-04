@@ -75,7 +75,7 @@
     </script>
 </head>
 <body>
-    <%@ include file="header2.jspf" %>
+    <%@ include file="header.jspf" %>
     <div class="container my-4">
         <div class="row align-items-center mb-4">
             <div class="col-md-4">

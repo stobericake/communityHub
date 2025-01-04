@@ -68,6 +68,14 @@
         <servlet-name>myEventList</servlet-name>
         <servlet-class>com.hub.controller.myEventList</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>donorListServlet</servlet-name>
+        <servlet-class>com.hub.controller.donorListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>volunteerListServlet</servlet-name>
+        <servlet-class>com.hub.controller.volunteerListServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -159,6 +167,14 @@
     <servlet-mapping>
         <servlet-name>myEventList</servlet-name>
         <url-pattern>/myList.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>donorListServlet</servlet-name>
+        <url-pattern>/donorList.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>volunteerListServlet</servlet-name>
+        <url-pattern>/volunteerList.do</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
