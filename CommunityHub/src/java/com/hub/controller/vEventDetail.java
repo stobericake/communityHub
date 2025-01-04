@@ -90,102 +90,98 @@ public class vEventDetail extends HttpServlet {
         events event = null;
         address address = null;
         beneficiary beneficiary = null;
-        double donationLimit  = 0.0;
         PreparedStatement donationStmt = null;
         ResultSet donationRs = null;
+        List<task> taskList = new ArrayList<>();
         
-        try {
-            conn = dbconnection.getConnection();
-            if (conn == null) {
-                    System.out.println("DB Connection: " + (conn != null));
-                    return;
+        if (eventID != 0 ) {
+                try {
+                    conn = dbconnection.getConnection();
+                    String sql = "SELECT * FROM events e " +
+                                 "INNER JOIN address a ON e.addressID = a.addressID " +
+                                 "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
+                    stmt = conn.prepareStatement(sql);
+                    stmt.setInt(1, eventID);
+                    rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                event = new events(
+                                rs.getInt("e.eventID"),
+                                rs.getString("e.name"),
+                                rs.getDate("date"),
+                                rs.getTime("time"),
+                                rs.getTime("duration"),
+                                rs.getString("description"),
+                                rs.getInt("volunteerNeeded"),
+                                rs.getString("status"),
+                                rs.getBlob("image"),
+                                rs.getDouble("donationLimit"),
+                                rs.getInt("addressID")
+                        );
+                address = new address(
+                                rs.getInt("addressID"),
+                                rs.getString("country"),
+                                rs.getInt("postalCode"),
+                                rs.getString("street"),
+                                rs.getString("city"),
+                                rs.getString("state")
+                        );
+
+                beneficiary = new beneficiary(
+                        rs.getInt("beneficiaryID"), 
+                        rs.getString("b.name")
+                );
+
+                String taskSql = "SELECT * FROM task WHERE eventID = ?";
+                PreparedStatement taskStmt = conn.prepareStatement(taskSql);
+                taskStmt.setInt(1, eventID);
+                ResultSet taskRs = taskStmt.executeQuery();
+                while (taskRs.next()) {
+                    int taskId = taskRs.getInt("taskID");
+                    String taskDescription = taskRs.getString("description");
+                    taskList.add(new task(taskId, taskDescription));
                 }
-            
-            // Fetch event details
-            String sql = "SELECT * FROM events e " +
-                         "INNER JOIN address a ON e.addressID = a.addressID " +
-                         "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, eventID);
-            rs = stmt.executeQuery();
-
-             // Retrieve event details
-                Date startDate = rs.getDate("e.eventDate");
-                Time eTime = rs.getTime("e.eventTime");
-                Time eDuration = rs.getTime("e.duration");
                 
-                SimpleDateFormat outputFormat = new SimpleDateFormat("MM/dd/yyyy - hh:mma");
-                SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                // Convert eventDate to LocalDate
-                LocalDate eventLocalDate = new java.util.Date(startDate.getTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("MM/dd/yyyy - hh:mma");
+                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                // Convert SQL Time to LocalTime
-                LocalTime startTime = eTime.toLocalTime();
-                LocalTime duration = eDuration.toLocalTime();
+                    // Convert eventDate to LocalDate
+                    LocalDate eventLocalDate = new java.util.Date(rs.getDate("date").getTime())
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate();
 
-                // Calculate the event's end time
-                LocalTime endTime = startTime.plusHours(duration.getHour()).plusMinutes(duration.getMinute());
+                    // Convert SQL Time to LocalTime
+                    LocalTime startTime = rs.getTime("time").toLocalTime();
+                    LocalTime duration = rs.getTime("duration").toLocalTime();
 
-                // Format the date and time for display
-                String formattedDate = inputDateFormat.format(startDate);
-                String formattedStartTime = outputFormat.format(eTime);
-                String formattedEndTime = outputFormat.format(Time.valueOf(endTime));
+                    // Calculate the event's end time
+                    LocalTime endTime = startTime.plusHours(duration.getHour()).plusMinutes(duration.getMinute());
 
-                // Calculate days left from the current date to the event date
-                LocalDate currentDate = LocalDate.now();
-                long daysLeft = ChronoUnit.DAYS.between(currentDate, eventLocalDate);           
+                    // Format the date and time for display
+                    String formattedDate = inputDateFormat.format(rs.getDate("date"));
+                    String formattedStartTime = outputFormat.format(rs.getTime("time"));
+                    String formattedEndTime = outputFormat.format(Time.valueOf(endTime));
+
+                    // Calculate days left from the current date to the event date
+                    LocalDate currentDate = LocalDate.now();
+                    long daysLeft = ChronoUnit.DAYS.between(currentDate, eventLocalDate); 
+                    
+                    request.setAttribute("formattedDate", formattedDate);
+                    request.setAttribute("formattedStartTime", formattedStartTime);
+                    request.setAttribute("formattedEndTime", formattedEndTime);
+                    request.setAttribute("daysLeft", daysLeft);
+                    request.setAttribute("event", event);
+                    request.setAttribute("address", address);
+                    request.setAttribute("beneficiary", beneficiary);
+                    request.setAttribute("tasks", taskList);
+                }
+      
             
-
-            if (rs.next()) {
-            event = new events(
-                            rs.getInt("eventID"),
-                            rs.getString("e.name"),
-                            rs.getDate("date"),
-                            rs.getTime("time"),
-                            rs.getTime("duration"),
-                            rs.getString("description"),
-                            rs.getInt("volunteerNeeded"),
-                            rs.getString("status"),
-                            rs.getBlob("image"),
-                            rs.getDouble("donationLimit"),
-                            rs.getInt("addressID")
-                    );
-            address = new address(
-                            rs.getInt("addressID"),
-                            rs.getString("country"),
-                            rs.getInt("postalCode"),
-                            rs.getString("street"),
-                            rs.getString("city"),
-                            rs.getString("state")
-                    );
-            
-            beneficiary = new beneficiary(
-                    rs.getInt("beneficiaryID"), 
-                    rs.getString("b.name")
-            );
-
-        }
-            List<task> taskList = new ArrayList<>();
-            String taskSql = "SELECT * FROM task WHERE eventID = ?";
-            PreparedStatement taskStmt = conn.prepareStatement(taskSql);
-            taskStmt.setInt(1, eventID);
-            ResultSet taskRs = taskStmt.executeQuery();
-            while (taskRs.next()) {
-                int taskId = taskRs.getInt("taskID");
-                String taskDescription = taskRs.getString("description");
-                taskList.add(new task(taskId, taskDescription));
-            }
-            request.setAttribute("event", event);
-            request.setAttribute("address", address);
-            request.setAttribute("beneficiary", beneficiary);
-            request.setAttribute("tasks", taskList);
-            request.setAttribute("formattedDate", formattedDate);
-            request.setAttribute("formattedStartTime", formattedStartTime);
-            request.setAttribute("formattedEndTime", formattedEndTime);
-            request.setAttribute("daysLeft", daysLeft);
-
             // Fetch donation details
+           double donationLimit  = rs.getDouble("donationLimit");
+
             double totalDonation = 0;
             String donationSql = "SELECT SUM(amount) AS totalDonation FROM donation WHERE eventID = ?";
             donationStmt = conn.prepareStatement(donationSql);
@@ -216,12 +212,12 @@ public class vEventDetail extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching events.");
-            request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
         } finally {
             try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-        }    }
+        }    }}
 
     /**
      * Handles the HTTP <code>POST</code> method.

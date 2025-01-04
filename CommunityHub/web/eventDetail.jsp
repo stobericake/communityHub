@@ -87,8 +87,11 @@
             events event = (events) request.getAttribute("event");
             address addressObj = (address) request.getAttribute("address");
             beneficiary beneficiaryObj = (beneficiary) request.getAttribute("beneficiary");
-            List<task> tasks = (List) request.getAttribute("taskList");
+            List<task> tasks = (List) request.getAttribute("tasks");
             
+            String formattedDate = request.getAttribute("formattedDate").toString();
+            String formattedStartTime = request.getAttribute("formattedStartTime").toString();
+            String formattedEndTime = request.getAttribute("formattedEndTime").toString();
             int totalContributors = Integer.parseInt(request.getAttribute("totalContributors").toString());
             double totalDonation = Double.parseDouble(request.getAttribute("totalDonation").toString());
             double remainingAmount = Double.parseDouble(request.getAttribute("remainingAmount").toString());
@@ -118,7 +121,7 @@
                         </div>
                         <div class="d-flex align-items-start justify-content-start">
                         <i class="bi bi-clock me-2"></i>
-                        <small class="text-muted"> ${daysLeft} days </small>
+                        <small class="text-muted"> 123 days </small>
                     </div>
                     <div class="d-flex align-items-start justify-content-start">
                         <i class="bi bi-heart-fill text-danger me-2"></i>
@@ -144,13 +147,13 @@
             
                 <br><div class="d-flex align-items-start justify-content-start">
                 <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted">${formattedStartTime}</p>
+                <p class="text-muted"><%=formattedStartTime%></p>
             </div>
             </small>
             <small>End Date
                 <br><div class="d-flex align-items-start justify-content-start">
                 <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted">${formattedStartTime}</p>
+                <p class="text-muted"<%=formattedEndTime%></p>
             </div>
             </small>
             </div>
