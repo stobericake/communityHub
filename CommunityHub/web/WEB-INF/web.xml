@@ -79,7 +79,6 @@
     <servlet>
         <servlet-name>volunteerListServlet</servlet-name>
         <servlet-class>com.hub.controller.volunteerListServlet</servlet-class>
-        >>>>>>> dfc1f7daf96c1c18263f82ece47946edb7e2afc2
     </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
@@ -136,8 +135,8 @@
     <servlet-mapping>
         <servlet-name>registerServlet</servlet-name>
         <url-pattern>/register</url-pattern>
-        <servlet-mapping>
-        </servlet-mapping>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>listEventMgmt</servlet-name>
         <url-pattern>/listEventMgmt.do</url-pattern>
     </servlet-mapping>
@@ -184,7 +183,6 @@
     <servlet-mapping>
         <servlet-name>volunteerListServlet</servlet-name>
         <url-pattern>/volunteerList.do</url-pattern>
-        >>>>>>> dfc1f7daf96c1c18263f82ece47946edb7e2afc2
     </servlet-mapping>
     <session-config>
         <session-timeout>
