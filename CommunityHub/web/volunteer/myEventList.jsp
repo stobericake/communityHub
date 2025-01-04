@@ -145,8 +145,8 @@
                     int totalPages = Integer.parseInt(request.getAttribute("totalPages").toString());
                     int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
 
-                    String volunteerId = request.getSession().getAttribute("volunteer").toString();
-                    if (volunteerId == null) {
+                    int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
+                    if (volunteerId == 0) {
                         response.sendRedirect(request.getContextPath() + "/login.jsp");
                         return;
                     }
@@ -187,9 +187,15 @@
                                             String city = "";
                                             String taskD = "";
                                             int index = 0;
-                                            for (task t : taskList) {
-                                                if (addr.getAddressID() == event.getAddressID()) {
-                                                    city = addr.getCity();
+                                            for (task t : tasks) {
+                                                if (t.getTaskID() ==  volunteerId) {
+                                                    taskD = t.getDescription();
+                                                    break; // Exit the loop once the match is found
+                                                }
+                                            }
+                                            for (address a : addresses) {
+                                                if (a.getAddressID() ==  event.getAddressID()) {
+                                                    city = a.getState();
                                                     break; // Exit the loop once the match is found
                                                 }
                                             }
@@ -202,7 +208,7 @@
                            <td><%= index++%>.</td>
                            <td><%= name %></td>
                            <td><%= formattedDate %></td>
-                           <td>task</td>
+                           <td><%= taskD %></td>
                            
                             <td><a href="myEventDetail.jsp?eventID=<%= event.getEventID() %>" class="view-details-button">View Details</a></td>
                         </tr>                                       
