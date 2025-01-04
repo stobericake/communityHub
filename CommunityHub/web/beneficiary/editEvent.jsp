@@ -88,6 +88,7 @@
                 display: table-row;  /* This maintains proper table structure */
             }
 
+
         </style>
         <%
             events event = (events) request.getAttribute("event");
@@ -386,7 +387,8 @@
                                                     <th class="px-4" style="width: 20%">Actions</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="taskList">           
+                                            <tbody id="taskList">        
+
                                                 <%          int count = 0;
 
                                                     List<task> taskList = (List) request.getAttribute("task");
@@ -420,11 +422,9 @@
                                             </tbody>
 
                                             <tr id="emptyState" class="empty-state">
-                                                <td colspan="3" class="text-center py-5 w-full">
-                                                    <div class="w-full">
-                                                        <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
-                                                        <p class="text-muted mb-0">No tasks added yet</p>
-                                                    </div>
+                                                <td colspan="3" class="text-center py-5">
+                                                    <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
+                                                    <p class="text-muted mb-0">No tasks added yet</p>
                                                 </td>
                                             </tr>
 
@@ -460,7 +460,237 @@
 
             </div>
 
-            <script src="javascript/editeventJS.js"></script>
+
         </form>
+
+        <script>
+
+            /* 
+             * To change this license header, choose License Headers in Project Properties.
+             * To change this template file, choose Tools | Templates
+             * and open the template in the editor.
+             */
+
+
+
+            let currentStep = 1;
+            const totalSteps = 5;
+
+            function updateButtons() {
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+
+                prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+
+                if (currentStep === totalSteps) {
+                    nextBtn.textContent = 'Submit';
+                } else {
+                    nextBtn.textContent = 'Next';
+                    nextBtn.setAttribute('type', 'button');
+                }
+            }
+
+            function updateSteps() {
+                // Update progress steps
+                document.querySelectorAll('.progress-step').forEach((step, index) => {
+                    const stepNum = index + 1;
+                    if (stepNum < currentStep) {
+                        step.classList.add('completed');
+                        step.classList.remove('active');
+                    } else if (stepNum === currentStep) {
+                        step.classList.add('active');
+                        step.classList.remove('completed');
+                    } else {
+                        step.classList.remove('completed', 'active');
+                    }
+                });
+
+                // Update progress lines
+                document.querySelectorAll('.progress-line').forEach((line, index) => {
+                    if (index + 1 < currentStep) {
+                        line.classList.add('active');
+                    } else {
+                        line.classList.remove('active');
+                    }
+                });
+
+                // Show/hide form sections
+                document.querySelectorAll('.form-section').forEach((section) => {
+                    if (parseInt(section.dataset.step) === currentStep) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+
+                updateButtons();
+            }
+
+            function nextStep() {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateSteps();
+                } else {
+                    const nextBtn = document.getElementById('nextBtn');
+                    nextBtn.setAttribute('type', 'submit');
+                }
+            }
+
+
+            function prevStep() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateSteps();
+                }
+            }
+
+            // Set minimum date to tomorrow
+            window.addEventListener('load', function () {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const formattedDate = tomorrow.toISOString().split('T')[0];
+                document.getElementById('eventDate').min = formattedDate;
+
+            });
+
+            // Validate duration inputs
+            document.getElementById('durationHours').addEventListener('input', function () {
+                if (this.value > 24)
+                    this.value = 24;
+                if (this.value < 0)
+                    this.value = 0;
+            });
+
+            document.getElementById('durationMinutes').addEventListener('input', function () {
+                if (this.value > 59)
+                    this.value = 59;
+                if (this.value < 0)
+                    this.value = 0;
+            });
+
+
+
+
+
+            let taskCount = 1;  // Assuming task count starts from 1
+
+            let taskTotal = parseInt(document.getElementById('taskCount').value, 10);
+
+            if (taskTotal !== null) {
+                taskCount = taskTotal + 1;
+            }
+
+            // Toggle Empty State Visibility
+            function toggleEmptyState() {
+                const taskList = document.getElementById('taskList');
+                let emptyStateRow = document.querySelector('.empty-state');
+
+                // If emptyStateRow doesn't exist, create it
+                if (!emptyStateRow) {
+                    emptyStateRow = document.createElement('tr');
+                    emptyStateRow.classList.add('empty-state');
+                    emptyStateRow.innerHTML = `
+            <td colspan="3" class="text-center py-5">
+                <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
+                <p class="text-muted mb-0">No tasks added yet</p>
+            </td>
+        `;
+                    taskList.appendChild(emptyStateRow);
+                }
+
+                // Show or hide the empty state row based on task count
+                if (taskList.children.length === 1) { // The only child is the empty state
+                    emptyStateRow.classList.add('show');
+                } else {
+                    emptyStateRow.classList.remove('show');
+                }
+            }
+
+            // Add Task Function
+            function addTask(event) {
+                event.preventDefault();
+
+                const taskList = document.getElementById('taskList');
+                const taskInput = document.getElementById('taskInput');
+                const taskName = taskInput.value.trim();
+
+                // Validate if task name is empty
+                if (!taskName) {
+                    alert('Task name cannot be empty!');
+                    return;
+                }
+
+                // Create task row
+                const row = document.createElement('tr');
+                row.innerHTML =
+                        '<td class="px-4"></td>' +
+                        '<td class="px-4">' +
+                        '<span class="task-name">' + taskName + '</span>' +
+                        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
+                        '</td>' +
+                        '<td class="px-4">' +
+                        '<div class="btn-group btn-group-sm">' +
+                        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
+                        '<i class="fas fa-edit"></i>' +
+                        '</button>' +
+                        '<button class="btn btn-outline-danger" onclick="deleteTask(event, this)">' +
+                        '<i class="fas fa-trash"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</td>';
+
+                // Append the new task to the list
+                taskList.appendChild(row);
+
+                // Update row numbering
+                updateRowNumbers();
+
+                // Hide empty state row if tasks exist
+                toggleEmptyState();
+
+                taskInput.value = '';
+            }
+
+            // Delete Task Function
+            function deleteTask(event, button) {
+                // Prevent the form from submitting
+                event.preventDefault();
+
+                const row = button.closest('tr');
+                const taskList = document.getElementById('taskList');
+                const taskId = button.getAttribute('data-task-id');
+
+                if (confirm('Are you sure you want to delete this task?')) {
+                    row.remove();
+
+                    // Update row numbering
+                    updateRowNumbers();
+
+                    // Show empty state if no tasks remain
+                    toggleEmptyState();
+                }
+            }
+
+// Update Row Numbers Function
+            function updateRowNumbers() {
+                const taskList = document.getElementById('taskList');
+                const rows = taskList.querySelectorAll('tr');
+
+                // Exclude the empty state row
+                let rowNumber = 1; // Start numbering from 1
+                rows.forEach((row) => {
+                    if (!row.id || row.id !== 'emptyState') { // Skip the empty state row
+                        const numberCell = row.querySelector('td:first-child');
+                        if (numberCell) {
+                            numberCell.textContent = rowNumber; // Update row number
+                            rowNumber++;
+                        }
+                    }
+                });
+            }
+
+
+
+        </script>
     </body>
 </html>

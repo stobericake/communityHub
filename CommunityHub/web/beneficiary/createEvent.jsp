@@ -4,8 +4,6 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        <!-- Bootstrap JS (optional, for responsive functionality) -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
         <style>
             .progress-step {
                 width: 35px;
@@ -65,6 +63,7 @@
     </head>
     <body class="bg-light">
         <%@ include file="../header.jspf" %>
+        
         <div class="container py-5">
             <form action="../addEvent.do" method="POST" enctype="multipart/form-data">
                 <div class="card p-4">
@@ -516,6 +515,7 @@
 
             // Delete task
             function deleteTask(button) {
+                event.preventDefault();
                 const row = button.closest('tr');
                 const taskList = document.getElementById('taskList');
 
