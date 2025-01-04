@@ -75,15 +75,15 @@ public class vEventDetail extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
-        if (volunteerId == 0) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        } 
+//        if (volunteerId == 0) {
+//            response.sendRedirect(request.getContextPath() + "/login.jsp");
+//            return;
+//        } 
         int eventID = Integer.parseInt(request.getParameter("eventID"));
-        if (eventID == 0) {
-            response.sendRedirect(request.getContextPath() + "/volunteer/newListingEvent.jsp");
-            return;
-        } 
+//        if (eventID == 0) {
+//            response.sendRedirect(request.getContextPath() + "/volunteer/newListingEvent.jsp");
+//            return;
+//        } 
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;

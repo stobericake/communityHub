@@ -4,6 +4,9 @@
     Author     : Rina
 --%>
 
+<%@page import="com.cm.model.task"%>
+<%@page import="com.cm.model.address"%>
+<%@page import="com.cm.model.events"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.text.SimpleDateFormat" %>
@@ -135,6 +138,19 @@
     </style>
 </head>
 <body>
+    <%
+                    List<events> events = (List) request.getAttribute("events");
+                    List<address> addresses = (List) request.getAttribute("address");
+                    List<task> tasks = (List) request.getAttribute("tasks");
+                    int totalPages = Integer.parseInt(request.getAttribute("totalPages").toString());
+                    int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
+
+                    String volunteerId = request.getSession().getAttribute("volunteer").toString();
+                    if (volunteerId == null) {
+                        response.sendRedirect(request.getContextPath() + "/login.jsp");
+                        return;
+                    }
+    %>
     <%@ include file="../header.jspf" %>
     <div class="container">
         <header>
@@ -160,88 +176,46 @@
                 </tr>
                 </table>
             </li>
-                <% 
-                String loggedInUser = (String) session.getAttribute("volunteer");
-                int pageSize = 10; // Number of events per page
-                int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-                int totalRecords = 0;
-                int totalPages = 0;
-
-                Connection conn = null;
-                PreparedStatement stmt = null;
-                ResultSet rs = null;
-
-                try {
-                    conn = dbconnection.getConnection(); // Get DB connection
-
-                    // Count total records
-                    String countQuery = "SELECT COUNT(*) AS total FROM events e " +
-                                        "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
-                                        "WHERE ev.volunteerID = ?";
-                    stmt = conn.prepareStatement(countQuery);
-                    stmt.setString(1, loggedInUser);
-                    rs = stmt.executeQuery();
-                    if (rs.next()) {
-                        totalRecords = rs.getInt("total");
-                        totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
-                    }
-                    rs.close();
-                    stmt.close();
-
-                     // Fetch paginated data
-                    String sql ="SELECT e.eventID, e.name, e.date, e.time, a.state, t.description "+
-                                "FROM events e " +
-                                "INNER JOIN address a ON e.addressID = a.addressID " +
-                                "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
-                                "INNER JOIN task t ON ev.volunteerID = t.volunteerID AND e.eventID = t.eventID " +
-                                "WHERE ev.volunteerID = ? "+
-                                "LIMIT ? OFFSET ?";
-
-                    stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, loggedInUser);
-                    stmt.setInt(2, pageSize);
-                    stmt.setInt(3, (currentPage - 1) * pageSize);
-                    rs = stmt.executeQuery();
-                    int index = 1;
-                    while (rs.next()) {
-                        
-                        int id = rs.getInt("e.eventID");
-                        String title = rs.getString("e.name");
-                        Date date = rs.getDate("e.date");
-                        Time time = rs.getTime("e.time");
-                        String task = rs.getString("t.description");
-                        String location = rs.getString("a.state");
-
-                        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                        SimpleDateFormat outputFormat = new SimpleDateFormat("MM/dd/yyyy - hh:mma");
-                        String formattedDateTime = outputFormat.format(inputFormat.parse(date + " " + time));
-                %>
+                
+                <%
+                if (events != null && !events.isEmpty()) {
+                                        int num = (currentPage - 1) * 4 + 1; // Start number for pagination
+                                        for (events event : events) {
+                                            int eventID = event.getEventID();
+                                            String name = event.getName();
+                                            String desc = event.getDescription();
+                                            String city = "";
+                                            String taskD = "";
+                                            int index = 0;
+                                            for (task t : taskList) {
+                                                if (addr.getAddressID() == event.getAddressID()) {
+                                                    city = addr.getCity();
+                                                    break; // Exit the loop once the match is found
+                                                }
+                                            }
+                                            String formattedDate = new SimpleDateFormat("dd/MM E").format(event.getDate());
+                                            String formattedTime = new SimpleDateFormat("HH:mm").format(event.getTime());
+            %>         
                <li class="list-group-item d-flex justify-content-between align-items-center">
                     <table class="volunteerTable">
                         <tr>
                            <td><%= index++%>.</td>
-                            <td><%= title %></td>
-                            <td><%= formattedDateTime %></td>                            
-                            <td><%= task %></td>
-                            <td><a href="myEventDetail.jsp?eventID=<%= id %>" class="view-details-button">View Details</a></td>
+                           <td><%= name %></td>
+                           <td><%= formattedDate %></td>
+                           <td>task</td>
+                           
+                            <td><a href="myEventDetail.jsp?eventID=<%= event.getEventID() %>" class="view-details-button">View Details</a></td>
                         </tr>                                       
 
                 </table>
                 
                     
-                <% 
-                    } // End while
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-                }
+                 <% }
+                        } else {
                 %>
-                </li>
-            
-        </div>
+            <div> No events found.</div>
+                               
+                <% }%>
         <!-- Pagination -->
         <div class="col-12">
             <nav aria-label="Page navigation">
