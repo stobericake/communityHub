@@ -3,9 +3,29 @@
     Created on : Dec 15, 2024, 7:40:46 PM
     Author     : HAZIQ
 --%>
-<%@ page import="java.util.Date" %>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="java.text.DecimalFormat"%>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="com.cm.model.events" %>
+<%@ page import="java.text.DecimalFormat" %>
+<%
+    String user = (String) session.getAttribute("userRole");
+
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
+<%
+    ArrayList<events> events = (ArrayList) request.getAttribute("events");
+    ArrayList<String> tasks = (ArrayList) request.getAttribute("tasks");
+    int totalHours = (Integer) request.getAttribute("totalHours");
+    double totalDonation = (Double) request.getAttribute("totalDonation");
+    double recentDonation = (Double) request.getAttribute("recentDonation");
+    String name = (String) request.getAttribute("volunteerName");
+    String volid = (String) request.getAttribute("volunteerID");
+    DecimalFormat df = new DecimalFormat("0.00");
+%>
 
 <!DOCTYPE html>
 <html>
@@ -28,28 +48,11 @@
     </head>
     <body>
         <%@ include file="../header.jspf" %>
-        <%
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-
-            conn = dbconnection.getConnection(); // Get DB connection
-            String currvolunteerID = request.getParameter("volunteerID");
-            String sql = "SELECT name FROM volunteer WHERE volunteerID = ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, Integer.parseInt(currvolunteerID));
-            rs = stmt.executeQuery();
-            String volu = "";
-            if (rs.next()) {
-                // Access the data in the first row
-                volu = rs.getString("name");
-            }
-        %>
         <div class='container mt-3'>
             <div class='row p-1'>
                 <div class='col-md-4'></div>
                 <div class='col text-center fw-bold text-uppercase'>
-                    <p class='fw-bold fs-6'><%=volu%><br> Volunteer ID: 12</p>
+                    <p class='fw-bold fs-6'><%=name%><br> Volunteer ID: <%=volid%></p>
                 </div>
                 <div class='col-md-4'></div>
             </div>
@@ -69,93 +72,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <%
-                                rs.close();
-                                // Database Connection
-                                
-                                DecimalFormat df = new DecimalFormat("0.00");
-                                int num = 0;
-                                int hours = 0;
-                                double totDonation = 0;
-                                double recent = 0;
-                                try {
-
-                                    String sql1 = "SELECT v.name AS volunteerName, e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration AS eventDuration, "
-                                            + "t.description AS taskDescription, d.amount AS donationAmount, d.date AS donationDate  "
-                                            + "FROM events e "
-                                            + "JOIN eventsvolunteer ev ON e.eventID = ev.eventID "
-                                            + "JOIN volunteer v ON ev.volunteerID = v.volunteerID "
-                                            + "LEFT JOIN task t ON t.volunteerID = v.volunteerID AND t.eventID = e.eventID "
-                                            + "LEFT JOIN donation d ON d.volunteerID = v.volunteerID AND d.eventID = e.eventID "
-                                            + "WHERE v.volunteerID = ?;";
-                                    stmt = conn.prepareStatement(sql1);
-                                    stmt.setInt(1, Integer.parseInt(currvolunteerID));
-                                    rs = stmt.executeQuery();
-
-                                    // Iterate through each event
-                                    while (rs.next()) {
-                                        num++;
-                                        String vname = rs.getString("volunteerName");
-                                        String ename = rs.getString("eventName");
-                                        String taskDesc = rs.getString("taskDescription");
-                                        Date eventDate = rs.getDate("eventDate");
-                                        Time eventTime = rs.getTime("eventTime");
-                                        Time dura = rs.getTime("eventDuration");
-                                        double donation = rs.getDouble("donationAmount");
-                                        if (donation > 0) {
-                                            recent = donation;
-                                        }
-
-                                        String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(eventDate);
-                                        String formattedTime = new SimpleDateFormat("HH:mm").format(eventTime);
-                                        String formattedDura = new SimpleDateFormat("H").format(dura);
-
-                                        if (taskDesc == null) {
-                                            taskDesc = "Crew";
-                                        }
-                                        int durationHour = dura.toLocalTime().getHour(); // Using java.time (modern)
-                                        hours += durationHour;
-                                        totDonation += donation;
-                            %>
-
+                            <% int count = 0; %>
+                            <% for (events event : events) {%>
                             <tr>
-                                <td class="text-center fw-bold"><%=num%></td>
-                                <td><%=ename%></td>
-                                <td class="text-center"><%=formattedDate%></td>
-                                <td class="text-center"><%=formattedTime%></td>
-                                <td class="text-center text-nowrap"><%=taskDesc%></td>
-                                <td class="text-center"><%=formattedDura%></td>
+                                <td class="text-center"><%= ++count%></td>
+                                <td><%= event.getName()%></td>
+                                <td class="text-center"><%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(event.getDate())%></td>
+                                <td class="text-center"><%= new java.text.SimpleDateFormat("HH:mm").format(event.getTime())%></td>
+                                <td class="text-center"><%= tasks.size() > count - 1 ? tasks.get(count - 1) : "Crew"%></td>
+                                <td class="text-center"><%= event.getDuration().toLocalTime().getHour()%></td>
                             </tr>
-
-                            <%
-
-                                    } // End while
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    try {
-                                        if (rs != null) {
-                                            rs.close();
-                                        }
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                    }
-                                    try {
-                                        if (stmt != null) {
-                                            stmt.close();
-                                        }
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                    }
-                                    try {
-                                        if (conn != null) {
-                                            conn.close();
-                                        }
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            %>
+                            <% }%>
                         </tbody>
                     </table>
                 </div>
@@ -164,8 +91,8 @@
                 <div class="col pt-3 ps-4">
                     <h5 class="fw-bold">Participant Details</h4>
                         <ul class='lh-1 text-body-secondary'>
-                            <li>Total Events Participated: <%=num%></li>
-                            <li>Total Hours Committed: <%=hours%> </li>
+                            <li>Total Events Participated: <%= events.size()%></li>
+                            <li>Total Hours Committed: <%= totalHours%></li>
                         </ul>
                 </div>
             </div>
@@ -173,8 +100,8 @@
                 <div class="col pt-3 ps-4">
                     <h5 class="fw-bold">Donations:</h5>
                     <ul class='lh-1 text-body-secondary'>
-                        <li>Total Donation: RM <%=df.format(totDonation)%></li>
-                        <li>Recent Donation: RM <%=df.format(recent)%></li>
+                        <li>Total Donation: RM <%= df.format(totalDonation)%></li>
+                        <li>Recent Donation: RM <%= df.format(recentDonation)%></li>
                     </ul>
                 </div>
                 <div class="col-md-6"></div>

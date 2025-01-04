@@ -171,20 +171,20 @@
 
 
 
-                        <% if (userRole.equals("admin")) { %>
+                        <% if (userRole.equals("admin")) {%>
                         <!-- Admin Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Menu
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminListing.jsp" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/admin/adminReport.jsp" onclick="updateDropdownText('Generate Report')">Generate Report</a></li>
+<!--                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>-->
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/adminList.do" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/reportList" onclick="updateDropdownText('Generate Report')">Generate Report</a></li>
                             </ul>
                         </li>
 
-                        <% } else if (userRole.equals("volunteer")) { %>
+                        <% } else if (userRole.equals("volunteer")) {%>
                         <!-- Volunteer Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -196,14 +196,14 @@
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/volunteer/donationHistory.jsp" onclick="updateDropdownText('My Donations')" >My Donations</a></li>
                             </ul>
                         </li>
-                        <% } else if (userRole.equals("beneficiary")) { %>
+                        <% } else if (userRole.equals("beneficiary")) {%>
                         <!-- Beneficiary Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Menu
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="beneficiaryDropdown">
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/eventManagement.jsp" onclick="updateDropdownText('Event Management')">Event Management</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/listEventMgmt.do" onclick="updateDropdownText('Event Management')">Event Management</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/donorList.jsp" onclick="updateDropdownText('Donor List')">Donor List</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/volunteerList.jsp" onclick="updateDropdownText('Volunteer List')">Volunteer List</a></li>
                             </ul>
@@ -211,16 +211,16 @@
                         <% } %> 
 
 
-                        
+
                         <%
                             String profileImageUrl = "";
                             if (session != null) {
                                 if (session.getAttribute("volunteer") != null) {
-                                    profileImageUrl = "../getImage.do?type=volunteer&id=" + session.getAttribute("volunteer");
+                                    profileImageUrl = "getImage.do?type=volunteer&id=" + session.getAttribute("volunteer");
                                 } else if (session.getAttribute("admin") != null) {
-                                    profileImageUrl = "../getImage.do?type=admin&id=" + session.getAttribute("admin");
+                                    profileImageUrl = "getImage.do?type=admin&id=" + session.getAttribute("admin");
                                 } else if (session.getAttribute("beneficiary") != null) {
-                                    profileImageUrl = "../getImage.do?type=beneficiary&id=" + session.getAttribute("beneficiary");
+                                    profileImageUrl = "getImage.do?type=beneficiary&id=" + session.getAttribute("beneficiary");
                                 }
                             }
                         %>
@@ -228,7 +228,7 @@
                         <li class="nav-item dropdown profile-dropdown ms-3">
                             <a class="nav-drop dropdown-toggle" href="#" id="profileDropdown" role="button" 
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src="<%= profileImageUrl %>" 
+                                <img src="<%= profileImageUrl%>" 
                                      alt="Profile" class="profile-img">
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
@@ -242,7 +242,7 @@
                             </ul>
                         </li>
                         <% } else {%>
-                        
+
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="<%=request.getContextPath()%>/login.jsp"><button class="btn btn-dark shadow-sm" type="button">Login</button></a>
                             <a href="<%=request.getContextPath()%>/register.jsp"><button class="btn btn-dark shadow-lg" type="button">Register</button></a>
@@ -261,29 +261,29 @@
         <script>
                                     function updateDropdownText(selectedItem) {
 
-                                       document.getElementById('DropdownHeader').textContent = selectedItem;
-                                        
-                                         // Store the selected item in localStorage
-                                            localStorage.setItem('dropdownSelection', selectedItem);
+                                        document.getElementById('DropdownHeader').textContent = selectedItem;
 
-                                          
+                                        // Store the selected item in localStorage
+                                        localStorage.setItem('dropdownSelection', selectedItem);
+
+
                                     }
-                                    
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        
-                                    // Retrieve the selected dropdown item from localStorage
-                                    const selectedItem = localStorage.getItem('dropdownSelection');
 
-                                    // If there's a stored selection, update the dropdown text
-                                    if (selectedItem) {
-                                        const dropdown = document.getElementById('DropdownHeader');
-                                        if (dropdown) {
-                                            dropdown.textContent = selectedItem;
+                                    document.addEventListener('DOMContentLoaded', function () {
+
+                                        // Retrieve the selected dropdown item from localStorage
+                                        const selectedItem = localStorage.getItem('dropdownSelection');
+
+                                        // If there's a stored selection, update the dropdown text
+                                        if (selectedItem) {
+                                            const dropdown = document.getElementById('DropdownHeader');
+                                            if (dropdown) {
+                                                dropdown.textContent = selectedItem;
+                                            }
                                         }
-                                    }
-                                });
-                                
-                                   function clearLocalStorage() {
+                                    });
+
+                                    function clearLocalStorage() {
                                         // Clear the dropdown selection stored in localStorage
                                         localStorage.removeItem('dropdownSelection');
                                     }

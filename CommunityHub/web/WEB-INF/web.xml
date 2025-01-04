@@ -32,6 +32,55 @@
         <servlet-name>registerServlet</servlet-name>
         <servlet-class>com.hub.controller.registerServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>listEventMgmt</servlet-name>
+        <servlet-class>com.hub.controller.listEventMgmt</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>listGuestEvent</servlet-name>
+        <servlet-class>com.hub.controller.listGuestEvent</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>adminList</servlet-name>
+        <servlet-class>com.hub.controller.AdminList</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminReportList</servlet-name>
+        <servlet-class>com.hub.controller.AdminReportList</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminVolunteerReport</servlet-name>
+        <servlet-class>com.hub.controller.AdminVolunteerReport</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AdminEventReport</servlet-name>
+        <servlet-class>com.hub.controller.AdminEventReport</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>GenerateCertificate</servlet-name>
+        <servlet-class>com.hub.controller.GenerateCertificate</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>vEventList</servlet-name>
+        <servlet-class>com.hub.controller.vEventList</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>vEventDetail</servlet-name>
+        <servlet-class>com.hub.controller.vEventDetail</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>myEventList</servlet-name>
+        <servlet-class>com.hub.controller.myEventList</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>donorListServlet</servlet-name>
+        <servlet-class>com.hub.controller.donorListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>volunteerListServlet</servlet-name>
+        <servlet-class>com.hub.controller.volunteerListServlet</servlet-class>
+        >>>>>>> dfc1f7daf96c1c18263f82ece47946edb7e2afc2
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -87,6 +136,55 @@
     <servlet-mapping>
         <servlet-name>registerServlet</servlet-name>
         <url-pattern>/register</url-pattern>
+        <servlet-mapping>
+        </servlet-mapping>
+        <servlet-name>listEventMgmt</servlet-name>
+        <url-pattern>/listEventMgmt.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>listGuestEvent</servlet-name>
+        <url-pattern>/listGuestEvent.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>adminList</servlet-name>
+        <url-pattern>/adminList.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminReportList</servlet-name>
+        <url-pattern>/reportList</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminVolunteerReport</servlet-name>
+        <url-pattern>/AdminVolunteer</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminEventReport</servlet-name>
+        <url-pattern>/AdminEvent</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GenerateCertificate</servlet-name>
+        <url-pattern>/certificate</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>vEventList</servlet-name>
+        <url-pattern>/vEventList.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>vEventDetail</servlet-name>
+        <url-pattern>/vEvent.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>myEventList</servlet-name>
+        <url-pattern>/myList.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>donorListServlet</servlet-name>
+        <url-pattern>/donorList.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>volunteerListServlet</servlet-name>
+        <url-pattern>/volunteerList.do</url-pattern>
+        >>>>>>> dfc1f7daf96c1c18263f82ece47946edb7e2afc2
     </servlet-mapping>
     <session-config>
         <session-timeout>

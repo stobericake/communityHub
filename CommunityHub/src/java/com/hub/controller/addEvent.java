@@ -188,7 +188,7 @@ public class addEvent extends HttpServlet {
                                 // No more tasks
                             }
 
-                            psTask.setInt(1, 1);
+                            psTask.setInt(1, 0);
                             psTask.setString(2, taskName);
                             psTask.setInt(3, eventID);
                             psTask.setNull(4, java.sql.Types.NULL);

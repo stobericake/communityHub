@@ -8,6 +8,10 @@ import java.sql.Time;
 import java.sql.Blob;
 
 public class events implements Serializable{
+
+    public static void add(events ev) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     private int eventID;
     private String name;
     private Blob image;
@@ -37,6 +41,21 @@ public class events implements Serializable{
         this.donationLimit = donationLimit;
         this.addressID = addressID;
     }
+    
+    public events(String name, Date date, Time time, Time duration) {
+        this.name = name;
+        this.date = date ;
+        this.time = time;
+        this.duration = duration;
+    }
+    
+    public events(int id, String name, Date date) {
+        this.eventID = id;
+        this.name = name;
+        this.date = date ;
+    }
+    
+    
     // Getters
     public int getEventID() {
         return eventID;

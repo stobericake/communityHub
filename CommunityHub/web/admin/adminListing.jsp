@@ -1,4 +1,13 @@
 <%@page import="java.text.SimpleDateFormat"%>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="com.cm.model.events" %>
+<%@ page import="com.cm.model.address" %>
+<%
+    ArrayList<events> events = (ArrayList) request.getAttribute("events");
+    ArrayList<address> addresses = (ArrayList) request.getAttribute("addresses");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+%>
 
 <%
     String user = (String) session.getAttribute("userRole");
@@ -12,14 +21,14 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Dashboard</title>
+        <title>Event Approval</title>
 
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 
         <style>
             html, body {
-                margin: 0; /* Removes default margin */
-                padding: 0; /* Removes default padding */
+                margin: 0;
+                padding: 0;
             }
         </style>
     </head>
@@ -56,50 +65,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% 
-                                    // Database Connection
-                                    Connection conn = null;
-                                    PreparedStatement stmt = null;
-                                    ResultSet rs = null;
-
-                                    try {
-                                        conn = dbconnection.getConnection(); // Get DB connection
-
-                                        // Count total events for pagination
-                                        String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE e.status = 1";
-                                        stmt = conn.prepareStatement(countSql);
-                                        rs = stmt.executeQuery();
-                                        rs.next();
-                                        int totalEvents = rs.getInt("total");
-
-                                        // Pagination parameters
-                                        int eventsPerPage = 5; // Number of events per page
-                                        int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-                                        int offset = (currentPage - 1) * eventsPerPage;
-                                        int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
-
-                                        // Fetch events with pagination
-                                        String sql = "SELECT e.*, a.* FROM events e "
-                                                + "JOIN address a ON e.addressID = a.addressID "
-                                                + "WHERE e.status = 1 LIMIT ? OFFSET ?";
-                                        stmt = conn.prepareStatement(sql);
-                                        stmt.setInt(1, eventsPerPage);
-                                        stmt.setInt(2, offset);
-                                        rs = stmt.executeQuery();
-                                        int num = offset + 1; // Start numbering from the current offset
-                                    %>
-
-                                <!-- Table Body -->
-                                <% while (rs.next()) {
-                                    int eventID = rs.getInt("eventID");
-                                    String name = rs.getString("name");
-                                    String desc = rs.getString("description");
-                                    String city = rs.getString("city");
-                                    Date eventDate = rs.getDate("date");
-                                    Time eventTime = rs.getTime("time");
-
-                                    String formattedDate = new SimpleDateFormat("dd/MM E").format(eventDate);
-                                    String formattedTime = new SimpleDateFormat("HH:mm").format(eventTime);
+                                <%
+                                    if (events != null && !events.isEmpty()) {
+                                        int num = (currentPage - 1) * 5 + 1; // Start number for pagination
+                                        for (events event : events) {
+                                            int eventID = event.getEventID();
+                                            String name = event.getName();
+                                            String desc = event.getDescription();
+                                            String city = "";
+                                            for (address addr : addresses) {
+                                                if (addr.getAddressID() == event.getAddressID()) {
+                                                    city = addr.getCity();
+                                                    break; // Exit the loop once the match is found
+                                                }
+                                            }
+                                            String formattedDate = new SimpleDateFormat("dd/MM E").format(event.getDate());
+                                            String formattedTime = new SimpleDateFormat("HH:mm").format(event.getTime());
                                 %>
                                 <tr>
                                     <td class="text-center"><%= num++%></td>
@@ -107,14 +88,14 @@
                                         <div class="card my-2 mx-2 event-card" data-title="<%= name%>" data-description="<%= desc%>" data-location="<%= city%>">
                                             <div class="row g-0">
                                                 <div class="col-md-4">
-                                                    <img src="../getImage.do?type=events&id=<%= eventID%>" class="img-fluid rounded-start" alt="Event Image">
+                                                    <img src="getImage.do?type=events&id=<%= eventID%>" class="img-fluid rounded-start" alt="Event Image">
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">
                                                         <h5 class="card-title fw-bold"><%= name%></h5>
                                                         <p class="card-text"><%= desc%></p>
                                                         <p class="card-text"><i class="bi bi-geo-alt-fill"></i><small class="text-body-secondary"><%= city%></small></p>
-                                                        <p class="card-text"><i class="bi bi-clock-fill"></i><small class="text-body-secondary"><%= formattedDate%> <%= formattedTime%></small></p>
+                                                        <p class="card-text"><i class="bi bi-clock-fill"></i><small class="text-body-secondary"> <%= formattedDate%> <%= formattedTime%></small></p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -129,66 +110,44 @@
                                         </div>
                                     </td>
                                 </tr>
+                                <% }
+                                } else {
+                                %>
+                                <tr>
+                                    <td colspan="3" class="text-center">No events found.</td>
+                                </tr>
                                 <% }%>
-                                </tbody>
-                            </table>
+                            </tbody>
+                        </table>
 
-                            <!-- Pagination Below the Table -->
-                            <div class="pagination-container text-center mt-4">
-                                <nav aria-label="Page navigation">
-                                    <ul class="pagination justify-content-center">
-                                        <!-- Previous -->
-                                        <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
-                                            <a class="page-link" href="?page=<%= currentPage - 1%>">&laquo;</a>
-                                        </li>
-                                        <% for (int i = 1; i <= totalPages; i++) {%>
-                                        <li class="page-item <%= currentPage == i ? "active" : ""%>">
-                                            <a class="page-link" href="?page=<%= i%>"><%= i%></a>
-                                        </li>
-                                        <% }%>
-                                        <!-- Next -->
-                                        <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
-                                            <a class="page-link" href="?page=<%= currentPage + 1%>">&raquo;</a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                            </div>
-
-                            <%
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    if (rs != null) {
-                                        try {
-                                            rs.close();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    if (stmt != null) {
-                                        try {
-                                            stmt.close();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    if (conn != null) {
-                                        try {
-                                            conn.close();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                            %>
+                        <!-- Pagination Below the Table -->
+                        <div class="pagination-container text-center mt-4">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Previous -->
+                                    <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
+                                        <a class="page-link" href="?page=<%= currentPage - 1%>">&laquo;</a>
+                                    </li>
+                                    <% for (int i = 1; i <= totalPages; i++) {%>
+                                    <li class="page-item <%= currentPage == i ? "active" : ""%>">
+                                        <a class="page-link" href="?page=<%= i%>"><%= i%></a>
+                                    </li>
+                                    <% }%>
+                                    <!-- Next -->
+                                    <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
+                                        <a class="page-link" href="?page=<%= currentPage + 1%>">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+
         <!--Hidden-->
-        <form id="updateStatusForm" method="post" action="../updatestatus.do" style="display:none;">
+        <form id="updateStatusForm" method="post" action="updatestatus.do" style="display:none;">
             <input type="hidden" id="eventIdInput" name="eventId">
             <input type="hidden" id="statusInput" name="status">
         </form>

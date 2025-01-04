@@ -95,11 +95,11 @@ public class loginServlet extends HttpServlet {
 
             if (resultSet.next()) {
                 // User is a volunteer
-                String volunteerID = resultSet.getString("volunteerID");
+                int volunteerID = resultSet.getInt("volunteerID");
                 HttpSession session = request.getSession();
-                session.setAttribute("userRole", "volunteer");
+                session.setAttribute("userRole", "volunteer"); 
                 session.setAttribute("volunteer", volunteerID);
-                response.sendRedirect(request.getContextPath() + "/volunteer/eventListingVolunteer.jsp");
+                response.sendRedirect(request.getContextPath() + "/vEventList.do");
 //                RequestDispatcher view = request.getRequestDispatcher(request.getContextPath() + "/volunteer/eventListingVolunteer.jsp");
 //                view.forward(request, response);
                 return;
@@ -118,7 +118,7 @@ public class loginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("userRole", "admin");
                 session.setAttribute("admin", adminID);
-                response.sendRedirect(request.getContextPath() + "/admin/adminListing.jsp");
+                response.sendRedirect(request.getContextPath() + "/adminList.do");
                 return;
             }
 
@@ -135,7 +135,7 @@ public class loginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("userRole", "beneficiary");
                 session.setAttribute("beneficiary", beneficiaryID);
-                response.sendRedirect(request.getContextPath() + "/beneficiary/eventManagement.jsp");
+                response.sendRedirect(request.getContextPath() + "/listEventMgmt.do");
 //                RequestDispatcher view = request.getRequestDispatcher(request.getContextPath() + "/beneficiary/eventManagement.jsp");
 //                view.forward(request, response);
                 return;

@@ -3,11 +3,19 @@
     Created on : Dec 15, 2024, 7:40:46 PM
     Author     : HAZIQ
 --%>
+<%@page import="java.util.ArrayList"%>
 <%@page import="java.time.format.DateTimeFormatter"%>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.time.*" %>
 <%@page import="java.text.SimpleDateFormat"%>
+<%
+    String user = (String) session.getAttribute("userRole");
 
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -25,65 +33,69 @@
                 font-family: 'Kanit', sans-serif;
             }
 
+            @media print {
+                @page {
+                    margin: 0; /* Removes browser default margins */
+                }
+
+                body {
+                    margin: 0;
+                    padding: 0;
+                }
+
+                /* Hide unnecessary elements */
+                header, footer {
+                    display: none; /* Hide header/footer elements if any */
+                }
+
+                /* Hide browser headers and footers */
+                body {
+                    overflow: hidden;
+                }
+
+                /* Optional: Ensure the printed content takes the full width */
+                .container {
+                    width: 100%;
+                }
+            }
         </style>
     </head>
     <body>
         <%@ include file="../header.jspf" %>
         <%
-            String eventID = request.getParameter("eventID");
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
+            String eName = (String) request.getAttribute("eventName");
+            Date eDate = (Date) request.getAttribute("eventDate");
+            Time eTime = (Time) request.getAttribute("eventTime");
+            Time eDuration = (Time) request.getAttribute("eventDuration");
+            String city = (String) request.getAttribute("city");
+            String state = (String) request.getAttribute("state");
+            int vCount = (Integer) request.getAttribute("volunteerCount");
 
-            conn = dbconnection.getConnection(); // Get DB connection
+            String formattedDate = new SimpleDateFormat("E FF, YYYY").format(eDate);
+            String formattedTime = new SimpleDateFormat("HH:mm").format(eTime);
+            String formattedDura = new SimpleDateFormat("HH:mm").format(eDuration);
 
-            String sql = "SELECT e.*, a.*, "
-                    + "(SELECT COUNT(*) "
-                    + "FROM eventsvolunteer ev "
-                    + "WHERE ev.eventID = e.eventID) AS volunteerCount "
-                    + "FROM events e "
-                    + "JOIN address a ON e.addressID = a.addressID "
-                    + "WHERE e.eventID = ?;";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, Integer.parseInt(eventID)); // Set the eventID
-            rs = stmt.executeQuery();
+            /// Convert java.sql.Time to LocalTime for the start time
+            LocalTime startTime = eTime.toLocalTime(); // Assuming eventTime is of type java.sql.Time
 
-            if (rs.next()) {
-                // Access the data in the first row
-//                event = rs.getString("name");
-                String ename = rs.getString("e.name");
-                Date eventDate = rs.getDate("e.date");
-                Time eventTime = rs.getTime("e.time");
-                Time dura = rs.getTime("e.duration");
-                String city = rs.getString("a.city");
-                String state = rs.getString("a.state");
-                int count = rs.getInt("volunteerCount");
-                String formattedDate = new SimpleDateFormat("E FF, YYYY").format(eventDate);
-                String formattedTime = new SimpleDateFormat("HH:mm").format(eventTime);
-                String formattedDura = new SimpleDateFormat("HH:mm").format(dura);
+            // Extract hours and minutes from the duration (dura) - which is also a java.sql.Time
+            LocalTime durationTime = eDuration.toLocalTime(); // Assuming dura is of type java.sql.Time
 
-                /// Convert java.sql.Time to LocalTime for the start time
-                LocalTime startTime = eventTime.toLocalTime(); // Assuming eventTime is of type java.sql.Time
+            // Convert durationTime to Duration object by manually extracting hours and minutes
+            Duration duration = Duration.ofHours(durationTime.getHour())
+                    .plusMinutes(durationTime.getMinute());
 
-                // Extract hours and minutes from the duration (dura) - which is also a java.sql.Time
-                LocalTime durationTime = dura.toLocalTime(); // Assuming dura is of type java.sql.Time
+            // Add the duration to the start time
+            LocalTime endTime = startTime.plus(duration);
 
-                // Convert durationTime to Duration object by manually extracting hours and minutes
-                Duration duration = Duration.ofHours(durationTime.getHour())
-                        .plusMinutes(durationTime.getMinute());
-
-                // Add the duration to the start time
-                LocalTime endTime = startTime.plus(duration);
-
-                // Format the end time as "HH:mm"
-                String formattedEndTime = endTime.format(DateTimeFormatter.ofPattern("HH:mm"));
-
+            // Format the end time as "HH:mm"
+            String formattedEndTime = endTime.format(DateTimeFormatter.ofPattern("HH:mm"));
         %>
 
         <div class='container mt-3'>
             <div class='row p-2'>
                 <div class='col-md-4'></div>
-                <div class='col text-center fw-bold text-uppercase'><p class='fw-bold fs-3'><%=ename%></p></div>
+                <div class='col text-center fw-bold text-uppercase'><p class='fw-bold fs-3'><%=eName%></p></div>
                 <div class='col-md-4'></div>
             </div>
         </div>
@@ -94,7 +106,7 @@
                         <div class="col ms-4 mb-3 py-2">
                             <h4 class="fw-bold">Participant Details</h4>
                             <ul class="text-body-secondary">
-                                <li>Total Participant: <%=count%></li>
+                                <li>Total Participant: <%=vCount%></li>
 
                             </ul>
                         </div>
@@ -121,31 +133,16 @@
                         </div>
                     </div>
                 </div>
-                <% rs.close();
-                    }
-                    String sql1 = "SELECT * "
-                            + "FROM servicereport  "
-                            + "WHERE eventID = 1; ";
-                    stmt = conn.prepareStatement(sql1);
-                    rs = stmt.executeQuery();
 
-                %>
                 <!--Left Side-->
                 <div class="col-6 pt-3 border-start border-black border-1">
                     <div class="container">
                         <div class="col ms-4 mb-3 ">
                             <h4 class="fw-bold">Environement & Community Impact</h4>
                             <ul class="text-body-secondary">
-                                <%                                    while (rs.next()) {
-                                        String recommend = rs.getString("recommendation");
-                                        String problem = rs.getString("challenge");
-                                        String solution = rs.getString("solution");
-                                        String feedback = rs.getString("feedback");
-                                %>
-                                <li><%=feedback%></li>
-                                    <%
-                                        }
-                                    %>
+                                <% for (String feedback : (ArrayList<String>) request.getAttribute("feedbackList")) {%>
+                                <li><%= feedback%></li>
+                                    <% } %>
                             </ul>
                         </div>
 
@@ -153,26 +150,14 @@
                             <h4 class="fw-bold">Challanges and Solutions</h4>
                             <ul class="text-body-secondary">
                                 <li>Challenge:
-                                    <%
-                                        rs.beforeFirst(); // Move the result set pointer back to the beginning to reuse it
-                                        while (rs.next()) {
-                                            String problem = rs.getString("challenge");
-                                    %>
-                                    <%=problem + ", "%>
-                                    <%
-                                        }
-                                    %>
+                                    <% for (String challenge : (ArrayList<String>) request.getAttribute("challengeList")) {
+                                            System.out.print(challenge + ", ");
+                                        } %>
                                 </li>
                                 <li>Solutions:
-                                    <%
-                                        rs.beforeFirst(); // Move the result set pointer back to the beginning to reuse it
-                                        while (rs.next()) {
-                                            String solution = rs.getString("solution");
-                                    %>
-                                    <%=solution + ", "%>
-                                    <%
-                                        }
-                                    %>
+                                    <% for (String solution : (ArrayList<String>) request.getAttribute("solutionList")) {
+                                            System.out.print(solution + ", ");
+                                        } %>
                                 </li>
                             </ul>
                         </div>
@@ -180,15 +165,9 @@
                         <div class="col ms-4 mb-3 mt-4">
                             <h4 class="fw-bold">Recommendations for Future Events</h4>
                             <ol class="text-body-secondary">
-                                <%
-                                    rs.beforeFirst(); // Move the result set pointer back to the beginning to reuse it
-                                    while (rs.next()) {
-                                        String recomm = rs.getString("recommendation");
-                                %>
-                                <li><%=recomm%></li>
-                                    <%
-                                        }
-                                    %>
+                                <% for (String recommendation : (ArrayList<String>) request.getAttribute("recommendationList")) {%>
+                                <li><%= recommendation%></li>
+                                    <% } %>
                             </ol>
                         </div>
                         <!--                        End Of Left Side-->

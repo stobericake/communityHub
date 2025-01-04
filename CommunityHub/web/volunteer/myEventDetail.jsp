@@ -18,7 +18,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>My Event Detail</title>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-         <style>
+        <style>
             body {
                 font-family: 'Poppins', sans-serif;
                 margin: 0;
@@ -52,27 +52,27 @@
                 color: #fff; /* White text */
                 border-radius: 30px; /* Rounded edges */
             }
-            
+
             .card {
                 border-radius: 10px; 
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
-             .modal-fullscreen .modal-content {
+            .modal-fullscreen .modal-content {
                 background-color: #fff; /* Overlay background color */
                 padding: 5px; /* Adjust padding */
-                }
+            }
 
-                .modal-fullscreen .modal-header, 
-                .modal-fullscreen .modal-footer {
-                    border: none; /* Remove borders */
-                }
+            .modal-fullscreen .modal-header, 
+            .modal-fullscreen .modal-footer {
+                border: none; /* Remove borders */
+            }
 
-                .print-button {
-                    background-color: #000; /* Black button */
-                    color: #fff; /* White text */
-                    border-radius: 30px; /* Rounded edges */
-                }
-                @media print {
+            .print-button {
+                background-color: #000; /* Black button */
+                color: #fff; /* White text */
+                border-radius: 30px; /* Rounded edges */
+            }
+            @media print {
                 body * {
                     visibility: hidden;
                 }
@@ -100,12 +100,25 @@
                 .modal-header, .modal-header, .modal-footer, .btn-close {
                     display: none;
                 }
+
+                .modal-body {
+                    padding: 0;
+                    overflow: hidden; /* Prevent scrolling */
+                }
+
+                /* Ensure iframe takes up the full modal height */
+                #certificatePreview {
+                    width: 100%;
+                    height: 100vh; /* Full viewport height */
+                    border: none;
+                    overflow: hidden;
+                }
             }
         </style>
-        </head>
-        <body>
-            <%@ include file="../header.jspf" %>
-            <%
+    </head>
+    <body>
+        <%@ include file="../header.jspf" %>
+        <%
             String eventID = request.getParameter("eventID");
             String loggedInUser = (String) session.getAttribute("volunteer");
             String selectedTask = (String) session.getAttribute("selectedTask");
@@ -122,9 +135,9 @@
             if (eventID != null && !eventID.isEmpty()) {
                 try {
                     conn = dbconnection.getConnection();
-                    String sql = "SELECT e.eventID, e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration, e.description, a.state AS location, b.name AS beneficiary, e.donationLimit FROM events e " +
-                                 "INNER JOIN address a ON e.addressID = a.addressID " +
-                                 "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
+                    String sql = "SELECT e.eventID, e.name AS eventName, e.date AS eventDate, e.time AS eventTime, e.duration, e.description, a.state AS location, b.name AS beneficiary, e.donationLimit FROM events e "
+                            + "INNER JOIN address a ON e.addressID = a.addressID "
+                            + "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
                     stmt = conn.prepareStatement(sql);
                     stmt.setInt(1, Integer.parseInt(eventID));
                     rs = stmt.executeQuery();
@@ -171,130 +184,176 @@
                         }
 
         %>
-            <img src="../getImage.do?type=events&id=<%= id%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
-            <figure class="text-center">
-                <blockquote class="blockquote">
-                    <p class="h6"><%= eventName %></p>
-                </blockquote>
-                <figcaption class="blockquote-footer">
-                    BY <cite title="Beneficiary Name">@<%= beneficiary %></cite>
-                </figcaption>
-            </figure>
-            <div class="divider"></div>
-            <div class="container">
-                    <div class="row">
-                        <!-- Left Column: About, Location, and Event Date -->
-                        <div class="col-md-8">
-                            <p><strong>About</strong></p>
-                <p><%= description %></p>
-                            <p><strong>Location.</strong></p>
-                            <div class="d-flex align-items-start justify-content-start">
-                                <i class="bi bi-geo-alt me-2"></i>
-                                <p class="text-muted"><%= location %></p>
-                            </div>
-                            <p><strong>Event Date.</strong></p>
-                            <div class="d-flex justify-content-between mb-3">
-                            <small>Start Date
+        <img src="../getImage.do?type=events&id=<%= id%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+        <figure class="text-center">
+            <blockquote class="blockquote">
+                <p class="h6"><%= eventName%></p>
+            </blockquote>
+            <figcaption class="blockquote-footer">
+                BY <cite title="Beneficiary Name">@<%= beneficiary%></cite>
+            </figcaption>
+        </figure>
+        <div class="divider"></div>
+        <div class="container">
+            <div class="row">
+                <!-- Left Column: About, Location, and Event Date -->
+                <div class="col-md-8">
+                    <p><strong>About</strong></p>
+                    <p><%= description%></p>
+                    <p><strong>Location.</strong></p>
+                    <div class="d-flex align-items-start justify-content-start">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        <p class="text-muted"><%= location%></p>
+                    </div>
+                    <p><strong>Event Date.</strong></p>
+                    <div class="d-flex justify-content-between mb-3">
+                        <small>Start Date
 
-                                <br><div class="d-flex align-items-start justify-content-start">
+                            <br><div class="d-flex align-items-start justify-content-start">
                                 <i class="bi bi-calendar-event me-2"></i>
-                                <p class="text-muted"><%= formattedStartTime %></p>
+                                <p class="text-muted"><%= formattedStartTime%></p>
                             </div>
-                            </small>
-                            <small>End Date
-                                <br><div class="d-flex align-items-start justify-content-start">
+                        </small>
+                        <small>End Date
+                            <br><div class="d-flex align-items-start justify-content-start">
                                 <i class="bi bi-calendar-event me-2"></i>
-                                <p class="text-muted"><%= formattedEndTime %></p>
+                                <p class="text-muted"><%= formattedEndTime%></p>
                             </div>
-                            </small>
+                        </small>
+                    </div>
+                    <p><strong>Selected Task:</strong> <%= selectedTask%></p>
+                </div>
+
+                <!-- Right Column: Cards -->
+                <div class="col-md-4">
+                    <div class="card mb-4" style="border-radius: 10px;">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <img src="../assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
+                                <p><strong>DOWNLOAD CERTIFICATE</strong></p>
                             </div>
-                            <p><strong>Selected Task:</strong> <%= selectedTask %></p>
+                            <a href="javascript:void(0)" onclick="showCertificateModal(<%= id%>)" 
+                               class="btn w-100 py-2" 
+                               style="background-color: #000; color: #fff; border-radius: 30px;">
+                                DOWNLOAD <i class="bi bi-download"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Fullscreen Overlay -->
+                    <div class="modal fade" id="certificateOverlay" tabindex="-1" aria-labelledby="certificateOverlayLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-fullscreen">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="certificateOverlayLabel">Certificate</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+<!--                                    Wrap the certificate content with a specific class -->
+                                    <div class="certificate-content">
+                                        <iframe id="certificatePreview" style="width: 100%; height: 100%; border: none;"></iframe>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary print-button" onclick="window.print();">Download</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Second Card -->
+                    <div class="card mb-4" style="border-radius: 10px;">
+                        <div class="card-body text-center">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <img src="../assets/medal.svg" alt="Icon" style="width: 50px; height: 50px;">
+                                <p><strong>SERVICE REPORT</strong></p>
+                            </div>
+                            <p class="card-text text-muted">
+                                Tell us about your experience and suggestions to improve our service and enhance our system.
+                            </p>
+                            <a href="serviceForm.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                                FILL IN FORM? <i class="bi bi-pencil-square"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <!-- Right Column: Cards -->
-        <div class="col-md-4">
-            <div class="card mb-4" style="border-radius: 10px;">
-                <div class="card-body text-center">
-                    <div class="d-flex align-items-center justify-content-center">
-                        <img src="../assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
-                        <p><strong>DOWNLOAD CERTIFICATE</strong></p>
-                    </div>
-                    <button class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;" type="button" data-bs-toggle="modal" data-bs-target="#certificateOverlay">
-                        DOWNLOAD <i class="bi bi-download"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Fullscreen Overlay -->
-            <div class="modal fade" id="certificateOverlay" tabindex="-1" aria-labelledby="certificateOverlayLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="certificateOverlayLabel">Certificate</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Wrap the certificate content with a specific class -->
-                            <div class="certificate-content">
-                                <%@ include file="certificate.jsp" %>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary print-button" onclick="window.print();">Download</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Second Card -->
-            <div class="card mb-4" style="border-radius: 10px;">
-                <div class="card-body text-center">
-                    <div class="d-flex align-items-center justify-content-center">
-                    <img src="../assets/medal.svg" alt="Icon" style="width: 50px; height: 50px;">
-                    <p><strong>SERVICE REPORT</strong></p>
-                    </div>
-                    <p class="card-text text-muted">
-                        Tell us about your experience and suggestions to improve our service and enhance our system.
-                    </p>
-                    <a href="serviceForm.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
-                        FILL IN FORM? <i class="bi bi-pencil-square"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-    <% 
-                    } else { 
+        <%
+        } else {
         %>
         <div class="container">
             <p>Event not found.</p>
         </div>
-    <%  }
+        <%  }
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
                 // Close resources manually
                 try {
-                    if (taskRs != null) taskRs.close();
-                    if (taskStmt != null) taskStmt.close();
-                    if (donationRs != null) donationRs.close();
-                    if (donationStmt != null) donationStmt.close();
-                    if (rs != null) rs.close();
-                    if (stmt != null) stmt.close();
-                    if (conn != null) conn.close();
+                    if (taskRs != null) {
+                        taskRs.close();
+                    }
+                    if (taskStmt != null) {
+                        taskStmt.close();
+                    }
+                    if (donationRs != null) {
+                        donationRs.close();
+                    }
+                    if (donationStmt != null) {
+                        donationStmt.close();
+                    }
+                    if (rs != null) {
+                        rs.close();
+                    }
+                    if (stmt != null) {
+                        stmt.close();
+                    }
+                    if (conn != null) {
+                        conn.close();
+                    }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-        } else { 
-         %>
-    <div class="container">
-        <p>Invalid Event ID.</p>
-    </div>
-    <% } %>
+        } else {
+        %>
+        <div class="container">
+            <p>Invalid Event ID.</p>
+        </div>
+        <% }%>
     </body>
 </html>
 
+<script>
+    function printCertificate() {
+        var iframe = document.getElementById('certificatePreview');
+
+        if (iframe.contentWindow) {
+            iframe.contentWindow.focus(); // Focus on the iframe content
+            iframe.contentWindow.print(); // Trigger the print dialog for the iframe content
+        } else {
+            alert("Failed to load certificate content for printing.");
+        }
+    }
+
+    function showCertificateModal(eventID) {
+        var contextPath = '<%= request.getContextPath()%>';
+        var iframe = document.getElementById('certificatePreview');
+
+        // Set the iframe source
+        iframe.src = contextPath + '/certificate?eventID=' + eventID;
+
+        // Adjust iframe height once content is fully loaded
+        iframe.onload = function () {
+            var contentHeight = iframe.contentWindow.document.body.scrollHeight;
+            iframe.style.height = contentHeight + 'px';
+        };
+
+        // Show the modal
+        var certificateModal = new bootstrap.Modal(document.getElementById('certificateOverlay'));
+        certificateModal.show();
+    }
+</script>

@@ -1,14 +1,26 @@
 <%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.cm.model.events"%>
+<%@page import="com.cm.model.volunteer"%>
 <!DOCTYPE html>
 <%
-    int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-    int currentPage1 = request.getParameter("page2") != null ? Integer.parseInt(request.getParameter("page2")) : 1;
-    int totalPages = 5; // Total pages for events
-    int totalPages1 = 3; // Total pages for volunteers
-    String status = request.getParameter("status") != null ? request.getParameter("status") : "all";
-    String activeTab = request.getParameter("activeTab") != null ? request.getParameter("activeTab") : "events";
-%>
+    ArrayList<events> eventsList = (ArrayList<events>) request.getAttribute("eventsList");
+    ArrayList<volunteer> volunteerList = (ArrayList<volunteer>) request.getAttribute("volunteerList");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    Integer totalPages1 = (Integer) request.getAttribute("totalPages1");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer currentPage1 = (Integer) request.getAttribute("currentPage1");
+    String status = (String) request.getAttribute("status");
+    String activeTab = (String) request.getAttribute("activeTab");
+%>  
+<%
+    String user = (String) session.getAttribute("userRole");
 
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -83,94 +95,32 @@
                                             <input class="form-check-input" type="checkbox" id="eventCheckAll" aria-label="Check All">
                                         </div>
                                     </td>
-                                    <th scope="col" class="col-1">No</th>
+                                    <th scope="col" class="col-1">ID</th>
                                     <th scope="col" class="col-6">Event Name</th>
                                     <th scope="col" class="text-center col-2">Date</th>
                                     <th scope="col" class="text-center col-2">Report</th>
                                 </tr>
                             </thead>
                             <tbody class="table-group-divider">
-                                <%
-                                    status = request.getParameter("status");
-                                    Connection conn = null;
-                                    PreparedStatement stmt = null;
-                                    ResultSet rs = null;
-
-                                    conn = dbconnection.getConnection();
-
-                                    String countSql = "SELECT COUNT(*) as total FROM events";
-                                    PreparedStatement countStmt = conn.prepareStatement(countSql);
-                                    ResultSet countRs = countStmt.executeQuery();
-                                    countRs.next();
-                                    int totalEvents = countRs.getInt("total");
-                                    countRs.close();
-                                    countStmt.close();
-
-                                    int eventsPerPage = 5;
-                                    totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
-                                    currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-                                    if (currentPage > totalPages) {
-                                        currentPage = totalPages > 0 ? totalPages : 1;
-                                    }
-                                    if (eventsPerPage > totalEvents) {
-                                        eventsPerPage = totalEvents;
-                                    }
-                                    int offset = (currentPage - 1) * eventsPerPage;
-
-                                    int idstat = 0;
-                                    String sql = "SELECT eventID, name, date FROM events";
-
-                                    if (status != null && !"All".equalsIgnoreCase(status)) {
-                                        if (status.equalsIgnoreCase("Pending")) {
-                                            idstat = 1;
-                                        } else if (status.equalsIgnoreCase("Approved")) {
-                                            idstat = 2;
-                                        } else {
-                                            idstat = 3;
-                                        }
-                                        sql += " WHERE status = ?";
-                                        sql += " LIMIT ? OFFSET ?";
-                                        stmt = conn.prepareStatement(sql);
-                                        stmt.setInt(1, idstat);
-                                        stmt.setInt(2, eventsPerPage);
-                                        stmt.setInt(3, offset);
-                                    } else {
-                                        sql += " LIMIT ? OFFSET ?";
-                                        stmt = conn.prepareStatement(sql);
-                                        stmt.setInt(1, eventsPerPage);
-                                        stmt.setInt(2, offset);
-                                    }
-
-                                    rs = stmt.executeQuery();
-
-                                    int num = 0;
-                                    while (rs.next()) {
-//                                        String eventIDString = rs.getString("eventID");
-//                                        int evt = (eventIDString != null && !eventIDString.isEmpty()) ? Integer.parseInt(eventIDString) : 0;
-
-                                        int evt = rs.getInt("eventID");
-                                        String ename = rs.getString("name");
-                                        Date eventDate = rs.getDate("date");
-
-                                        String formattedDate = new SimpleDateFormat("dd/MM/YYYY").format(eventDate);
-                                        num++;
+                                <% if (eventsList != null && !eventsList.isEmpty()) {
+                                        for (events event : eventsList) {
+                                            String formattedDate = new SimpleDateFormat("dd/MM/YYYY").format(event.getDate());
                                 %>
                                 <tr>
                                     <td>
                                         <div>
-                                            <input class="form-check-input row-checkbox" type="checkbox" data-event-id="<%=evt%>" aria-label="Row Checkbox">
+                                            <input class="form-check-input row-checkbox" type="checkbox" data-event-id="<%=event.getEventID()%>" aria-label="Row Checkbox">
                                         </div>
                                     </td>
-                                    <td class=""><%=evt%></td>
-                                    <td><%=ename%></td>
+                                    <td><%=event.getEventID()%></td>
+                                    <td><%=event.getName()%></td>
                                     <td class="text-center"><%=formattedDate%></td>
-                                    <td class="text-center ">
-                                        <a class="btn btn-info bg-purple rounded-4"  href="reportEvent.jsp?eventID=<%=evt%>">Generate</a>
+                                    <td class="text-center">
+                                        <a class="btn btn-info bg-purple rounded-4" href="<%= request.getContextPath() %>/AdminEvent?eventID=<%= event.getEventID() %>">Generate</a>
                                     </td>
                                 </tr>
-                                <%
-                                    }
-                                %>
+                                <% }
+                                    }%>
                             </tbody>
                         </table>
                         <!-- Pagination -->
@@ -231,58 +181,24 @@
                                 </tr>
                             </thead>
                             <tbody class="table-group-divider">
-                                <%
-                                    conn = dbconnection.getConnection();
-
-                                    String countVol = "SELECT COUNT(*) as total FROM volunteer";
-                                    PreparedStatement countStmt1 = conn.prepareStatement(countVol);
-                                    ResultSet countRs1 = countStmt1.executeQuery();
-                                    countRs1.next();
-                                    int totalVolunteer = countRs1.getInt("total");
-                                    countRs.close();
-                                    countStmt.close();
-
-                                    int volunteerPerPage = 5;
-                                    totalPages1 = (int) Math.ceil((double) totalVolunteer / volunteerPerPage);
-                                    currentPage1 = request.getParameter("page2") != null ? Integer.parseInt(request.getParameter("page2")) : 1;
-                                    if (currentPage1 > totalPages1) {
-                                        currentPage1 = totalPages1 > 0 ? totalPages1 : 1;
-                                    }
-                                    if (volunteerPerPage > totalVolunteer) {
-                                        volunteerPerPage = totalVolunteer;
-                                    }
-                                    int offset1 = (currentPage1 - 1) * volunteerPerPage;
-
-                                    String sql1 = "SELECT * FROM volunteer LIMIT ? OFFSET ?";
-                                    stmt = conn.prepareStatement(sql1);
-                                    stmt.setInt(1, volunteerPerPage);
-                                    stmt.setInt(2, offset1);
-
-                                    rs = stmt.executeQuery();
-
-                                    int num1 = 0;
-                                    while (rs.next()) {
-                                        int vol = rs.getInt("volunteerID");
-                                        String name = rs.getString("name");
-                                        int contact = rs.getInt("contactInfo");
-                                        num1++;
+                                <% if (volunteerList != null && !volunteerList.isEmpty()) {
+                                        for (volunteer vol : volunteerList) {
                                 %>
                                 <tr>
                                     <td>
                                         <div>
-                                            <input class="form-check-input row-checkbox" type="checkbox" data-volunteer-id="<%=vol%>" aria-label="Row Checkbox">
+                                            <input class="form-check-input row-checkbox" type="checkbox" data-volunteer-id="<%=vol.getVolunteerID()%>" aria-label="Row Checkbox">
                                         </div>
                                     </td>
-                                    <td><%=vol%></td>
-                                    <td><%=name%></td>
-                                    <td class="text-center"><%=contact%></td>
-                                    <td class="text-center ">
-                                        <a class="btn btn-info bg-purple rounded-4"  href="reportVolunteer.jsp?volunteerID=<%=vol%>">Generate</a>
+                                    <td><%=vol.getVolunteerID()%></td>
+                                    <td><%=vol.getName()%></td>
+                                    <td class="text-center"><%=vol.getContactInfo()%></td>
+                                    <td class="text-center">
+                                        <a class="btn btn-info bg-purple rounded-4" href="<%= request.getContextPath() %>/AdminVolunteer?volunteerID=<%= vol.getVolunteerID() %>">Generate</a>
                                     </td>
                                 </tr>
-                                <%
-                                    }
-                                %>
+                                <% }
+                                }%>
                             </tbody>
                         </table>
                         <!-- Pagination -->
