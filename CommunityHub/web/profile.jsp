@@ -71,29 +71,29 @@
                 </div>
 
                 <!-- Update User Info Form -->
-                <form class="border mt-3 p-3">
+                <form class="border mt-3 p-3" action="<%=request.getContextPath()%>/updateprofile?type=basic" method="POST">
                     <div class="row mb-3">
                         <div class="col">
                             <label for="Username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="Username" value="<%=username%>">
+                            <input type="text" name="username" class="form-control" id="Username" value="<%=username%>">
                         </div>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email Address</label>
-                        <input type="email" class="form-control" id="email" value="<%=email%>">
+                        <input type="email" name="email" class="form-control" id="email" value="<%=email%>">
                     </div>
                     <div class="mb-3">
                         <label for="contactNumber" class="form-label">Contact Number</label>
-                        <input type="text" class="form-control" id="contactNumber" value="<%=contact%>">
+                        <input type="text" name="phone_number" class="form-control" id="contactNumber" value="<%=contact%>">
                     </div>
                     <div class="d-flex justify-content-start">
                         <button type="submit" class="btn btn-primary me-2">Update Info</button>
-                        <button type="button" class="btn btn-danger">Cancel</button>
+                        <button type="button"  class="btn btn-danger">Cancel</button>
                     </div>
                 </form>
 
                 <!-- Change Password Form -->
-                <form class="border mt-3 p-3">
+                <form class="border mt-3 p-3" action="<%=request.getContextPath()%>/updateprofile?type=password" method="POST">
                     <div class="mb-3">
                         <label for="currentPassword" class="form-label">Current Password</label>
                         <div class="position-relative">
@@ -106,7 +106,7 @@
                     <div class="mb-3">
                         <label for="newPassword" class="form-label">New Password</label>
                         <div class="position-relative">
-                            <input type="password" class="form-control" id="newPassword">
+                            <input type="password" name="password" class="form-control" id="newPassword">
                             <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#newPassword">
 
                             </button>
@@ -115,7 +115,7 @@
                     <div class="mb-3">
                         <label for="confirmPassword" class="form-label">Confirm Password</label>
                         <div class="position-relative">
-                            <input type="password" class="form-control" id="confirmPassword">
+                            <input type="password" name="password" class="form-control" id="confirmPassword">
                             <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#confirmPassword">
 
                             </button>
