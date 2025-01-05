@@ -64,11 +64,11 @@ public class myEventList extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
                 int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
-        if (volunteerId == 0) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
-            return;
-        }
-                int pageSize = 10; // Number of events per page
+//        if (volunteerId == 0) {
+//            response.sendRedirect(request.getContextPath() + "/login.jsp");
+//            return;
+//        }
+                int pageSize = 5; // Number of events per page
                 int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
                 int totalRecords = 0;
                 int totalPages = 0;
@@ -98,8 +98,7 @@ public class myEventList extends HttpServlet {
                     stmt.close();
 
                      // Fetch paginated data
-                    String sql ="SELECT e.eventID, e.name, e.date, e.time, a.state, t.taskID, t.description "+
-                                "FROM events e " +
+                    String sql ="SELECT * FROM events e " +
                                 "INNER JOIN address a ON e.addressID = a.addressID " +
                                 "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
                                 "INNER JOIN task t ON ev.volunteerID = t.volunteerID AND e.eventID = t.eventID " +
@@ -151,6 +150,8 @@ public class myEventList extends HttpServlet {
                 request.setAttribute("tasks", taskList);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("currentPage", currentPage);
+                
+                request.getRequestDispatcher("/volunteer/myEventList.jsp").forward(request, response);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {

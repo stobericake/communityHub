@@ -179,28 +179,29 @@
                 
                 <%
                 if (events != null && !events.isEmpty()) {
-                                        int num = (currentPage - 1) * 4 + 1; // Start number for pagination
-                                        for (events event : events) {
-                                            int eventID = event.getEventID();
-                                            String name = event.getName();
-                                            String desc = event.getDescription();
-                                            String city = "";
-                                            String taskD = "";
-                                            int index = 0;
-                                            for (task t : tasks) {
-                                                if (t.getTaskID() ==  volunteerId) {
-                                                    taskD = t.getDescription();
-                                                    break; // Exit the loop once the match is found
+                    int index = 0;
+                    int num = (currentPage - 1) * 4 + 1; // Start number for pagination
+                        for (events event : events) {
+                           int eventID = event.getEventID();
+                           String name = event.getName();
+                           String desc = event.getDescription();
+                           String city = "";
+                           String taskD = "";
+                                            
+                           for (task t : tasks) {
+                                if (t.getVolunteerID() ==  volunteerId) {
+                                taskD = t.getDescription();
+                                 break; // Exit the loop once the match is found
                                                 }
                                             }
-                                            for (address a : addresses) {
-                                                if (a.getAddressID() ==  event.getAddressID()) {
-                                                    city = a.getState();
-                                                    break; // Exit the loop once the match is found
-                                                }
-                                            }
-                                            String formattedDate = new SimpleDateFormat("dd/MM E").format(event.getDate());
-                                            String formattedTime = new SimpleDateFormat("HH:mm").format(event.getTime());
+                            for (address a : addresses) {
+                                if (a.getAddressID() ==  event.getAddressID()) {
+                                city = a.getState();
+                                break; // Exit the loop once the match is found
+            }
+          }
+         String formattedDate = new SimpleDateFormat("dd/MM E").format(event.getDate());
+         String formattedTime = new SimpleDateFormat("HH:mm").format(event.getTime());
             %>         
                <li class="list-group-item d-flex justify-content-between align-items-center">
                     <table class="volunteerTable">
@@ -214,7 +215,7 @@
                         </tr>                                       
 
                 </table>
-                
+               </li>
                     
                  <% }
                         } else {
@@ -223,7 +224,7 @@
                                
                 <% }%>
         <!-- Pagination -->
-        <div class="col-12">
+        <div class="container  mb-3">
             <nav aria-label="Page navigation">
                 <ul class="pagination">
                     <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
