@@ -159,7 +159,7 @@ public class vEventList extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "An error occurred while fetching events.");
-            request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
         } finally {
             try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
             try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }

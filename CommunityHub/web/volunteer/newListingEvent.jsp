@@ -172,7 +172,7 @@
                             </div>
                         </div>
 <div class="d-flex justify-content-end align-items-center">                     
-                            <a href="#" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
+                            <a href="../guest/donationForm.jsp?eventID=<%= eventID %>" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
                             <a href="vEvent.do?eventID=<%= eventID %>" class="volunteer-button">View Details</a>      
                         </div>
                     </div>

@@ -4,6 +4,7 @@
     Author     : Rina
 --%>
 
+<%@page import="com.cm.model.eventsVolunteer"%>
 <%@page import="com.cm.model.task"%>
 <%@page import="com.cm.model.address"%>
 <%@page import="com.cm.model.events"%>
@@ -142,6 +143,7 @@
                     List<events> events = (List) request.getAttribute("events");
                     List<address> addresses = (List) request.getAttribute("address");
                     List<task> tasks = (List) request.getAttribute("tasks");
+                    List<eventsVolunteer> eventsV = (List) request.getAttribute("eventsV");
                     int totalPages = Integer.parseInt(request.getAttribute("totalPages").toString());
                     int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
 
@@ -179,27 +181,13 @@
                 
                 <%
                 if (events != null && !events.isEmpty()) {
-                    int index = 0;
+                    int index = 1;
                     int num = (currentPage - 1) * 4 + 1; // Start number for pagination
-                        for (events event : events) {
-                           int eventID = event.getEventID();
-                           String name = event.getName();
-                           String desc = event.getDescription();
-                           String city = "";
-                           String taskD = "";
-                                            
-                           for (task t : tasks) {
-                                if (t.getVolunteerID() ==  volunteerId) {
-                                taskD = t.getDescription();
-                                 break; // Exit the loop once the match is found
-                                                }
-                                            }
-                            for (address a : addresses) {
-                                if (a.getAddressID() ==  event.getAddressID()) {
-                                city = a.getState();
-                                break; // Exit the loop once the match is found
-            }
-          }
+                        if (events != null && !events.isEmpty()) {
+                    for (int i = 0; i < events.size(); i++) {
+                        events event = events.get(i);
+                        task task = tasks.get(i); // Assuming tasks and events are aligned
+            
          String formattedDate = new SimpleDateFormat("dd/MM E").format(event.getDate());
          String formattedTime = new SimpleDateFormat("HH:mm").format(event.getTime());
             %>         
@@ -207,9 +195,9 @@
                     <table class="volunteerTable">
                         <tr>
                            <td><%= index++%>.</td>
-                           <td><%= name %></td>
+                           <td><%= event.getName() %></td>
                            <td><%= formattedDate %></td>
-                           <td><%= taskD %></td>
+                           <td><%= task.getDescription() %></td>
                            
                             <td><a href="myEventDetail.jsp?eventID=<%= event.getEventID() %>" class="view-details-button">View Details</a></td>
                         </tr>                                       
@@ -222,7 +210,8 @@
                 %>
             <div> No events found.</div>
                                
-                <% }%>
+                <% }
+}%>
         <!-- Pagination -->
         <div class="container  mb-3">
             <nav aria-label="Page navigation">

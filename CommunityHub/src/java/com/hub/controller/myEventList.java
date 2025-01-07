@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.cm.model.address;
 import com.cm.model.events;
+import com.cm.model.eventsVolunteer;
 import com.cm.model.task;
 import java.text.SimpleDateFormat;
 
@@ -73,6 +74,7 @@ public class myEventList extends HttpServlet {
                 int totalRecords = 0;
                 int totalPages = 0;
                 List<events> eventList = new ArrayList<>();
+                List<eventsVolunteer> eventsVolList = new ArrayList<>();
                 List<address> addressList = new ArrayList<>();
                 List<task> taskList = new ArrayList<>();
 
@@ -110,7 +112,6 @@ public class myEventList extends HttpServlet {
                     stmt.setInt(2, pageSize);
                     stmt.setInt(3, (currentPage - 1) * pageSize);
                     rs = stmt.executeQuery();
-                    int index = 1;
                    while (rs.next()) {
                     address address = new address(
                             rs.getInt("addressID"),
@@ -123,6 +124,14 @@ public class myEventList extends HttpServlet {
 
                     addressList.add(address);
 
+                    eventsVolunteer eventsv = new eventsVolunteer(
+                            rs.getInt("eventsVolunteerID"), 
+                            rs.getInt("eventID"), 
+                            rs.getInt("volunteerID")
+                    );
+                    
+                    eventsVolList.add(eventsv);
+                    
                     events event = new events(
                             rs.getInt("eventID"),
                             rs.getString("name"),
@@ -140,7 +149,8 @@ public class myEventList extends HttpServlet {
                     
                      task tasks = new task(
                              rs.getInt("taskID"),
-                             rs.getString("t.description")
+                             rs.getString("t.description"),
+                             rs.getInt("t.volunteerID")
                      ); 
                      taskList.add(tasks);
                 }
@@ -148,6 +158,7 @@ public class myEventList extends HttpServlet {
                 request.setAttribute("events", eventList);
                 request.setAttribute("address", addressList);
                 request.setAttribute("tasks", taskList);
+                request.setAttribute("eventsV", eventsVolList);
                 request.setAttribute("totalPages", totalPages);
                 request.setAttribute("currentPage", currentPage);
                 

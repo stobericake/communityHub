@@ -139,7 +139,7 @@ public class vEventDetail extends HttpServlet {
                 while (taskRs.next()) {
                     int taskId = taskRs.getInt("taskID");
                     String taskDescription = taskRs.getString("description");
-                    taskList.add(new task(taskId, taskDescription));
+                    taskList.add(new task(taskId, taskDescription, volunteerId));
                 }
                 
 
