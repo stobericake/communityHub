@@ -128,7 +128,7 @@
                         <small class="text-muted"><%= totalContributors %> Contributors</small>
                     </div>
                     <hr>
-                    <button class="btn w-100 py-2" href="../guest/donationForm.jsp?eventID=<%= eventID %>" style="background-color: #000; color: #fff; border-radius: 30px;">
+                    <button class="btn w-100 py-2" onclick="location.href='guest/donationForm.jsp?eventID=<%= eventID %>'" style="background-color: #000; color: #fff; border-radius: 30px;">
                         DONATE <i class="bi bi-heart"></i>
                     </button>
                 </div>
@@ -142,18 +142,19 @@
                 <p class="text-muted"><%= addressObj.getState() %></p>
             </div>
             <p><strong>Event Date.</strong></p>
-            <div class="d-flex justify-content-between mb-3">
+            <div class="d-flex justify-content-between md-3">
             <small>Start Date
             
                 <br><div class="d-flex align-items-start justify-content-start">
                 <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"><%=formattedStartTime%></p>
+                <p class="text-muted"><%=formattedDate%> <%=formattedStartTime%></p>
             </div>
             </small>
             <small>End Date
+            
                 <br><div class="d-flex align-items-start justify-content-start">
                 <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"<%=formattedEndTime%></p>
+                <p class="text-muted"><%=formattedDate%> <%=formattedEndTime%></p>
             </div>
             </small>
             </div>

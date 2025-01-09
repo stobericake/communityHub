@@ -155,7 +155,7 @@
                 <div class="card h-100 event-card" data-title="<%= name%>" 
                      data-description="<%= desc %>" data-location="<%= city%>">
                     <div class="position-relative">
-                        <img src="getImage.do?id=<%= eventID %>" alt="Image" class="w-100 h-100" style="object-fit: cover;">
+                        <img src="getImage.do?type=events&id=<%= eventID %>" alt="Image" class="w-100 h-100" style="object-fit: cover;">
                     </div>
                     <div class="card-body">
                         <h5 class="card-title styl"><%= name %></h5>
@@ -168,18 +168,18 @@
                             </div>
                             <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-calendar-date me-2"></i>
-                                <small><%= formattedDate %> <%= formattedTime %> %></small>
+                                <small><%= formattedDate %> <%= formattedTime %></small>
                             </div>
                         </div>
 <div class="d-flex justify-content-end align-items-center">                     
-                            <a href="../guest/donationForm.jsp?eventID=<%= eventID %>" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
+                            <a href="guest/donationForm.jsp?eventID=<%= eventID %>" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
                             <a href="vEvent.do?eventID=<%= eventID %>" class="volunteer-button">View Details</a>      
                         </div>
                     </div>
                 </div>
             </div>
                 <% }
-                                } else {
+                  } else {
                 %>
             <div> No events found.</div>
                                
