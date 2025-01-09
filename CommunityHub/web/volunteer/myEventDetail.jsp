@@ -168,13 +168,13 @@
 
                             <br><div class="d-flex align-items-start justify-content-start">
                                 <i class="bi bi-calendar-event me-2"></i>
-                                <p class="text-muted"><%= formattedStartTime%></p>
+                                <p class="text-muted"><%=formattedDate%> <%=formattedStartTime%></p>
                             </div>
                         </small>
                         <small>End Date
                             <br><div class="d-flex align-items-start justify-content-start">
                                 <i class="bi bi-calendar-event me-2"></i>
-                                <p class="text-muted"><%= formattedEndTime%></p>
+                                <p class="text-muted"><%=formattedDate%> <%= formattedEndTime%></p>
                             </div>
                         </small>
                     </div>
@@ -240,7 +240,7 @@
         </div>
     </body>
 </html>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function printCertificate() {
         var iframe = document.getElementById('certificatePreview');

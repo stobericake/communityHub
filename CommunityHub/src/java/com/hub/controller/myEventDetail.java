@@ -128,9 +128,8 @@ public class myEventDetail extends HttpServlet {
                              rs.getInt("t.volunteerID")
                         );
 
-                        // Formatting setup
-                        SimpleDateFormat outputFormat = new SimpleDateFormat("MM/dd/yyyy - hh:mma");
-                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mma");
+                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("MM/dd/yyyy - ");
 
                         // Convert `eventDate` to LocalDate (compatible approach)
                         LocalDate eventLocalDate = new java.util.Date(rs.getDate("date").getTime())
