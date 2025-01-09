@@ -199,7 +199,7 @@
                            <td><%= formattedDate %><%= formattedTime %></td>
                            <td><%= task.getDescription() %></td>
                            
-                            <td><a href="myEventDetail.jsp?eventID=<%= event.getEventID() %>" class="view-details-button">View Details</a></td>
+                            <td><a href="myDetail.do?eventID=<%= event.getEventID() %>" class="view-details-button">View Details</a></td>
                         </tr>                                       
 
                 </table>
