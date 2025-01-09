@@ -148,8 +148,8 @@
                                                     break; // Exit the loop once the match is found
                                                 }
                                             }
-                                            String formattedDate = new SimpleDateFormat("dd/MM E").format(event.getDate());
-                                            String formattedTime = new SimpleDateFormat("HH:mm").format(event.getTime());
+                                            String formattedDate = new SimpleDateFormat("dd/MM:").format(event.getDate());
+                                            String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
             %>            
             <div class="col-md-3">
                 <div class="card h-100 event-card" data-title="<%= name%>" 

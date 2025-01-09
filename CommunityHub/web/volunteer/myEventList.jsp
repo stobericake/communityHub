@@ -188,15 +188,15 @@
                         events event = events.get(i);
                         task task = tasks.get(i); // Assuming tasks and events are aligned
             
-         String formattedDate = new SimpleDateFormat("dd/MM E").format(event.getDate());
-         String formattedTime = new SimpleDateFormat("HH:mm").format(event.getTime());
+         String formattedDate = new SimpleDateFormat("MM/dd/yyyy -").format(event.getDate());
+         String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
             %>         
                <li class="list-group-item d-flex justify-content-between align-items-center">
                     <table class="volunteerTable">
                         <tr>
                            <td><%= index++%>.</td>
                            <td><%= event.getName() %></td>
-                           <td><%= formattedDate %></td>
+                           <td><%= formattedDate %><%= formattedTime %></td>
                            <td><%= task.getDescription() %></td>
                            
                             <td><a href="myEventDetail.jsp?eventID=<%= event.getEventID() %>" class="view-details-button">View Details</a></td>
