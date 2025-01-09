@@ -84,6 +84,10 @@
         <servlet-name>UpdateProfile</servlet-name>
         <servlet-class>com.hub.controller.UpdateProfile</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>myEventDetail</servlet-name>
+        <servlet-class>com.hub.controller.myEventDetail</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -191,6 +195,10 @@
     <servlet-mapping>
         <servlet-name>UpdateProfile</servlet-name>
         <url-pattern>/updateprofile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>myEventDetail</servlet-name>
+        <url-pattern>/myDetail.do</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

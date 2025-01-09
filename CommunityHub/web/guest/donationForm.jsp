@@ -1,3 +1,4 @@
+<%@page import="com.cm.model.events"%>
 <%@ page import="java.sql.*" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
@@ -16,29 +17,7 @@
 <body>
     <%@ include file="../header.jspf" %>
     <%
-        String eventID = "1"; // Example: Replace with dynamic ID if needed.
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        String eventName = "";
-
-        try {
-            conn = dbconnection.getConnection();
-            String sql = "SELECT eventID, name FROM events WHERE eventID = ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, Integer.parseInt(eventID));
-            rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                eventName = rs.getString("name");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (rs != null) rs.close();
-            if (stmt != null) stmt.close();
-            if (conn != null) conn.close();
-        }
+        events event = (events) request.getAttribute("event");
 
         // Get current date
         Date currentDate = new Date();
@@ -57,8 +36,8 @@
                     </div>
                     <div class="col-12">
                         <label for="eventName" class="form-label">Event</label>
-                        <input type="text" class="form-control" id="eventName" value="<%= eventName %>" name="eventName" readonly required>
-                        <input type="hidden" name="eventID" value="<%= eventID %>">
+                        <input type="text" class="form-control" id="eventName" value="<%= event.getName() %>" name="eventName" readonly required>
+                        <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
                         <div class="invalid-feedback">Event name is required.</div>
                     </div>
                     <div class="col-12">

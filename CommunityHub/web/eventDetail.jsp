@@ -128,7 +128,7 @@
                         <small class="text-muted"><%= totalContributors %> Contributors</small>
                     </div>
                     <hr>
-                    <button class="btn w-100 py-2" onclick="location.href='guest/donationForm.jsp?eventID=<%= eventID %>'" style="background-color: #000; color: #fff; border-radius: 30px;">
+                    <button class="btn w-100 py-2" onclick="location.href='addDonor.do?eventID=<%= eventID %>'" style="background-color: #000; color: #fff; border-radius: 30px;">
                         DONATE <i class="bi bi-heart"></i>
                     </button>
                 </div>

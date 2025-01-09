@@ -1,11 +1,16 @@
 package com.hub.controller;
 
+import com.cm.model.events;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.util.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -20,14 +25,82 @@ import javax.servlet.http.Part;
         maxRequestSize = 1024 * 1024 * 60) // 60MB
 public class donationFormServlet extends HttpServlet {
 
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+            String eventID = "1"; // Example: Replace with dynamic ID if needed.
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        events event = null;
+
+        try {
+            conn = dbconnection.getConnection();
+            if (conn == null) {
+                    System.out.println("DB Connection: " + (conn != null));
+                    return;
+                }
+            
+            String sql = "SELECT * FROM events WHERE eventID = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, Integer.parseInt(eventID));
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+               event = new events(
+                            rs.getInt("eventID"),
+                            rs.getString("name"),
+                            rs.getDate("date"),
+                            rs.getTime("time"),
+                            rs.getTime("duration"),
+                            rs.getString("description"),
+                            rs.getInt("volunteerNeeded"),
+                            rs.getString("status"),
+                            rs.getBlob("image"),
+                            rs.getDouble("donationLimit"),
+                            rs.getInt("addressID")
+                    );
+            }
+            request.setAttribute("event", event);
+            
+            request.getRequestDispatcher("/guest/donationForm.jsp").forward(request, response);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "An error occurred while fetching events.");
+            request.getRequestDispatcher("/error.jsp").forward(request, response);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(donationFormServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (rs != null) try {
+                rs.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(donationFormServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (stmt != null) try {
+                stmt.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(donationFormServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (conn != null) try {
+                conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(donationFormServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        // Get current date
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String formattedDate = dateFormat.format(currentDate);
+    }
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-
-        try {
+try {
             // Retrieve form data
             String eventID = request.getParameter("eventID");
             String donorName = request.getParameter("name");
