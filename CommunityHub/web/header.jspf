@@ -204,8 +204,8 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="beneficiaryDropdown">
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/listEventMgmt.do" onclick="updateDropdownText('Event Management')">Event Management</a></li>
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/donorList.jsp" onclick="updateDropdownText('Donor List')">Donor List</a></li>
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiary/volunteerList.jsp" onclick="updateDropdownText('Volunteer List')">Volunteer List</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/donorList.do" onclick="updateDropdownText('Donor List')">Donor List</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/volunteerList.do" onclick="updateDropdownText('Volunteer List')">Volunteer List</a></li>
                             </ul>
                         </li>
                         <% } %> 
