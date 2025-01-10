@@ -198,18 +198,12 @@ public class updateEvent extends HttpServlet {
                 int rowsDeleted = stmt.executeUpdate();
                 stmt.close();
 
-                if (rowsDeleted > 0) {
-                    // Redirect back to the event list
-                    response.sendRedirect("listEventMgmt.do"); // You may need to adjust the redirect
-                } else {
-                    // Handle the case where the event ID was not found
-                    request.setAttribute("error", "Event not found.");
-                    request.getRequestDispatcher("error.jsp").forward(request, response);
-                }
+                response.sendRedirect("listEventMgmt.do"); // You may need to adjust the redirect
+                
             } catch (SQLException e) {
                 e.printStackTrace();
                 // Handle errors (e.g., database issues)
-                request.setAttribute("error", "Database error occurred.");
+                request.setAttribute("msg", "Database error occurred.");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(updateEvent.class.getName()).log(Level.SEVERE, null, ex);
@@ -231,7 +225,7 @@ public class updateEvent extends HttpServlet {
             }
         } else {
             // Event ID was not provided, handle the error
-            request.setAttribute("error", "Event ID is missing.");
+            request.setAttribute("msg", "Event ID is missing.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }

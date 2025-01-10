@@ -93,7 +93,7 @@ public class addEvent extends HttpServlet {
     String street = request.getParameter("street");
     int numParticipants = Integer.parseInt(request.getParameter("numParticipants"));
     double donationLimit = Double.parseDouble(request.getParameter("donationLimit"));
-
+    String[] task = request.getParameterValues("newTask");
    
 
     
@@ -181,15 +181,10 @@ public class addEvent extends HttpServlet {
                         psTask = conn.prepareStatement(sqlTask);
 
                         // Retrieve tasks dynamically
-                        for (int i = 0; ; i++) {
-                            String taskName = request.getParameter("task[" + i + "].name");
-                            if (taskName == null) { 
-                                break;
-                                // No more tasks
-                            }
-
+                        for(String addTask: task){
+                       
                             psTask.setInt(1, 0);
-                            psTask.setString(2, taskName);
+                            psTask.setString(2, addTask);
                             psTask.setInt(3, eventID);
                             psTask.setNull(4, java.sql.Types.NULL);
                             psTask.addBatch();

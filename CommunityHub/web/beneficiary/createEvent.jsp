@@ -293,7 +293,7 @@
                             <!-- Task List -->
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body p-0">
-                                    <div class="table-responsive" style="max-height: 25vh;">
+                                    <div class="table-responsive" style="max-height: 30vh;">
                                         <table class="table table-hover mb-0" id="taskTable">
                                             <thead class="table-light">
                                                 <tr>
