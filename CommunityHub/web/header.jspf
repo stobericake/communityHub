@@ -146,26 +146,27 @@
     </head>
     <body>
         <!-- Header -->
+        <% String userRole = (session != null && session.getAttribute("userRole") != null)
+                    ? session.getAttribute("userRole").toString()
+                    : "guest";
+        %>
+
         <nav class="header navbar navbar-expand-lg navbar-dark fixed-top">
             <div class="container-fluid">
-                <a href="<%=request.getContextPath()%>/index.html" class="text-decoration-none">
+                <a href="<%=userRole.equals("admin") ? request.getContextPath() + "/adminList.do"
+                        : userRole.equals("volunteer") ? request.getContextPath() + "/vEventList.do"
+                        : userRole.equals("beneficiary") ? request.getContextPath() + "/listEventMgmt.do"
+                        : request.getContextPath() + "/index.html"%>" class="text-decoration-none">
                     <div class="d-flex align-items-center">
                         <img src="<%=request.getContextPath()%>/assets/logo.png" alt="Logo" style="height: 60px; vertical-align: middle;" class="me-2 mb-3">
                         <h1 class="h5 text-white font-weight-bold" style="font-size: 30px; -webkit-text-stroke-width: 1px;">CommUNITYHub</h1>
                     </div>
-
                 </a>
 
 
 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto align-items-center">
-                        <%
-                            // Check user role and session
-                            String userRole = (session != null && session.getAttribute("userRole") != null)
-                                    ? session.getAttribute("userRole").toString()
-                                    : "guest";
-                        %>
 
                         <!-- Admin Specific Navigation -->
 
@@ -178,7 +179,7 @@
                                 Menu
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-<!--                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>-->
+                                <!--                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>-->
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/adminList.do" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/reportList" onclick="updateDropdownText('Generate Report')">Generate Report</a></li>
                             </ul>
