@@ -59,11 +59,18 @@
             .form-section.active {
                 display: block;
             }
+
+            thead th {
+                position: -webkit-sticky; /* For Safari */
+                position: sticky;
+                top: 0;
+                background-color: #fff; /* Adjust background color as needed */
+            }
         </style>
     </head>
     <body class="bg-light">
         <%@ include file="../header.jspf" %>
-        
+
         <div class="container py-5">
             <form action="../addEvent.do" method="POST" enctype="multipart/form-data">
                 <div class="card p-4">
@@ -286,7 +293,7 @@
                             <!-- Task List -->
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body p-0">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive" style="max-height: 25vh;">
                                         <table class="table table-hover mb-0" id="taskTable">
                                             <thead class="table-light">
                                                 <tr>
@@ -342,7 +349,7 @@
                 const prevBtn = document.getElementById('prevBtn');
                 const nextBtn = document.getElementById('nextBtn');
 
-                prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+                prevBtn.style.display = 'block';
 
                 if (currentStep === totalSteps) {
                     nextBtn.textContent = 'Submit';
@@ -431,57 +438,56 @@
 
 
 
-            // Array to store tasks
-            let taskArray = [];
-            let taskCount = 1;  // Assuming task count starts from 1
 
-            function addTask(event) {
-                event.preventDefault();
+            // Initialize task count starting from 1
+let taskCount = 1;
 
-                const taskList = document.getElementById('taskList');
-                const taskInput = document.getElementById('taskInput');
-                const taskName = taskInput.value.trim();
+function addTask(event) {
+    event.preventDefault();
 
-                // Validate if task name is empty
-                if (!taskName) {
-                    alert('Task name cannot be empty!');
-                    return;
-                }
+    const taskList = document.getElementById('taskList');
+    const taskInput = document.getElementById('taskInput');
+    const taskName = taskInput.value.trim();
 
-                // Remove empty state if present
-                const emptyState = document.getElementById('emptyState');
-                if (emptyState) {
-                    emptyState.remove();
-                }
+    if (!taskName) {
+        alert('Task name cannot be empty!');
+        return;
+    }
 
-                // Create task row
-                const row = document.createElement('tr');
-                row.innerHTML =
-                        '<td class="px-4"></td>' +
-                        '<td class="px-4">' +
-                        '<span class="task-name">' + taskName + '</span>' +
-                        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
-                        '</td>' +
-                        '<td class="px-4">' +
-                        '<div class="btn-group btn-group-sm">' +
-                        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
-                        '<i class="fas fa-edit"></i>' +
-                        '</button>' +
-                        '<button class="btn btn-outline-danger" onclick="deleteTask(this)">' +
-                        '<i class="fas fa-trash"></i>' +
-                        '</button>' +
-                        '</div>' +
-                        '</td>';
+    // Remove empty state if present
+    const emptyState = document.getElementById('emptyState');
+    if (emptyState) {
+        emptyState.remove();
+    }
 
-                // Append the new task to the list
-                taskList.appendChild(row);
+    // Create task row
+    const row = document.createElement('tr');
+    row.innerHTML =
+        '<td class="px-4">' + taskCount + '</td>' +
+        '<td class="px-4">' +
+        '<span class="task-name">' + taskName + '</span>' +
+        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
+        '</td>' +
+        '<td class="px-4">' +
+        '<div class="btn-group btn-group-sm">' +
+        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
+        '<i class="fas fa-edit"></i>' +
+        '</button>' +
+        '<button class="btn btn-outline-danger" onclick="deleteTask(this)">' +
+        '<i class="fas fa-trash"></i>' +
+        '</button>' +
+        '</div>' +
+        '</td>';
 
-                // Update row numbering
-                updateRowNumbers();
+    // Append the new task to the list
+    taskList.appendChild(row);
 
-                // Clear the input field
-                taskInput.value = '';
-            }
+    // Increment task count
+    taskCount++;
+
+    // Clear the input field
+    taskInput.value = '';
+}
 
 
             // Edit task
@@ -515,19 +521,24 @@
 
             // Delete task
             function deleteTask(button) {
-                event.preventDefault();
-                const row = button.closest('tr');
-                const taskList = document.getElementById('taskList');
+    event.preventDefault();
+    const row = button.closest('tr');
+    const taskList = document.getElementById('taskList');
 
-                if (confirm('Are you sure you want to delete this task?')) {
-                    row.remove();
+    if (confirm('Are you sure you want to delete this task?')) {
+        row.remove();
 
-                    // Update row numbering
-                    updateRowNumbers();
+        // Decrement task count if not on the first task
+        if (taskCount > 1) {
+            taskCount--;
+        }
 
-                    // Show empty state if no tasks remain
-                    if (taskList.children.length === 0) {
-                        taskList.innerHTML = `
+        // Update row numbering
+        updateRowNumbers();
+
+        // Show empty state if no tasks remain
+        if (taskList.children.length === 0) {
+            taskList.innerHTML = `
                 <tr id="emptyState">
                     <td colspan="3" class="text-center py-5">
                         <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
@@ -535,21 +546,24 @@
                     </td>
                 </tr>
             `;
-                    }
-                }
-            }
+        }
+    }
+}
 
             function updateRowNumbers() {
-                const taskList = document.getElementById('taskList');
-                const rows = taskList.querySelectorAll('tr');
-                rows.forEach((row, index) => {
-                    const numberCell = row.querySelector('td:first-child');
-                    if (numberCell) {
-                        numberCell.textContent = index + 1; // Update row number
-                    }
-                });
-            }
+    const taskList = document.getElementById('taskList');
+    const rows = taskList.querySelectorAll('tr');
 
+    // Reset taskCount based on the number of tasks
+    taskCount = rows.length;
+
+    rows.forEach((row, index) => {
+        const numberCell = row.querySelector('td:first-child');
+        if (numberCell) {
+            numberCell.textContent = index + 1;
+        }
+    });
+}
 
             document.addEventListener('DOMContentLoaded', function () {
                 var form = document.querySelector('form[action="../addEvent.do"][method="POST"]');

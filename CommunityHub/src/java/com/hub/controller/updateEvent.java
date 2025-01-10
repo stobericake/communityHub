@@ -95,10 +95,32 @@ public class updateEvent extends HttpServlet {
                     events event = new events(eventID, name, date, time, duration, description, volunteersNeeded, status, image, donationLimit, addressID);
                     address address = new address(addressID, country, postalCode, street, city, state);
 
+                           // Set the pagination parameters
+                    int pageSize = 3;  // Limit of data per page
+                    int page = 1; // Default to first page
+                    String pageParam = request.getParameter("page");
+                    if (pageParam != null) {
+                        page = Integer.parseInt(pageParam);
+                    }
+
+                    // Calculate start index for slicing
+                    int startIndex = (page - 1) * pageSize;
+                    int endIndex = Math.min(startIndex + pageSize, taskList.size());
+
+                    // Slice the eventList and addressList based on the current page
+                    List<task> paginatedTaskList = taskList.subList(startIndex, endIndex);
+
+                    // Get the total number of events for pagination controls
+                    int totalList = taskList.size();
+                    int totalPages = (int) Math.ceil((double) totalList / pageSize);
+        
                     request.setAttribute("event", event);
                     request.setAttribute("address", address);
-                    request.setAttribute("task", taskList);
+                    request.setAttribute("task", paginatedTaskList);
+                    request.setAttribute("totalPages", totalPages);
+                    request.setAttribute("currentPage", page);
 
+                    
                     // Forward the request to the JSP
                     RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/editEvent.jsp");
                     dispatcher.forward(request, response);
@@ -237,7 +259,7 @@ public class updateEvent extends HttpServlet {
 
         String[] newTasks = request.getParameterValues("newTask");
 
-        String[] deleteTasks = request.getParameterValues("deleteTasks");
+        String deleteTasks = request.getParameter("deleteTasks");
 
         Part filePart = request.getPart("eventImage"); // Get the uploaded file
         InputStream imageInputStream = null;
@@ -349,21 +371,23 @@ public class updateEvent extends HttpServlet {
                     }
                 }
 
-                if (!(deleteTasks == null)) {
-                    String sqlDeleteTask = "DELETE FROM task WHERE taskID = ?";
-                    PreparedStatement psDeleteTask = conn.prepareStatement(sqlDeleteTask);
-
-                    for (int i = 0; i < deleteTasks.length; i++) {
-                        String taskID = deleteTasks[i];
-                        System.out.println(taskID);
-                        psDeleteTask.setInt(1, Integer.parseInt(taskID));
-                        psDeleteTask.addBatch();
-                    }
-
-                    if (psDeleteTask != null) {
-                        psDeleteTask.executeBatch();
+               if (deleteTasks != null && !deleteTasks.isEmpty()) {
+                String[] taskIdsArray = deleteTasks.split(",");
+                String sqlDeleteTask = "DELETE FROM task WHERE taskID = ?";
+                PreparedStatement psDeleteTask = conn.prepareStatement(sqlDeleteTask);
+                for (String taskIdStr : taskIdsArray) {
+                    taskIdStr = taskIdStr.trim();
+                    if (!taskIdStr.isEmpty()) {
+                       
+                            int taskId = Integer.parseInt(taskIdStr);
+                            psDeleteTask.setInt(1, taskId);
+                            psDeleteTask.addBatch();
+                        
                     }
                 }
+                 psDeleteTask.executeBatch();
+                 psDeleteTask.close();
+            }
 
             }
 

@@ -10,8 +10,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-        <!-- Bootstrap JS (optional, for responsive functionality) -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+       
         <style>
             .progress-step {
                 width: 35px;
@@ -87,6 +86,15 @@
             .empty-state.show {
                 display: table-row;  /* This maintains proper table structure */
             }
+
+
+            thead th {
+                position: -webkit-sticky; /* For Safari */
+                position: sticky;
+                top: 0;
+                background-color: #fff; /* Match the background color of the table headers */
+            }
+         
 
 
         </style>
@@ -378,7 +386,7 @@
                             <!-- Task List -->
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body p-0">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive" style="max-height: 30vh;">
                                         <table class="table table-hover mb-0" id="taskTable">
                                             <thead class="table-light">
                                                 <tr>
@@ -387,49 +395,45 @@
                                                     <th class="px-4" style="width: 20%">Actions</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="taskList">        
-
-                                                <%          int count = 0;
-
+                                            <tbody id="taskList">
+                                                <%
+                                                    int count = 0;
                                                     List<task> taskList = (List) request.getAttribute("task");
-                                                    for (task task : taskList) {
-
-                                                        count++;
-
+                                                    if (taskList != null && !taskList.isEmpty()) {
+                                                        for (task task : taskList) {
+                                                            count++;
                                                 %>
-                                                <tr> 
-                                                    <td class="px-4">  <%= count%> </td>
-                                                    <td class="px-4"> 
-                                                        <span class="task-name"> <%= task.getDescription()%> </span>
+                                                <tr>
+                                                    <td class="px-4"><%= count%></td>
+                                                    <td class="px-4">
+                                                        <span class="task-name"><%= task.getDescription()%></span>
                                                         <input type="text" class="form-control d-none edit-input" name="updatedTask" value="<%= task.getDescription()%>">
                                                         <input type="hidden" class="form-control d-none edit-input" name="taskID" value="<%= task.getTaskID()%>">
-
-                                                    </td> 
+                                                    </td>
                                                     <td class="px-4">
                                                         <div class="btn-group btn-group-sm">
                                                             <button class="btn btn-outline-primary" onclick="editTask(this)">
                                                                 <i class="fas fa-edit"></i>
-                                                            </button> 
+                                                            </button>
                                                             <button class="btn btn-outline-danger" onclick="deleteTask(event, this)" data-task-id="<%= task.getTaskID()%>">
                                                                 <i class="fas fa-trash"></i>
                                                             </button>
                                                         </div>
                                                     </td>
-                                                    <% }%>
                                                 </tr>
-                                            <input id="taskCount" type="hidden" value="<%= count%>" >
-
+                                                <% }
+                                                } else { %>
+                                                <tr id="emptyState" class="empty-state">
+                                                    <td colspan="3" class="text-center py-5">
+                                                        <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
+                                                        <p class="text-muted mb-0">No tasks added yet</p>
+                                                    </td>
+                                                </tr>
+                                                <% }%>
                                             </tbody>
-
-                                            <tr id="emptyState" class="empty-state">
-                                                <td colspan="3" class="text-center py-5">
-                                                    <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
-                                                    <p class="text-muted mb-0">No tasks added yet</p>
-                                                </td>
-                                            </tr>
-
                                         </table>
                                     </div>
+                                    <input id="taskCount" type="hidden" value="<%= count%>">
                                 </div>
                             </div>
 
@@ -480,7 +484,7 @@
                 const prevBtn = document.getElementById('prevBtn');
                 const nextBtn = document.getElementById('nextBtn');
 
-                prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+                prevBtn.style.display = 'block';
 
                 if (currentStep === totalSteps) {
                     nextBtn.textContent = 'Submit';
@@ -580,161 +584,157 @@
                 taskCount = taskTotal + 1;
             }
 
-            // Toggle Empty State Visibility
-            function toggleEmptyState() {
-                const taskList = document.getElementById('taskList');
-                let emptyStateRow = document.querySelector('.empty-state');
-
-                // If emptyStateRow doesn't exist, create it
-                if (!emptyStateRow) {
-                    emptyStateRow = document.createElement('tr');
-                    emptyStateRow.classList.add('empty-state');
-                    emptyStateRow.innerHTML = `
+          // Toggle Empty State Visibility// Toggle Empty State Visibility
+function toggleEmptyState() {
+    const taskList = document.getElementById('taskList');
+    const emptyStateRow = taskList.querySelector('#emptyState');
+    const taskRows = taskList.querySelectorAll('tr .task-name');
+    if (taskRows.length === 0 && !emptyStateRow) {
+        // Create and append the empty state row
+        const row = document.createElement('tr');
+        row.id = 'emptyState';
+        row.innerHTML = `
             <td colspan="3" class="text-center py-5">
                 <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
                 <p class="text-muted mb-0">No tasks added yet</p>
             </td>
         `;
-                    taskList.appendChild(emptyStateRow);
-                }
-
-                // Show or hide the empty state row based on task count
-                if (taskList.children.length === 1) { // The only child is the empty state
-                    emptyStateRow.classList.add('show');
-                } else {
-                    emptyStateRow.classList.remove('show');
-                }
-            }
-
-            // Add Task Function
-            function addTask(event) {
-                event.preventDefault();
-
-                const taskList = document.getElementById('taskList');
-                const taskInput = document.getElementById('taskInput');
-                const taskName = taskInput.value.trim();
-
-                // Validate if task name is empty
-                if (!taskName) {
-                    alert('Task name cannot be empty!');
-                    return;
-                }
-
-                // Create task row
-                const row = document.createElement('tr');
-                row.innerHTML =
-                        '<td class="px-4"></td>' +
-                        '<td class="px-4">' +
-                        '<span class="task-name">' + taskName + '</span>' +
-                        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
-                        '</td>' +
-                        '<td class="px-4">' +
-                        '<div class="btn-group btn-group-sm">' +
-                        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
-                        '<i class="fas fa-edit"></i>' +
-                        '</button>' +
-                        '<button class="btn btn-outline-danger" onclick="deleteTask(event, this)">' +
-                        '<i class="fas fa-trash"></i>' +
-                        '</button>' +
-                        '</div>' +
-                        '</td>';
-
-                // Append the new task to the list
-                taskList.appendChild(row);
-
-                // Update row numbering
-                updateRowNumbers();
-
-                // Hide empty state row if tasks exist
-                toggleEmptyState();
-
-                taskInput.value = '';
-            }
-            
-            // Edit Task Function
-function editTask(button) {
-    event.preventDefault();
-    const row = button.closest('tr');
-    const nameSpan = row.querySelector('.task-name');
-    const nameInput = row.querySelector('.edit-input');
-
-    if (nameSpan.classList.contains('d-none')) {
-        // Save changes
-        const newName = nameInput.value.trim();
-        if (!newName) {
-            return;
-        }
-        nameSpan.textContent = newName;
-        nameSpan.classList.remove('d-none');
-        nameInput.classList.add('d-none');
-        nameInput.value = newName;
-        button.innerHTML = '<i class="fas fa-edit"></i>';
-
-    } else {
-        // Show edit input
-        nameSpan.classList.add('d-none');
-        nameInput.classList.remove('d-none');
-        nameInput.focus();
-        button.innerHTML = '<i class="fas fa-save"></i>';
+        taskList.appendChild(row);
+    } else if (taskRows.length > 0 && emptyStateRow) {
+        // Remove the empty state row if there are task rows
+        taskList.removeChild(emptyStateRow);
     }
 }
 
+            // Add Task Function
+           function addTask(event) {
+    event.preventDefault();
+
+    const taskList = document.getElementById('taskList');
+    const taskInput = document.getElementById('taskInput');
+    const taskName = taskInput.value.trim();
+
+    // Validate if task name is empty
+    if (!taskName) {
+        alert('Task name cannot be empty!');
+        return;
+    }
+
+    // Create task row
+    const row = document.createElement('tr');
+    row.innerHTML =
+        '<td class="px-4"></td>' +
+        '<td class="px-4">' +
+        '<span class="task-name">' + taskName + '</span>' +
+        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
+        '</td>' +
+        '<td class="px-4">' +
+        '<div class="btn-group btn-group-sm">' +
+        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
+        '<i class="fas fa-edit"></i>' +
+        '</button>' +
+        '<button class="btn btn-outline-danger" onclick="deleteTask(event, this)">' +
+        '<i class="fas fa-trash"></i>' +
+        '</button>' +
+        '</div>' +
+        '</td>';
+
+    // Append the new task to the list
+    taskList.appendChild(row);
+
+    // Update row numbering
+    updateRowNumbers();
+
+    // Hide empty state row if tasks exist
+    toggleEmptyState();
+
+    taskInput.value = '';
+}
+
+            // Edit Task Function
+            function editTask(button) {
+                event.preventDefault();
+                const row = button.closest('tr');
+                const nameSpan = row.querySelector('.task-name');
+                const nameInput = row.querySelector('.edit-input');
+
+                if (nameSpan.classList.contains('d-none')) {
+                    // Save changes
+                    const newName = nameInput.value.trim();
+                    if (!newName) {
+                        return;
+                    }
+                    nameSpan.textContent = newName;
+                    nameSpan.classList.remove('d-none');
+                    nameInput.classList.add('d-none');
+                    nameInput.value = newName;
+                    button.innerHTML = '<i class="fas fa-edit"></i>';
+
+                } else {
+                    // Show edit input
+                    nameSpan.classList.add('d-none');
+                    nameInput.classList.remove('d-none');
+                    nameInput.focus();
+                    button.innerHTML = '<i class="fas fa-save"></i>';
+                }
+            }
+
             // Delete Task Function
             function deleteTask(event, button) {
-                // Prevent the form from submitting
-                event.preventDefault();
+    event.preventDefault();
 
-                const row = button.closest('tr');
-                const taskList = document.getElementById('taskList');
-                const taskId = button.getAttribute('data-task-id');
+    const row = button.closest('tr');
+    const taskList = document.getElementById('taskList');
+    const taskId = button.getAttribute('data-task-id');
 
-                if (confirm('Are you sure you want to delete this task?')) {
-                    
-                
-                    
-                    row.remove();
-                    
-                    // Update row numbering
-                    updateRowNumbers();
+    if (confirm('Are you sure you want to delete this task?')) {
+        row.remove();
 
-                    // Show empty state if no tasks remain
-                    toggleEmptyState();
-                    
-                    if(taskId){
-                    deleteTaskDB(taskId);
-                }
-                }
-            }
+        // Update row numbering
+        updateRowNumbers();
 
-            // Update Row Numbers Function
-            function updateRowNumbers() {
-                const taskList = document.getElementById('taskList');
-                const rows = taskList.querySelectorAll('tr');
+        // Show empty state if no tasks remain
+        toggleEmptyState();
 
-                // Exclude the empty state row
-                let rowNumber = 1; // Start numbering from 1
-                rows.forEach((row) => {
-                    if (!row.id || row.id !== 'emptyState') { // Skip the empty state row
-                        const numberCell = row.querySelector('td:first-child');
-                        if (numberCell) {
-                            numberCell.textContent = rowNumber; // Update row number
-                            rowNumber++;
-                        }
-                    }
-                });
-            }
-            
-            function deleteTaskDB(taskId){
-                    id = taskId;
-                    const taskList = document.getElementById('taskList');
-                    if (id !== null) {
-                        const inputTask = document.createElement('tr');
-                        inputTask.innerHTML =
-                                '<input type="hidden" class="form-control" name="deleteTasks" value="' + id + '">';
+        if (taskId) {
+            deleteTaskDB(taskId);
+        }
+    }
+}
 
-                        taskList.appendChild(inputTask);
-                    }
-            }
+          // Update Row Numbers Function
+function updateRowNumbers() {
+    const taskList = document.getElementById('taskList');
+    let rows = taskList.querySelectorAll('tr');
+    let taskRows = [];
+    rows.forEach(row => {
+        if (row.querySelector('.task-name')) {
+            taskRows.push(row);
+        }
+    });
+    taskRows.forEach((row, index) => {
+        row.querySelector('td:first-child').textContent = index + 1;
+    });
+    toggleEmptyState();
+}
+
+          function deleteTaskDB(taskId) {
+    const deleteTasksInput = document.getElementById('deleteTasks');
+    if (!deleteTasksInput) {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.id = 'deleteTasks';
+        hiddenInput.name = 'deleteTasks';
+        document.getElementById('taskList').appendChild(hiddenInput);
+    }
+    let taskIds = document.getElementById('deleteTasks').value;
+    if (taskId && taskIds) {
+        taskIds += ',' + taskId;
+    } else if (taskId) {
+        taskIds = taskId;
+    }
+    document.getElementById('deleteTasks').value = taskIds;
+}
 
 
 
