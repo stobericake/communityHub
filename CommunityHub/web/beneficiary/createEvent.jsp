@@ -440,54 +440,54 @@
 
 
             // Initialize task count starting from 1
-let taskCount = 1;
+            let taskCount = 1;
 
-function addTask(event) {
-    event.preventDefault();
+            function addTask(event) {
+                event.preventDefault();
 
-    const taskList = document.getElementById('taskList');
-    const taskInput = document.getElementById('taskInput');
-    const taskName = taskInput.value.trim();
+                const taskList = document.getElementById('taskList');
+                const taskInput = document.getElementById('taskInput');
+                const taskName = taskInput.value.trim();
 
-    if (!taskName) {
-        alert('Task name cannot be empty!');
-        return;
-    }
+                if (!taskName) {
+                    alert('Task name cannot be empty!');
+                    return;
+                }
 
-    // Remove empty state if present
-    const emptyState = document.getElementById('emptyState');
-    if (emptyState) {
-        emptyState.remove();
-    }
+                // Remove empty state if present
+                const emptyState = document.getElementById('emptyState');
+                if (emptyState) {
+                    emptyState.remove();
+                }
 
-    // Create task row
-    const row = document.createElement('tr');
-    row.innerHTML =
-        '<td class="px-4">' + taskCount + '</td>' +
-        '<td class="px-4">' +
-        '<span class="task-name">' + taskName + '</span>' +
-        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
-        '</td>' +
-        '<td class="px-4">' +
-        '<div class="btn-group btn-group-sm">' +
-        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
-        '<i class="fas fa-edit"></i>' +
-        '</button>' +
-        '<button class="btn btn-outline-danger" onclick="deleteTask(this)">' +
-        '<i class="fas fa-trash"></i>' +
-        '</button>' +
-        '</div>' +
-        '</td>';
+                // Create task row
+                const row = document.createElement('tr');
+                row.innerHTML =
+                        '<td class="px-4">' + taskCount + '</td>' +
+                        '<td class="px-4">' +
+                        '<span class="task-name">' + taskName + '</span>' +
+                        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
+                        '</td>' +
+                        '<td class="px-4">' +
+                        '<div class="btn-group btn-group-sm">' +
+                        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
+                        '<i class="fas fa-edit"></i>' +
+                        '</button>' +
+                        '<button class="btn btn-outline-danger" onclick="deleteTask(this)">' +
+                        '<i class="fas fa-trash"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</td>';
 
-    // Append the new task to the list
-    taskList.appendChild(row);
+                // Append the new task to the list
+                taskList.appendChild(row);
 
-    // Increment task count
-    taskCount++;
+                // Increment task count
+                taskCount++;
 
-    // Clear the input field
-    taskInput.value = '';
-}
+                // Clear the input field
+                taskInput.value = '';
+            }
 
 
             // Edit task
@@ -521,24 +521,24 @@ function addTask(event) {
 
             // Delete task
             function deleteTask(button) {
-    event.preventDefault();
-    const row = button.closest('tr');
-    const taskList = document.getElementById('taskList');
+                event.preventDefault();
+                const row = button.closest('tr');
+                const taskList = document.getElementById('taskList');
 
-    if (confirm('Are you sure you want to delete this task?')) {
-        row.remove();
+                if (confirm('Are you sure you want to delete this task?')) {
+                    row.remove();
 
-        // Decrement task count if not on the first task
-        if (taskCount > 1) {
-            taskCount--;
-        }
+                    // Decrement task count if not on the first task
+                    if (taskCount > 1) {
+                        taskCount--;
+                    }
 
-        // Update row numbering
-        updateRowNumbers();
+                    // Update row numbering
+                    updateRowNumbers();
 
-        // Show empty state if no tasks remain
-        if (taskList.children.length === 0) {
-            taskList.innerHTML = `
+                    // Show empty state if no tasks remain
+                    if (taskList.children.length === 0) {
+                        taskList.innerHTML = `
                 <tr id="emptyState">
                     <td colspan="3" class="text-center py-5">
                         <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
@@ -546,24 +546,24 @@ function addTask(event) {
                     </td>
                 </tr>
             `;
-        }
-    }
-}
+                    }
+                }
+            }
 
             function updateRowNumbers() {
-    const taskList = document.getElementById('taskList');
-    const rows = taskList.querySelectorAll('tr');
+                const taskList = document.getElementById('taskList');
+                const rows = taskList.querySelectorAll('tr');
 
-    // Reset taskCount based on the number of tasks
-    taskCount = rows.length;
+                // Reset taskCount based on the number of tasks
+                taskCount = rows.length;
 
-    rows.forEach((row, index) => {
-        const numberCell = row.querySelector('td:first-child');
-        if (numberCell) {
-            numberCell.textContent = index + 1;
-        }
-    });
-}
+                rows.forEach((row, index) => {
+                    const numberCell = row.querySelector('td:first-child');
+                    if (numberCell) {
+                        numberCell.textContent = index + 1;
+                    }
+                });
+            }
 
             document.addEventListener('DOMContentLoaded', function () {
                 var form = document.querySelector('form[action="../addEvent.do"][method="POST"]');

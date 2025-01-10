@@ -10,7 +10,7 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-       
+
         <style>
             .progress-step {
                 width: 35px;
@@ -94,7 +94,7 @@
                 top: 0;
                 background-color: #fff; /* Match the background color of the table headers */
             }
-         
+
 
 
         </style>
@@ -584,72 +584,72 @@
                 taskCount = taskTotal + 1;
             }
 
-          // Toggle Empty State Visibility// Toggle Empty State Visibility
-function toggleEmptyState() {
-    const taskList = document.getElementById('taskList');
-    const emptyStateRow = taskList.querySelector('#emptyState');
-    const taskRows = taskList.querySelectorAll('tr .task-name');
-    if (taskRows.length === 0 && !emptyStateRow) {
-        // Create and append the empty state row
-        const row = document.createElement('tr');
-        row.id = 'emptyState';
-        row.innerHTML = `
+            // Toggle Empty State Visibility// Toggle Empty State Visibility
+            function toggleEmptyState() {
+                const taskList = document.getElementById('taskList');
+                const emptyStateRow = taskList.querySelector('#emptyState');
+                const taskRows = taskList.querySelectorAll('tr .task-name');
+                if (taskRows.length === 0 && !emptyStateRow) {
+                    // Create and append the empty state row
+                    const row = document.createElement('tr');
+                    row.id = 'emptyState';
+                    row.innerHTML = `
             <td colspan="3" class="text-center py-5">
                 <i class="fas fa-tasks mb-3 text-muted" style="font-size: 2rem;"></i>
                 <p class="text-muted mb-0">No tasks added yet</p>
             </td>
         `;
-        taskList.appendChild(row);
-    } else if (taskRows.length > 0 && emptyStateRow) {
-        // Remove the empty state row if there are task rows
-        taskList.removeChild(emptyStateRow);
-    }
-}
+                    taskList.appendChild(row);
+                } else if (taskRows.length > 0 && emptyStateRow) {
+                    // Remove the empty state row if there are task rows
+                    taskList.removeChild(emptyStateRow);
+                }
+            }
 
             // Add Task Function
-           function addTask(event) {
-    event.preventDefault();
+            function addTask(event) {
+                event.preventDefault();
 
-    const taskList = document.getElementById('taskList');
-    const taskInput = document.getElementById('taskInput');
-    const taskName = taskInput.value.trim();
+                const taskList = document.getElementById('taskList');
+                const taskInput = document.getElementById('taskInput');
+                const taskName = taskInput.value.trim();
 
-    // Validate if task name is empty
-    if (!taskName) {
-        alert('Task name cannot be empty!');
-        return;
-    }
+                // Validate if task name is empty
+                if (!taskName) {
+                    alert('Task name cannot be empty!');
+                    return;
+                }
 
-    // Create task row
-    const row = document.createElement('tr');
-    row.innerHTML =
-        '<td class="px-4"></td>' +
-        '<td class="px-4">' +
-        '<span class="task-name">' + taskName + '</span>' +
-        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
-        '</td>' +
-        '<td class="px-4">' +
-        '<div class="btn-group btn-group-sm">' +
-        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
-        '<i class="fas fa-edit"></i>' +
-        '</button>' +
-        '<button class="btn btn-outline-danger" onclick="deleteTask(event, this)">' +
-        '<i class="fas fa-trash"></i>' +
-        '</button>' +
-        '</div>' +
-        '</td>';
+                // Create task row
+                const row = document.createElement('tr');
+                row.innerHTML =
+                        '<td class="px-4"></td>' +
+                        '<td class="px-4">' +
+                        '<span class="task-name">' + taskName + '</span>' +
+                        '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
+                        '</td>' +
+                        '<td class="px-4">' +
+                        '<div class="btn-group btn-group-sm">' +
+                        '<button class="btn btn-outline-primary" onclick="editTask(this)">' +
+                        '<i class="fas fa-edit"></i>' +
+                        '</button>' +
+                        '<button class="btn btn-outline-danger" onclick="deleteTask(event, this)">' +
+                        '<i class="fas fa-trash"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</td>';
 
-    // Append the new task to the list
-    taskList.appendChild(row);
+                // Append the new task to the list
+                taskList.appendChild(row);
 
-    // Update row numbering
-    updateRowNumbers();
+                // Update row numbering
+                updateRowNumbers();
 
-    // Hide empty state row if tasks exist
-    toggleEmptyState();
+                // Hide empty state row if tasks exist
+                toggleEmptyState();
 
-    taskInput.value = '';
-}
+                taskInput.value = '';
+            }
 
             // Edit Task Function
             function editTask(button) {
@@ -681,60 +681,60 @@ function toggleEmptyState() {
 
             // Delete Task Function
             function deleteTask(event, button) {
-    event.preventDefault();
+                event.preventDefault();
 
-    const row = button.closest('tr');
-    const taskList = document.getElementById('taskList');
-    const taskId = button.getAttribute('data-task-id');
+                const row = button.closest('tr');
+                const taskList = document.getElementById('taskList');
+                const taskId = button.getAttribute('data-task-id');
 
-    if (confirm('Are you sure you want to delete this task?')) {
-        row.remove();
+                if (confirm('Are you sure you want to delete this task?')) {
+                    row.remove();
 
-        // Update row numbering
-        updateRowNumbers();
+                    // Update row numbering
+                    updateRowNumbers();
 
-        // Show empty state if no tasks remain
-        toggleEmptyState();
+                    // Show empty state if no tasks remain
+                    toggleEmptyState();
 
-        if (taskId) {
-            deleteTaskDB(taskId);
-        }
-    }
-}
+                    if (taskId) {
+                        deleteTaskDB(taskId);
+                    }
+                }
+            }
 
-          // Update Row Numbers Function
-function updateRowNumbers() {
-    const taskList = document.getElementById('taskList');
-    let rows = taskList.querySelectorAll('tr');
-    let taskRows = [];
-    rows.forEach(row => {
-        if (row.querySelector('.task-name')) {
-            taskRows.push(row);
-        }
-    });
-    taskRows.forEach((row, index) => {
-        row.querySelector('td:first-child').textContent = index + 1;
-    });
-    toggleEmptyState();
-}
+            // Update Row Numbers Function
+            function updateRowNumbers() {
+                const taskList = document.getElementById('taskList');
+                let rows = taskList.querySelectorAll('tr');
+                let taskRows = [];
+                rows.forEach(row => {
+                    if (row.querySelector('.task-name')) {
+                        taskRows.push(row);
+                    }
+                });
+                taskRows.forEach((row, index) => {
+                    row.querySelector('td:first-child').textContent = index + 1;
+                });
+                toggleEmptyState();
+            }
 
-          function deleteTaskDB(taskId) {
-    const deleteTasksInput = document.getElementById('deleteTasks');
-    if (!deleteTasksInput) {
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.id = 'deleteTasks';
-        hiddenInput.name = 'deleteTasks';
-        document.getElementById('taskList').appendChild(hiddenInput);
-    }
-    let taskIds = document.getElementById('deleteTasks').value;
-    if (taskId && taskIds) {
-        taskIds += ',' + taskId;
-    } else if (taskId) {
-        taskIds = taskId;
-    }
-    document.getElementById('deleteTasks').value = taskIds;
-}
+            function deleteTaskDB(taskId) {
+                const deleteTasksInput = document.getElementById('deleteTasks');
+                if (!deleteTasksInput) {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.id = 'deleteTasks';
+                    hiddenInput.name = 'deleteTasks';
+                    document.getElementById('taskList').appendChild(hiddenInput);
+                }
+                let taskIds = document.getElementById('deleteTasks').value;
+                if (taskId && taskIds) {
+                    taskIds += ',' + taskId;
+                } else if (taskId) {
+                    taskIds = taskId;
+                }
+                document.getElementById('deleteTasks').value = taskIds;
+            }
 
 
 
