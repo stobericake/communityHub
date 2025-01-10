@@ -59,11 +59,18 @@
             .form-section.active {
                 display: block;
             }
+
+            thead th {
+                position: -webkit-sticky; /* For Safari */
+                position: sticky;
+                top: 0;
+                background-color: #fff; /* Adjust background color as needed */
+            }
         </style>
     </head>
     <body class="bg-light">
         <%@ include file="../header.jspf" %>
-        
+
         <div class="container py-5">
             <form action="../addEvent.do" method="POST" enctype="multipart/form-data">
                 <div class="card p-4">
@@ -286,7 +293,7 @@
                             <!-- Task List -->
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body p-0">
-                                    <div class="table-responsive">
+                                    <div class="table-responsive" style="max-height: 30vh;">
                                         <table class="table table-hover mb-0" id="taskTable">
                                             <thead class="table-light">
                                                 <tr>
@@ -342,7 +349,7 @@
                 const prevBtn = document.getElementById('prevBtn');
                 const nextBtn = document.getElementById('nextBtn');
 
-                prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+                prevBtn.style.display = 'block';
 
                 if (currentStep === totalSteps) {
                     nextBtn.textContent = 'Submit';
@@ -431,9 +438,9 @@
 
 
 
-            // Array to store tasks
-            let taskArray = [];
-            let taskCount = 1;  // Assuming task count starts from 1
+
+            // Initialize task count starting from 1
+            let taskCount = 1;
 
             function addTask(event) {
                 event.preventDefault();
@@ -442,7 +449,6 @@
                 const taskInput = document.getElementById('taskInput');
                 const taskName = taskInput.value.trim();
 
-                // Validate if task name is empty
                 if (!taskName) {
                     alert('Task name cannot be empty!');
                     return;
@@ -457,7 +463,7 @@
                 // Create task row
                 const row = document.createElement('tr');
                 row.innerHTML =
-                        '<td class="px-4"></td>' +
+                        '<td class="px-4">' + taskCount + '</td>' +
                         '<td class="px-4">' +
                         '<span class="task-name">' + taskName + '</span>' +
                         '<input type="text" class="form-control d-none edit-input" name="newTask" value="' + taskName + '">' +
@@ -476,8 +482,8 @@
                 // Append the new task to the list
                 taskList.appendChild(row);
 
-                // Update row numbering
-                updateRowNumbers();
+                // Increment task count
+                taskCount++;
 
                 // Clear the input field
                 taskInput.value = '';
@@ -522,6 +528,11 @@
                 if (confirm('Are you sure you want to delete this task?')) {
                     row.remove();
 
+                    // Decrement task count if not on the first task
+                    if (taskCount > 1) {
+                        taskCount--;
+                    }
+
                     // Update row numbering
                     updateRowNumbers();
 
@@ -542,14 +553,17 @@
             function updateRowNumbers() {
                 const taskList = document.getElementById('taskList');
                 const rows = taskList.querySelectorAll('tr');
+
+                // Reset taskCount based on the number of tasks
+                taskCount = rows.length;
+
                 rows.forEach((row, index) => {
                     const numberCell = row.querySelector('td:first-child');
                     if (numberCell) {
-                        numberCell.textContent = index + 1; // Update row number
+                        numberCell.textContent = index + 1;
                     }
                 });
             }
-
 
             document.addEventListener('DOMContentLoaded', function () {
                 var form = document.querySelector('form[action="../addEvent.do"][method="POST"]');

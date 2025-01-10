@@ -3,51 +3,37 @@ package com.hub.controller;
 import com.cm.model.volunteer;
 import com.cm.model.eventsVolunteer;
 import com.cm.model.events;
-import com.hub.controller.dbconnection;
-
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-@WebServlet("/volunteerList")
+@WebServlet("/volunteerListServlet")
 public class volunteerListServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String searchName = request.getParameter("searchName");
-        int currentPage = 1;
-        int volunteersPerPage = 10;
-
-        if (request.getParameter("page") != null) {
-            try {
-                currentPage = Integer.parseInt(request.getParameter("page"));
-            } catch (NumberFormatException e) {
-                currentPage = 1;
-            }
-        }
-
+        int beneficiaryID = Integer.parseInt(request.getSession().getAttribute("beneficiary").toString());
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        List<volunteer> volunteers = new ArrayList<>();
 
         try {
-            try {
-                conn = dbconnection.getConnection();
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(volunteerListServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (conn == null) {
-                throw new SQLException("Failed to establish a database connection.");
-            }
+            conn = dbconnection.getConnection();
+
+            String searchName = request.getParameter("searchName");
+            int volunteerPerPage = 8;
+            int currentPage = request.getParameter("page") != null
+                    ? Integer.parseInt(request.getParameter("page")) : 1;
+            int offset = (currentPage - 1) * volunteerPerPage;
 
             // Count total volunteers for pagination
             String countSql = "SELECT COUNT(*) AS total FROM volunteer v " +
@@ -60,53 +46,56 @@ public class volunteerListServlet extends HttpServlet {
             }
 
             stmt = conn.prepareStatement(countSql);
-
             if (searchName != null && !searchName.isEmpty()) {
                 String likePattern = "%" + searchName + "%";
-                for (int i = 1; i <= 6; i++) {
-                    stmt.setString(i, likePattern);
-                }
+                stmt.setString(1, likePattern);
+                stmt.setString(2, likePattern);
+                stmt.setString(3, likePattern);
+                stmt.setString(4, likePattern);
+                stmt.setString(5, likePattern);
+                stmt.setString(6, likePattern);
             }
 
             rs = stmt.executeQuery();
             rs.next();
-            int totalVolunteers = rs.getInt("total");
-            rs.close();
-            stmt.close();
+            int totalVolunteer = rs.getInt("total");
+            int totalPages = (int) Math.ceil((double) totalVolunteer / volunteerPerPage);
 
-            int offset = (currentPage - 1) * volunteersPerPage;
-            int totalPages = (int) Math.ceil((double) totalVolunteers / volunteersPerPage);
-
-            // Fetch volunteer data with pagination
-            String sql = "SELECT v.volunteerID, v.name, v.contactInfo, v.username, e.eventID, e.name AS eventName, e.date AS dateJoined " +
+           // Fetch volunteer data with pagination
+            String sql = "SELECT * " +
                     "FROM volunteer v " +
                     "INNER JOIN eventsVolunteer ev ON v.volunteerID = ev.volunteerID " +
-                    "INNER JOIN events e ON ev.eventID = e.eventID WHERE 1=1";
+                    "INNER JOIN events e ON ev.eventID = e.eventID WHERE 1=1 AND e.beneficiaryID =" + beneficiaryID;
 
             if (searchName != null && !searchName.isEmpty()) {
                 sql += " AND (v.volunteerID LIKE ? OR v.name LIKE ? OR v.contactInfo LIKE ? " +
                         "OR v.username LIKE ? OR e.name LIKE ? OR e.date LIKE ?)";
             }
 
-            // Apply pagination
             sql += " LIMIT ? OFFSET ?";
-
             stmt = conn.prepareStatement(sql);
 
             int paramIndex = 1;
             if (searchName != null && !searchName.isEmpty()) {
                 String likePattern = "%" + searchName + "%";
-                for (int i = 1; i <= 6; i++) {
-                    stmt.setString(paramIndex++, likePattern);
-                }
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
             }
-            stmt.setInt(paramIndex++, volunteersPerPage);
+            stmt.setInt(paramIndex++, volunteerPerPage);
             stmt.setInt(paramIndex++, offset);
 
             rs = stmt.executeQuery();
 
+            List<volunteer> volunteers = new ArrayList<>();
+            List<eventsVolunteer> eventsVolunteers = new ArrayList<>();
+            List<events> events = new ArrayList<>();
+         
             while (rs.next()) {
-                volunteer v = new volunteer(
+                volunteer volunteer = new volunteer(
                         rs.getInt("volunteerID"),
                         rs.getString("name"),
                         rs.getInt("contactInfo"),
@@ -115,50 +104,48 @@ public class volunteerListServlet extends HttpServlet {
                         0,    // AddressID is not retrieved
                         null  // Image is not retrieved
                 );
+                volunteers.add(volunteer);
 
-                events e = new events(
+                eventsVolunteer eventsVolunteer = new eventsVolunteer(
+                        rs.getInt("eventsVolunteerID"),
                         rs.getInt("eventID"),
-                        rs.getString("eventName"),
-                        rs.getDate("dateJoined")
+                        rs.getInt("volunteerID")
                 );
+                eventsVolunteers.add(eventsVolunteer);
 
-                eventsVolunteer evv = new eventsVolunteer(
-                        rs.getInt("eventID"),
-                        v.getVolunteerID(),
-                        e.getEventID()
+                events event = new events(
+                        rs.getInt("e.eventID"),
+                        rs.getString("e.name"),
+                        rs.getDate("date"),
+                        rs.getTime("time"),
+                        rs.getTime("duration"),
+                        rs.getString("description"),
+                        rs.getInt("volunteerNeeded"),
+                        rs.getString("status"),
+                        rs.getBlob("image"),
+                        rs.getDouble("donationLimit"),
+                        rs.getInt("addressID")
                 );
-
-                volunteers.add(v);
+                events.add(event);
             }
 
-            request.setAttribute("volunteers", volunteers);
+            // Set attributes for JSP
+            request.setAttribute("volunteer", volunteers);
+            request.setAttribute("eventsVolunteer", eventsVolunteers);
+            request.setAttribute("events", events);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("currentPage", currentPage);
+            request.setAttribute("searchName", searchName);
 
             // Forward to JSP
-            request.getRequestDispatcher("/views/volunteerList.jsp").forward(request, response);
+            request.getRequestDispatcher("/beneficiary/volunteerList.jsp").forward(request, response);
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Error while retrieving volunteer data.");
-            request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
-
+        } catch (Exception e) {
+            throw new ServletException("Error fetching volunteer data", e);
         } finally {
-            try {
-                if (rs != null) rs.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (stmt != null) stmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            try { if (rs != null) rs.close(); } catch (SQLException ignored) {}
+            try { if (stmt != null) stmt.close(); } catch (SQLException ignored) {}
+            try { if (conn != null) conn.close(); } catch (SQLException ignored) {}
         }
     }
 }

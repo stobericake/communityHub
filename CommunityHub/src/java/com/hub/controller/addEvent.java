@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+
 /**
  *
  * @author anaqi
@@ -46,7 +47,7 @@ public class addEvent extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet addEvent</title>");            
+            out.println("<title>Servlet addEvent</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet addEvent at " + request.getContextPath() + "</h1>");
@@ -79,31 +80,28 @@ public class addEvent extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    // Retrieve form data
-    String eventName = request.getParameter("eventName");
-    String eventDescription = request.getParameter("eventDescription");
-    String eventDate = request.getParameter("eventDate");
-    String eventTime = request.getParameter("eventTime");
-    String city = request.getParameter("city");
-    String country = request.getParameter("country");
-    String postalCode = request.getParameter("postalCode");
-    String state = request.getParameter("state");
-    String street = request.getParameter("street");
-    int numParticipants = Integer.parseInt(request.getParameter("numParticipants"));
-    double donationLimit = Double.parseDouble(request.getParameter("donationLimit"));
+        // Retrieve form data
+        String eventName = request.getParameter("eventName");
+        String eventDescription = request.getParameter("eventDescription");
+        String eventDate = request.getParameter("eventDate");
+        String eventTime = request.getParameter("eventTime");
+        String city = request.getParameter("city");
+        String country = request.getParameter("country");
+        String postalCode = request.getParameter("postalCode");
+        String state = request.getParameter("state");
+        String street = request.getParameter("street");
+        int numParticipants = Integer.parseInt(request.getParameter("numParticipants"));
+        double donationLimit = Double.parseDouble(request.getParameter("donationLimit"));
+        String[] task = request.getParameterValues("newTask");
 
-   
-
-    
         Part filePart = request.getPart("eventImage"); // Get the image file from the form
-
 
         // Create an InputStream from the uploaded file
         InputStream imageInputStream = filePart.getInputStream();
-    
-      String hoursStr = request.getParameter("durationHours");
+
+        String hoursStr = request.getParameter("durationHours");
         String minutesStr = request.getParameter("durationMinutes");
         String secondsStr = "0";
 
@@ -123,136 +121,155 @@ public class addEvent extends HttpServlet {
         String timeString = String.format("%02d:%02d:%02d", hours, minutes, 00);
         Time duration = Time.valueOf(timeString);
 
+        // Establish DB connection
+        Connection conn = null;
+        PreparedStatement psEvent = null, psAddress = null, psTask = null;
+        ResultSet rs = null;
 
-    // Establish DB connection
-    Connection conn = null;
-    PreparedStatement psEvent = null, psAddress = null, psTask = null;
-    ResultSet rs = null;
-    
-     HttpSession session = request.getSession();
-     String beneficiaryID = session.getAttribute("beneficiary").toString();
-     
-    try {
-        conn = dbconnection.getConnection();
-        conn.setAutoCommit(false);  // Start transaction
+        HttpSession session = request.getSession();
+        String beneficiaryID = session.getAttribute("beneficiary").toString();
 
-        // Insert the address first to get the addressID
-        String sqlAddress = "INSERT INTO address (city, country, postalCode, state, street) VALUES (?, ?, ?, ?, ?)";
-        psAddress = conn.prepareStatement(sqlAddress, Statement.RETURN_GENERATED_KEYS);
-        psAddress.setString(1, city);
-        psAddress.setString(2, country);
-        psAddress.setInt(3, Integer.parseInt(postalCode));
-        psAddress.setString(4, state);
-        psAddress.setString(5, street);
-        int affectedRows = psAddress.executeUpdate();
+        try {
+            conn = dbconnection.getConnection();
+            conn.setAutoCommit(false);  // Start transaction
 
-        if (affectedRows > 0) {
-            rs = psAddress.getGeneratedKeys();
+            String sqlCheckAddress = "SELECT addressID FROM address WHERE city = ? AND country = ? AND postalCode = ? AND state = ? AND street = ?";
+            psAddress = conn.prepareStatement(sqlCheckAddress);
+            psAddress.setString(1, city);
+            psAddress.setString(2, country);
+            psAddress.setInt(3, Integer.parseInt(postalCode));
+            psAddress.setString(4, state);
+            psAddress.setString(5, street);
+
+            rs = psAddress.executeQuery();
+
+            int addressID;
+
             if (rs.next()) {
-                int addressID = rs.getInt(1);
+                addressID = rs.getInt("addressID");
+            } else {
+                String sqlAddress = "INSERT INTO address (city, country, postalCode, state, street) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement psInsertAddress = conn.prepareStatement(sqlAddress, Statement.RETURN_GENERATED_KEYS)) {
+                    psInsertAddress.setString(1, city);
+                    psInsertAddress.setString(2, country);
+                    psInsertAddress.setInt(3, Integer.parseInt(postalCode));
+                    psInsertAddress.setString(4, state);
+                    psInsertAddress.setString(5, street);
+                    psInsertAddress.executeUpdate();
 
-                // Insert event data
-                String sqlEvent = "INSERT INTO events (name, date, time, duration, description,"
-                        + " volunteerNeeded, donationLimit, status, beneficiaryID, addressID, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                psEvent = conn.prepareStatement(sqlEvent, Statement.RETURN_GENERATED_KEYS);
-                psEvent.setString(1, eventName);
-                psEvent.setDate(2, Date.valueOf(eventDate));
-                psEvent.setTime(3, Time.valueOf(eventTime + ":00"));
-                psEvent.setTime(4, duration);
-                psEvent.setString(5, eventDescription);
-                psEvent.setInt(6, numParticipants);
-                psEvent.setDouble(7, donationLimit);
-                psEvent.setInt(8, 1);
-                psEvent.setInt(9, Integer.parseInt(beneficiaryID));
-                psEvent.setInt(10, addressID);
-                psEvent.setBlob(11, imageInputStream);
-       
-             
-
-                int eventRows = psEvent.executeUpdate();
-                if (eventRows > 0) {
-                    // Get the generated event ID
-                    ResultSet eventRs = psEvent.getGeneratedKeys();
-                    if (eventRs.next()) {
-                        int eventID = eventRs.getInt(1);
-
-                        // Insert tasks
-                        String sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
-                        psTask = conn.prepareStatement(sqlTask);
-
-                        // Retrieve tasks dynamically
-                        for (int i = 0; ; i++) {
-                            String taskName = request.getParameter("task[" + i + "].name");
-                            if (taskName == null) { 
-                                break;
-                                // No more tasks
-                            }
-
-                            psTask.setInt(1, 0);
-                            psTask.setString(2, taskName);
-                            psTask.setInt(3, eventID);
-                            psTask.setNull(4, java.sql.Types.NULL);
-                            psTask.addBatch();
-                        }
-
-                        // Execute batch task insertions
-                        if (psTask != null) {
-                            psTask.executeBatch();
+                    try (ResultSet generatedKeys = psInsertAddress.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            addressID = generatedKeys.getInt(1);
+                        } else {
+                            throw new SQLException("Address insertion failed, no ID obtained.");
                         }
                     }
-
-                    // Commit transaction
-                    conn.commit();
-
-                    // Redirect to event listing page
-
-                          // Create the success message
-                          String message = "The Event Name: " + eventName + " Successfully created";
-
-                          // URL encode the message to handle special characters
-                          String encodedMessage = URLEncoder.encode(message, "UTF-8");
-
-                          // Redirect to success.jsp with the encoded message
-                          response.sendRedirect("success.jsp?msg=" + encodedMessage);
-                    return;
                 }
             }
-        }
 
-        // If we reach here, something went wrong
-        response.getWriter().println("Error: Event could not be created.");
-        conn.rollback();
+                    // Insert event data
+                    String sqlEvent = "INSERT INTO events (name, date, time, duration, description,"
+                            + " volunteerNeeded, donationLimit, status, beneficiaryID, addressID, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    psEvent = conn.prepareStatement(sqlEvent, Statement.RETURN_GENERATED_KEYS);
+                    psEvent.setString(1, eventName);
+                    psEvent.setDate(2, Date.valueOf(eventDate));
+                    psEvent.setTime(3, Time.valueOf(eventTime + ":00"));
+                    psEvent.setTime(4, duration);
+                    psEvent.setString(5, eventDescription);
+                    psEvent.setInt(6, numParticipants);
+                    psEvent.setDouble(7, donationLimit);
+                    psEvent.setInt(8, 1);
+                    psEvent.setInt(9, Integer.parseInt(beneficiaryID));
+                    psEvent.setInt(10, addressID);
+                    psEvent.setBlob(11, imageInputStream);
 
-    } catch (SQLException e) {
-        // Rollback the transaction in case of error
-        if (conn != null) {
+                    int eventRows = psEvent.executeUpdate();
+                    if (eventRows > 0) {
+                        // Get the generated event ID
+                        ResultSet eventRs = psEvent.getGeneratedKeys();
+                        if (eventRs.next()) {
+                            int eventID = eventRs.getInt(1);
+
+                            // Insert tasks
+                            String sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
+                            psTask = conn.prepareStatement(sqlTask);
+
+                            // Retrieve tasks dynamically
+                            for (String addTask : task) {
+
+                                psTask.setInt(1, 0);
+                                psTask.setString(2, addTask);
+                                psTask.setInt(3, eventID);
+                                psTask.setNull(4, java.sql.Types.NULL);
+                                psTask.addBatch();
+                            }
+
+                            // Execute batch task insertions
+                            if (psTask != null) {
+                                psTask.executeBatch();
+                            }
+                        }
+
+                        // Commit transaction
+                        conn.commit();
+
+                        // Redirect to event listing page
+                        // Create the success message
+                        String message = "The Event Name: " + eventName + " Successfully created";
+
+                        // URL encode the message to handle special characters
+                        String encodedMessage = URLEncoder.encode(message, "UTF-8");
+
+                        // Redirect to success.jsp with the encoded message
+                        response.sendRedirect("success.jsp?msg=" + encodedMessage);
+                        return;
+                    }
+                
+            
+
+            // If we reach here, something went wrong
+            response.getWriter().println("Error: Event could not be created.");
+            conn.rollback();
+
+        } catch (SQLException e) {
+            // Rollback the transaction in case of error
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            e.printStackTrace();
+            response.getWriter().println("Database error: " + e.getMessage());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(addEvent.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
             try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+                // Reset to default commit behavior
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                }
+
+                // Close resources
+                if (psEvent != null) {
+                    psEvent.close();
+                }
+                if (psAddress != null) {
+                    psAddress.close();
+                }
+                if (psTask != null) {
+                    psTask.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
-        
-        e.printStackTrace();
-        response.getWriter().println("Database error: " + e.getMessage());
-    } catch (ClassNotFoundException ex) {
-        Logger.getLogger(addEvent.class.getName()).log(Level.SEVERE, null, ex);
-    } finally {
-        try {
-            // Reset to default commit behavior
-            if (conn != null) conn.setAutoCommit(true);
-            
-            // Close resources
-            if (psEvent != null) psEvent.close();
-            if (psAddress != null) psAddress.close();
-            if (psTask != null) psTask.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
-}
-    
 
     /**
      * Returns a short description of the servlet.

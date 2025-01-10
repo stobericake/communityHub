@@ -1,62 +1,74 @@
+<%@page import="com.cm.model.events"%>
+<%@page import="com.cm.model.donation"%>
+<%@page import="com.cm.model.donor"%>
+<%@page import="java.util.List"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.cm.model.donor" %>
-<%@ page import="com.cm.model.donation" %>
-<%@ page import="com.cm.model.events" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="com.hub.controller.dbconnection" %>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Donor List Overview</title>
     <style>
-        /* Styles from the original code */
         .table-dark th {
             background-color: #2F6690 !important;
         }
+
         .page-header {
             font-weight: bold;
             font-size: 1.5rem;
         }
+
         .page-subheader {
             font-size: 1.0rem;
             color: #6c757d;
         }
+
         .search-bar input {
             border-radius: 20px;
             padding: 10px;
             width: 100%;
             max-width: 300px;
         }
+
+        /* Pagination styles */
         .pagination {
             justify-content: center;
         }
+
         .pagination .page-link {
             color: #2F6690;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
+            border-radius: 50%; /* Makes the button circular */
+            width: 40px;        /* Fixed width for circular shape */
+            height: 40px;       /* Fixed height for circular shape */
+            display: flex;      /* Center the content inside */
             justify-content: center;
             align-items: center;
-            border: 1px solid #2F6690;
-            margin: 0 5px;
+            border: 1px solid #2F6690; /* Add border for clarity */
+            margin: 0 5px;     /* Add spacing between buttons */
         }
+
         .pagination .page-item.active .page-link {
             background-color: #2F6690;
             border-color: #2F6690;
             color: #C3DFE6;
         }
+
         .pagination-container {
             display: flex;
             justify-content: center;
             margin-top: 20px;
         }
+
         .section-spacing {
             margin-top: 20px;
         }
+        
         .table-spacing {
             margin-top: 30px;
         }
+
         .header-spacing {
             margin-bottom: 15px;
         }
@@ -67,27 +79,56 @@
             const rows = document.querySelectorAll('#donorTable tbody tr');
 
             rows.forEach(row => {
-                const cells = Array.from(row.querySelectorAll('td'));
-                const match = cells.some(cell => cell.textContent.toLowerCase().includes(input));
-                row.style.display = match ? '' : 'none';
+                const id = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const contact = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                const amount = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                const event = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                const date = row.querySelector('td:nth-child(6)').textContent.toLowerCase();
+
+                if (
+                    id.includes(input) ||
+                    name.includes(input) ||
+                    contact.includes(input) ||
+                    amount.includes(input) ||
+                    event.includes(input) ||
+                    date.includes(input)
+                ) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
             });
         }
     </script>
 </head>
 <body>
-    <%@ include file="header.jspf" %>
+    <%@ include file="../header.jspf" %>
     <div class="container my-4">
+        <!-- Donor List Overview Header -->
         <div class="row align-items-center mb-4">
             <div class="col-md-4">
                 <h1 class="page-header">DONORS OVERVIEW</h1>
                 <p class="page-subheader">Donors List</p>
             </div>
+            
+            <!-- Search Bar -->
             <div class="col-md-4 offset-md-4">
-                <input type="text" id="searchInput" class="form-control rounded"
+                <input type="text" id="searchInput" class="form-control rounded" 
                        placeholder="Search by any field..." onkeyup="filterTable()">
             </div>
         </div>
+
+        <% 
+            List<donor> donorList = (List) request.getAttribute("donors");
+            List<donation> donationList = (List) request.getAttribute("donations");
+            List<events> eventList = (List) request.getAttribute("events");
+            int totalPages = Integer.parseInt(request.getAttribute("totalPages").toString());
+            int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
+            String searchName = (String) request.getAttribute("searchName");
+        %>
         
+        <!-- donors List Table -->
         <div class="table-spacing table-responsive">
             <table id="donorTable" class="table table-bordered table-striped">
                 <thead class="table-dark">
@@ -101,36 +142,45 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <c:forEach var="donor" items="${donors}">
-                        <tr>
-                            <td>${donor.donorID}</td>
-                            <td>${donor.name}</td>
-                            <td>${donor.contactInfo}</td>
-                            <td>${donor.amount}</td>
-                            <td>${donor.eventName}</td>
-                            <td>${donor.dateDonated}</td>
-                        </tr>
-                    </c:forEach>
+                <% 
+                    for(int i = 0; i < donorList.size(); i++){
+                        donor donor = donorList.get(i);
+                        donation donation = donationList.get(i);
+                        events event = eventList.get(i);
+                %>
+                    <tr>
+                        <td><%= donor.getDonorID() %></td>
+                        <td><%= donor.getName() %></td>
+                        <td><%= donor.getContactInfo() %></td>
+                        <td><%= donation.getAmount() %></td>
+                        <td><%= event.getName() %></td>
+                        <td><%= donation.getDate() %></td>
+                    </tr>
+                <% } // end while %>
                 </tbody>
             </table>
         </div>
-
+                
+         <!-- Pagination -->
         <div class="pagination-container">
             <nav aria-label="Page navigation">
                 <ul class="pagination">
-                    <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                        <a class="page-link" href="?page=${currentPage - 1}&searchName=${searchName}" aria-label="Previous">
-                            &laquo;
+                    <!-- Previous Button -->
+                    <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>&searchName=<%= searchName != null ? searchName : "" %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
-                    <c:forEach begin="1" end="${totalPages}" var="page">
-                        <li class="page-item ${currentPage == page ? 'active' : ''}">
-                            <a class="page-link" href="?page=${page}&searchName=${searchName}">${page}</a>
+                    <!-- Page Numbers -->
+                    <% for (int i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage == i ? "active" : "" %>">
+                            <a class="page-link" href="?page=<%= i %>&searchName=<%= searchName != null ? searchName : "" %>"><%= i %></a>
                         </li>
-                    </c:forEach>
-                    <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                        <a class="page-link" href="?page=${currentPage + 1}&searchName=${searchName}" aria-label="Next">
-                            &raquo;
+                    <% } %>
+                    <!-- Next Button -->
+                    <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>&searchName=<%= searchName != null ? searchName : "" %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
                 </ul>
