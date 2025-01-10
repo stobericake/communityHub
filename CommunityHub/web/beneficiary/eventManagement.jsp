@@ -12,7 +12,7 @@
     <body>
         <%@ include file="../header.jspf" %>
 
-        <div class="container my-2">
+        <div class="container my-3">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="text-dark mb-2">Event Management</h1>
@@ -38,8 +38,8 @@
                 <div class="card-body">
                     <form action="updateEvent.do" method="post">
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped align-middle mb-0" id="eventTable">
-                                <thead class="table-light">
+                            <table class="table table-hover table-striped align-middle mb-0" id="eventTable" >
+                                <thead class="table" style="background-color: #2F6690; color: white">
                                     <tr>
                                         <th scope="col" width="5%">NO</th>
                                         <th scope="col" width="25%">EVENT LIST</th>
