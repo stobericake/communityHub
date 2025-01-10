@@ -81,7 +81,7 @@ public class AdminList extends HttpServlet {
             rs.next();
             int totalEvents = rs.getInt("total");
 
-            int eventsPerPage = 5;
+            int eventsPerPage = 3;
             int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
             int offset = (currentPage - 1) * eventsPerPage;
             int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);

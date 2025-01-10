@@ -105,18 +105,19 @@ public class UpdateEventStatus extends HttpServlet {
                 return;
             }
 
-            // Retrieve the current adminID from the session
-//            Integer adminID = (Integer) request.getSession().getAttribute("adminID");
-//            if (adminID == null) {
-//                response.sendRedirect("index.jsp?msg=not_logged_in");
-//                return;
-//            }
+//             Retrieve the current adminID from the session
+            Integer adminID = (Integer) request.getSession().getAttribute("admin");
+            if (adminID == null) {
+                response.sendRedirect("index.jsp?msg=not_logged_in");
+                return;
+            }
+            
             // Database connection
             conn = dbconnection.getConnection();
             String sql = "UPDATE events SET status = ?, adminID = ? WHERE eventID = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, status);
-            stmt.setInt(2, 2);
+            stmt.setInt(2, adminID);
             stmt.setInt(3, eventId);
 
             // Execute the update

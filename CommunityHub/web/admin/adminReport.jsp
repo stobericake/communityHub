@@ -280,7 +280,7 @@
             }
 
             selectedEvents.forEach(eventID => {
-                const url = new URL("http://localhost:16113/CommunityHub/admin/reportEvent.jsp");
+                const url = new URL("http://localhost:16113/CommunityHub/AdminEvent");
                 url.searchParams.append("eventID", eventID);
                 window.open(url.toString(), '_blank');
             });
