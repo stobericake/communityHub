@@ -7,29 +7,39 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Event Management</title>
+
     </head>
     <body>
         <%@ include file="../header.jspf" %>
 
-        <div class="container my-5">
+        <div class="container my-3">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="text-dark mb-2">Event Management</h1>
                     <h6 class="text-secondary">The tables below show all of the events</h6>
-                </div>
-                <div>
                     <a href="beneficiary/createEvent.jsp" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>Create Event
                     </a>
                 </div>
+
+                <div class="col-md-4 offset-md-4">
+                    <input type="text" id="searchInput" class="form-control rounded"
+                           placeholder="Search by any field..." onkeyup="filterTable()"><br>
+
+                </div>
+
+
+
             </div>
+
+
 
             <div class="card shadow-sm">
                 <div class="card-body">
                     <form action="updateEvent.do" method="post">
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped align-middle mb-0">
-                                <thead class="table-light">
+                            <table class="table table-hover table-striped align-middle mb-0" id="eventTable" >
+                                <thead class="table" style="background-color: #2F6690; color: white">
                                     <tr>
                                         <th scope="col" width="5%">NO</th>
                                         <th scope="col" width="25%">EVENT LIST</th>
@@ -57,8 +67,9 @@
                                                    class="btn btn-outline-primary btn-sm">
                                                     <i class="bi bi-pencil"></i> Edit
                                                 </a>
-                                                <a href="updateEvent.do?eventDeleteId=<%= eventList.get(i).getEventID()%>" 
-                                                   class="btn btn-outline-danger btn-sm">
+                                                <a href="#" class="btn btn-outline-danger btn-sm delete-link"
+                                                   data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                                   data-event-id="<%= eventList.get(i).getEventID()%>">
                                                     <i class="bi bi-trash"></i> Delete
                                                 </a>
                                             </div>
@@ -70,12 +81,38 @@
                                 </tbody>
                             </table>
                         </div>
+
                     </form>
                 </div>
             </div>
 
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete this event?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form id="deleteForm" action="updateEvent.do" method="GET">
+                                <input type="hidden" name="eventDeleteId" id="eventIdToDelete">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Pagination Controls -->
+
+
             <div class="d-flex justify-content-between align-items-center mt-4">
+
                 <div>
                     <%
                         Integer currentPage = (Integer) request.getAttribute("currentPage");
@@ -101,8 +138,45 @@
                     </nav>
                 </div>
             </div>
-
-
         </div>
+
+        <script>
+            function filterTable() {
+                const input = document.getElementById('searchInput').value.toLowerCase();
+                const rows = document.querySelectorAll('#eventTable tbody tr');
+
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    const match = cells.some(cell => cell.textContent.toLowerCase().includes(input));
+                    row.style.display = match ? '' : 'none';
+                });
+            }
+
+
+
+
+
+            document.addEventListener("DOMContentLoaded", function () {
+                // Add a click event listener to the document
+                document.addEventListener("click", function (event) {
+                    // Check if the clicked element has the class "delete-link"
+                    if (event.target.closest('.delete-link')) {
+                        // Get the delete-link element (use closest for nested elements like icons)
+                        const deleteLink = event.target.closest('.delete-link');
+                        // Retrieve the event ID from the data-event-id attribute
+                        const eventId = deleteLink.getAttribute('data-event-id');
+                        console.log("Event ID:", eventId); // Debugging output
+                        // Set the value of the hidden input field
+                        const eventIdInput = document.getElementById('eventIdToDelete');
+                        if (eventIdInput) {
+                            eventIdInput.value = eventId;
+                        }
+                    }
+                });
+            });
+
+
+
+        </script>
     </body>
 </html>

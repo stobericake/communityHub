@@ -130,7 +130,7 @@ public class listEventMgmt extends HttpServlet {
         }
 
         // Set the pagination parameters
-        int pageSize = 8;  // Limit of data per page
+        int pageSize = 6;  // Limit of data per page
         int page = 1; // Default to first page
         String pageParam = request.getParameter("page");
         if (pageParam != null) {

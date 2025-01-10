@@ -95,9 +95,30 @@ public class updateEvent extends HttpServlet {
                     events event = new events(eventID, name, date, time, duration, description, volunteersNeeded, status, image, donationLimit, addressID);
                     address address = new address(addressID, country, postalCode, street, city, state);
 
+                    // Set the pagination parameters
+                    int pageSize = 3;  // Limit of data per page
+                    int page = 1; // Default to first page
+                    String pageParam = request.getParameter("page");
+                    if (pageParam != null) {
+                        page = Integer.parseInt(pageParam);
+                    }
+
+                    // Calculate start index for slicing
+                    int startIndex = (page - 1) * pageSize;
+                    int endIndex = Math.min(startIndex + pageSize, taskList.size());
+
+                    // Slice the eventList and addressList based on the current page
+                    List<task> paginatedTaskList = taskList.subList(startIndex, endIndex);
+
+                    // Get the total number of events for pagination controls
+                    int totalList = taskList.size();
+                    int totalPages = (int) Math.ceil((double) totalList / pageSize);
+
                     request.setAttribute("event", event);
                     request.setAttribute("address", address);
-                    request.setAttribute("task", taskList);
+                    request.setAttribute("task", paginatedTaskList);
+                    request.setAttribute("totalPages", totalPages);
+                    request.setAttribute("currentPage", page);
 
                     // Forward the request to the JSP
                     RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/editEvent.jsp");
@@ -133,7 +154,7 @@ public class updateEvent extends HttpServlet {
                     getServletContext().log("Error closing connection", e);
                 }
             }
-            
+
         } else if (eventdeleteId != null && !eventdeleteId.isEmpty()) {
             Connection conn = null;
             PreparedStatement stmt = null;
@@ -162,32 +183,72 @@ public class updateEvent extends HttpServlet {
                 stmt.executeUpdate();
                 stmt.close();
 
+                String checkBeneficiarySQL = "SELECT COUNT(*) FROM beneficiary WHERE addressID = ?";
+                String checkVolunteerSQL = "SELECT COUNT(*) FROM volunteer WHERE addressID = ?";
+                boolean addressExists = false;
+
+                try (PreparedStatement checkBeneficiaryStmt = conn.prepareStatement(checkBeneficiarySQL);
+                        PreparedStatement checkVolunteerStmt = conn.prepareStatement(checkVolunteerSQL)) {
+
+                    // Check in beneficiary table
+                    checkBeneficiaryStmt.setInt(1, addressID);
+                    try (ResultSet rsBeneficiary = checkBeneficiaryStmt.executeQuery()) {
+                        if (rsBeneficiary.next() && rsBeneficiary.getInt(1) > 0) {
+                            addressExists = true;
+                        }
+                    }
+
+                    // Check in volunteer table
+                    if (!addressExists) { // Only check if it hasn't been found yet
+                        checkVolunteerStmt.setInt(1, addressID);
+                        try (ResultSet rsVolunteer = checkVolunteerStmt.executeQuery()) {
+                            if (rsVolunteer.next() && rsVolunteer.getInt(1) > 0) {
+                                addressExists = true;
+                            }
+                        }
+                    }
+                }
+
+                // Delete the address
+                if (!addressExists) {
+                    String deleteAddressSQL = "DELETE FROM address WHERE addressID = ?";
+                    try (PreparedStatement deleteAddressStmt = conn.prepareStatement(deleteAddressSQL)) {
+                        deleteAddressStmt.setInt(1, addressID);
+                        deleteAddressStmt.executeUpdate();
+                    }
+                }
+
                 // Delete the event
+                deleteSQL = "DELETE FROM donation WHERE eventID = ?";
+                stmt = conn.prepareStatement(deleteSQL);
+                stmt.setInt(1, Integer.parseInt(eventdeleteId));
+                stmt.executeUpdate();
+                stmt.close();
+
+                deleteSQL = "DELETE FROM servicereport WHERE eventID = ?";
+                stmt = conn.prepareStatement(deleteSQL);
+                stmt.setInt(1, Integer.parseInt(eventdeleteId));
+                stmt.executeUpdate();
+                stmt.close();
+
+                deleteSQL = "DELETE FROM eventsvolunteer WHERE eventID = ?";
+                stmt = conn.prepareStatement(deleteSQL);
+                stmt.setInt(1, Integer.parseInt(eventdeleteId));
+                stmt.executeUpdate();
+                stmt.close();
+
                 deleteSQL = "DELETE FROM events WHERE eventID = ?";
                 stmt = conn.prepareStatement(deleteSQL);
                 stmt.setInt(1, Integer.parseInt(eventdeleteId));
                 stmt.executeUpdate();
                 stmt.close();
 
-                // Delete the address
-                deleteSQL = "DELETE FROM address WHERE addressID = ?";
-                stmt = conn.prepareStatement(deleteSQL);
-                stmt.setInt(1, addressID);
-                int rowsDeleted = stmt.executeUpdate();
-                stmt.close();
+                response.sendRedirect("listEventMgmt.do"); // You may need to adjust the redirect
 
-                if (rowsDeleted > 0) {
-                    // Redirect back to the event list
-                    response.sendRedirect("listEventMgmt.do"); // You may need to adjust the redirect
-                } else {
-                    // Handle the case where the event ID was not found
-                    request.setAttribute("error", "Event not found.");
-                    request.getRequestDispatcher("error.jsp").forward(request, response);
-                }
             } catch (SQLException e) {
                 e.printStackTrace();
                 // Handle errors (e.g., database issues)
-                request.setAttribute("error", "Database error occurred.");
+                request.setAttribute("msg", "Database error occurred.");
                 request.getRequestDispatcher("error.jsp").forward(request, response);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(updateEvent.class.getName()).log(Level.SEVERE, null, ex);
@@ -209,7 +270,7 @@ public class updateEvent extends HttpServlet {
             }
         } else {
             // Event ID was not provided, handle the error
-            request.setAttribute("error", "Event ID is missing.");
+            request.setAttribute("msg", "Event ID is missing.");
             request.getRequestDispatcher("error.jsp").forward(request, response);
         }
     }
@@ -237,7 +298,7 @@ public class updateEvent extends HttpServlet {
 
         String[] newTasks = request.getParameterValues("newTask");
 
-        String[] deleteTasks = request.getParameterValues("deleteTasks");
+        String deleteTasks = request.getParameter("deleteTasks");
 
         Part filePart = request.getPart("eventImage"); // Get the uploaded file
         InputStream imageInputStream = null;
@@ -302,25 +363,25 @@ public class updateEvent extends HttpServlet {
                 stmt.executeUpdate();
                 PreparedStatement psTask = null;
                 String sqlTask = null;
-                if(updatedTask != null){
-           
-                sqlTask = "UPDATE task SET status = ?, description = ?, eventID = ? WHERE taskID = ?";
-                psTask = conn.prepareStatement(sqlTask);
+                if (updatedTask != null) {
 
-                for (int i = 0; i < updatedTask.length; i++) {
-                    String newTask = updatedTask[i];
-                    String taskID = taskIDs[i];
+                    sqlTask = "UPDATE task SET status = ?, description = ?, eventID = ? WHERE taskID = ?";
+                    psTask = conn.prepareStatement(sqlTask);
 
-                    psTask.setInt(1, 1);
-                    psTask.setString(2, newTask);
-                    psTask.setInt(3, Integer.parseInt(idValue));
-                    psTask.setInt(4, Integer.parseInt(taskID));
-                    psTask.addBatch();
-                }
+                    for (int i = 0; i < updatedTask.length; i++) {
+                        String newTask = updatedTask[i];
+                        String taskID = taskIDs[i];
 
-                if (psTask != null) {
-                    psTask.executeBatch();
-                }
+                        psTask.setInt(1, 1);
+                        psTask.setString(2, newTask);
+                        psTask.setInt(3, Integer.parseInt(idValue));
+                        psTask.setInt(4, Integer.parseInt(taskID));
+                        psTask.addBatch();
+                    }
+
+                    if (psTask != null) {
+                        psTask.executeBatch();
+                    }
                 }
 
                 if (!(newTasks == null)) {
@@ -349,20 +410,22 @@ public class updateEvent extends HttpServlet {
                     }
                 }
 
-                if (!(deleteTasks == null)) {
+                if (deleteTasks != null && !deleteTasks.isEmpty()) {
+                    String[] taskIdsArray = deleteTasks.split(",");
                     String sqlDeleteTask = "DELETE FROM task WHERE taskID = ?";
                     PreparedStatement psDeleteTask = conn.prepareStatement(sqlDeleteTask);
+                    for (String taskIdStr : taskIdsArray) {
+                        taskIdStr = taskIdStr.trim();
+                        if (!taskIdStr.isEmpty()) {
 
-                    for (int i = 0; i < deleteTasks.length; i++) {
-                        String taskID = deleteTasks[i];
-                        System.out.println(taskID);
-                        psDeleteTask.setInt(1, Integer.parseInt(taskID));
-                        psDeleteTask.addBatch();
-                    }
+                            int taskId = Integer.parseInt(taskIdStr);
+                            psDeleteTask.setInt(1, taskId);
+                            psDeleteTask.addBatch();
 
-                    if (psDeleteTask != null) {
-                        psDeleteTask.executeBatch();
+                        }
                     }
+                    psDeleteTask.executeBatch();
+                    psDeleteTask.close();
                 }
 
             }
