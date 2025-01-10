@@ -247,7 +247,7 @@ public class getImage extends HttpServlet {
                     rs = ps.executeQuery();
                     if (rs.next()) {
                         // Retrieve BLOB as InputStream
-                        InputStream inputStream = rs.getBinaryStream("image");
+                        InputStream inputStream = rs.getBinaryStream("receiptImage");
                         
                         // Check if the BLOB is NULL or empty
                         if (inputStream == null) {
