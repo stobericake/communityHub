@@ -146,14 +146,14 @@ public class donation implements Serializable {
      * @return the receiptImagePath
      */
     public Blob getReceiptImagePath() {
-        return receiptImage;
+        return getReceiptImage();
     }
 
     /**
      * @param receiptImagePath the receiptImagePath to set
      */
     public void setReceiptImagePath(Blob receiptImage) {
-        this.receiptImage = receiptImage;
+        this.setReceiptImage(receiptImage);
     }
 
     /**
@@ -196,5 +196,19 @@ public class donation implements Serializable {
      */
     public void setVolunteerID(int volunteerID) {
         this.volunteerID = volunteerID;
+    }
+
+    /**
+     * @return the receiptImage
+     */
+    public Blob getReceiptImage() {
+        return receiptImage;
+    }
+
+    /**
+     * @param receiptImage the receiptImage to set
+     */
+    public void setReceiptImage(Blob receiptImage) {
+        this.receiptImage = receiptImage;
     }
 }

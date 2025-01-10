@@ -14,7 +14,7 @@
 <%@page import="java.util.Date"%>
 
 <%
-    String user = (String) session.getAttribute("userRole");
+    Integer user = (Integer) session.getAttribute("volunteer");
     if (user == null) {
         response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;

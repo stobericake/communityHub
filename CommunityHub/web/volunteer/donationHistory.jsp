@@ -1,3 +1,5 @@
+<%@page import="com.cm.model.donation"%>
+<%@page import="com.cm.model.events"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, java.sql.*" %>
 
@@ -218,45 +220,16 @@
         <div class="center-card">
             <div class="donation-card">
                 <%
-                    String volunteerID = (String) session.getAttribute("volunteer");
-                    Connection con = dbconnection.getConnection();
-                    Statement stmt = con.createStatement();
+                    List<events> events = (List) request.getAttribute("eventList");
+                    List<donation> donations = (List) request.getAttribute("donationList");
+                    double totalDonation = Double.parseDouble(request.getAttribute("totalDonation").toString());
+                    double latestDonation = Double.parseDouble(request.getAttribute("latestDonation").toString());
+                    int totalDonations = Integer.parseInt(request.getAttribute("totalDonations").toString());
+                    int totalPages = Integer.parseInt(request.getAttribute("totalPages").toString());
+                    int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
 
-                    // Fetch total donation amount
-                    String totalDonationQuery = "SELECT SUM(amount) AS totalDonation FROM donation WHERE volunteerID = '" + volunteerID + "'";
-                    ResultSet totalDonationRs = stmt.executeQuery(totalDonationQuery);
-                    totalDonationRs.next();
-                    double totalDonation = totalDonationRs.getDouble("totalDonation");
-
-                    // Fetch the latest donation
-                    String latestDonationQuery = "SELECT amount FROM donation WHERE volunteerID = '" + volunteerID + "' ORDER BY date DESC LIMIT 1";
-                    ResultSet latestDonationRs = stmt.executeQuery(latestDonationQuery);
-                    double latestDonation = 0;
-                    if (latestDonationRs.next()) {
-                        latestDonation = latestDonationRs.getDouble("amount");
-                    }
-
-                    // Pagination variables
-                    int itemsPerPage = 5;
-                    String pageParam = request.getParameter("page");
-                    int currentPage = (pageParam == null) ? 1 : Integer.parseInt(pageParam);
-                    int offset = (currentPage - 1) * itemsPerPage;
-
-                    // Get total number of donations
-                    String countQuery = "SELECT COUNT(*) AS total FROM donation WHERE volunteerID = '" + volunteerID + "'";
-                    ResultSet countRs = stmt.executeQuery(countQuery);
-                    countRs.next();
-                    int totalDonations = countRs.getInt("total");
-
-                    // Calculate total number of pages
-                    int totalPages = (int) Math.ceil(totalDonations * 1.0 / itemsPerPage);
-
-                    // Fetch the donation history with pagination
-                    String donationHistoryQuery = "SELECT d.donationID, d.amount, d.date, e.name " +
-                                                  "FROM donation d JOIN events e ON d.eventID = e.eventID " +
-                                                  "WHERE d.volunteerID = '" + volunteerID + "' " +
-                                                  "ORDER BY d.date DESC LIMIT " + itemsPerPage + " OFFSET " + offset;
-                    ResultSet donationHistoryRs = stmt.executeQuery(donationHistoryQuery);
+                    int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
+                    
                 %>
                 <!-- Total Donation Section -->
                 <div class="donation-section">
@@ -296,16 +269,17 @@
                 </table>
             </li>
             <%
-                int index = 1;
-                while (donationHistoryRs.next()) {
+                for (int i = 0; i < events.size(); i++) {
+                    events event = events.get(i);
+                    donation donation = donations.get(i);      
             %>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <table class="event-table">
                         <tr>
-                            <td><%= index++ %>.</td>
-                            <td><%= donationHistoryRs.getString("name") %></td>
-                            <td><%= donationHistoryRs.getString("date") %></td>
-                            <td>RM<%= donationHistoryRs.getDouble("amount") %></td>
+                            <td><%= i %>.</td>
+                            <td><%= event.getName() %></td>
+                            <td><%= donation.getDate() %></td>
+                            <td>RM<%=  donation.getAmount() %></td>
                             <td><button class="view-details-button" data-bs-toggle="modal" data-bs-target="#receiptOverlay">View Receipt</button></td>
                         </tr>
                     </table>
@@ -322,7 +296,7 @@
                         <div class="modal-body">
                             <!-- Wrap the certificate content with a specific class -->
                             <div class="receipt-content">
-                                <img src="../getImage.do?type=events&id=<%= donationHistoryRs.getInt("donationID") %>" class="modal-img">
+                                <img src="getImage.do?type=donation&id=<%= donation.getDonationID() %>" class="modal-img">
                             </div>
                         </div>
                         <div class="modal-footer">

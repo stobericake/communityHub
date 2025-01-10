@@ -74,7 +74,7 @@ public class GenerateCertificate extends HttpServlet {
             return;
         }
 
-        String volunteerID = (String) session.getAttribute("volunteer");
+        int volunteerID = (Integer) session.getAttribute("volunteer");
 
         String eventIDParam = request.getParameter("eventID");
         if (eventIDParam == null || eventIDParam.isEmpty()) {
@@ -101,7 +101,7 @@ public class GenerateCertificate extends HttpServlet {
                     + "WHERE e.eventID = ?";
 
             stmt = conn.prepareStatement(query);
-            stmt.setInt(1, Integer.parseInt(volunteerID));
+            stmt.setInt(1, volunteerID);
             stmt.setInt(2, eventID);
 
             rs = stmt.executeQuery();

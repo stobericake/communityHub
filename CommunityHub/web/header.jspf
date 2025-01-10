@@ -193,7 +193,7 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="volunteerDropdown">
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/vEventList.do" onclick="updateDropdownText('Home')">Home</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/myList.do" onclick="updateDropdownText('My Events')">My Events</a></li>
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/volunteer/donationHistory.jsp" onclick="updateDropdownText('My Donations')" >My Donations</a></li>
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/donation_history.do" onclick="updateDropdownText('My Donations')" >My Donations</a></li>
                             </ul>
                         </li>
                         <% } else if (userRole.equals("beneficiary")) {%>
