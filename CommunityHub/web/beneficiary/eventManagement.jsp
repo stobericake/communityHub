@@ -82,7 +82,6 @@
                         <table class="table table-bordered table-striped" id="eventTable" >
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col" width="5%">ID</th>
                                     <th scope="col" width="25%">Event List</th>
                                     <th scope="col" width="20%">Date</th>
                                     <th scope="col" width="15%">Time</th>
@@ -101,7 +100,6 @@
                                      String date = formatter.format(eventDate);
                                 %>
                                 <tr>
-                                    <td><%= eventList.get(i).getEventID()%></td>
                                     <td class="fw-medium"><%= eventList.get(i).getName()%></td>
                                     <td><%= date %></td>
                                     <td><%= eventList.get(i).getTime()%></td>
