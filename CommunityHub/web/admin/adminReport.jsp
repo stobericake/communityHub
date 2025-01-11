@@ -21,6 +21,37 @@
         return;
     }
 %>
+<style>
+
+    /* Updated Pagination Styles */
+    .pagination {
+        justify-content: center;
+    }
+
+    .pagination .page-link {
+        color: #2F6690;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid #2F6690;
+        margin: 0 5px;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #2F6690;
+        border-color: #2F6690;
+        color: #C3DFE6;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        border-color: #6c757d;
+        pointer-events: none;
+    }
+</style>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -116,7 +147,7 @@
                                     <td><%=event.getName()%></td>
                                     <td class="text-center"><%=formattedDate%></td>
                                     <td class="text-center">
-                                        <a class="btn btn-info bg-purple rounded-4" href="<%= request.getContextPath() %>/AdminEvent?eventID=<%= event.getEventID() %>">Generate</a>
+                                        <a class="btn btn-info bg-purple rounded-3" href="<%= request.getContextPath()%>/AdminEvent?eventID=<%= event.getEventID()%>">Generate</a>
                                     </td>
                                 </tr>
                                 <% }
@@ -194,11 +225,11 @@
                                     <td><%=vol.getName()%></td>
                                     <td class="text-center"><%=vol.getContactInfo()%></td>
                                     <td class="text-center">
-                                        <a class="btn btn-info bg-purple rounded-4" href="<%= request.getContextPath() %>/AdminVolunteer?volunteerID=<%= vol.getVolunteerID() %>">Generate</a>
+                                        <a class="btn btn-info bg-purple rounded-4" href="<%= request.getContextPath()%>/AdminVolunteer?volunteerID=<%= vol.getVolunteerID()%>">Generate</a>
                                     </td>
                                 </tr>
                                 <% }
-                                }%>
+                                    }%>
                             </tbody>
                         </table>
                         <!-- Pagination -->
