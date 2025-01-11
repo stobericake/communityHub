@@ -1,6 +1,7 @@
 <%@page import="com.cm.model.events"%>
 <%@page import="com.cm.model.donation"%>
 <%@page import="com.cm.model.donor"%>
+<%@page import="java.text.DecimalFormat"%>
 <%@page import="java.util.List"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*" %>
@@ -121,6 +122,8 @@
             int totalPages = Integer.parseInt(request.getAttribute("totalPages").toString());
             int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
             String searchName = (String) request.getAttribute("searchName");
+            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd-MM-yyyy");
+            java.text.DecimalFormat amountFormat = new java.text.DecimalFormat("#,##0.00");
         %>
 
         <div class="table-spacing table-responsive">
@@ -135,22 +138,21 @@
                     </tr>
                 </thead>
                 <tbody>
-                <% 
-                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd-MM-yyyy");
-                    for (int i = 0; i < donorList.size(); i++) {
-                        donor donor = donorList.get(i);
-                        donation donation = donationList.get(i);
-                        events event = eventList.get(i);
-                %>
-                    <tr>
-                        <td><%= donor.getName() %></td>
-                        <td><%= donor.getContactInfo() %></td>
-                        <td><%= donation.getAmount() %></td>
-                        <td><%= event.getName() %></td>
-                        <td><%= dateFormat.format(donation.getDate()) %></td>
-                    </tr>
-                <% } %>
-                </tbody>
+                    <% 
+                        for (int i = 0; i < donorList.size(); i++) {
+                            donor donor = donorList.get(i);
+                            donation donation = donationList.get(i);
+                            events event = eventList.get(i);
+                    %>
+                        <tr>
+                            <td><%= donor.getName() %></td>
+                            <td><%= donor.getContactInfo() %></td>
+                            <td><%= amountFormat.format(donation.getAmount()) %></td>
+                            <td><%= event.getName() %></td>
+                            <td><%= dateFormat.format(donation.getDate()) %></td>
+                        </tr>
+                    <% } %>
+                    </tbody>
             </table>
         </div>
 

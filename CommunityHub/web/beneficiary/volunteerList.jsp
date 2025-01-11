@@ -152,9 +152,10 @@
                         <td><%= vol.getContactInfo() %></td>
                         <td><%= vol.getUsername() %></td>
                         <td><%= event.getName() %></td>
-                        <td><%= event.getDate() %></td>
+                        <td><%= dateFormat.format(event.getDate()) %></td>
                     </tr>
-                    <% } // end while %>
+                    <% } // end for %>
+
                 </tbody>
             </table>
         </div>
