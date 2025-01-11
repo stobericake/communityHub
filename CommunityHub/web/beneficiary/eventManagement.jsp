@@ -1,3 +1,4 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.cm.model.address"%>
 <%@page import="com.cm.model.events"%>
 <%@page import="java.util.List"%>
@@ -94,11 +95,15 @@
                                     List<events> eventList = (List) request.getAttribute("event");
                                     List<address> addressList = (List) request.getAttribute("address");
                                     for (int i = 0; i < eventList.size(); i++) {
+                                        
+                                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+                                     Date eventDate = eventList.get(i).getDate();
+                                     String date = formatter.format(eventDate);
                                 %>
                                 <tr>
                                     <td><%= eventList.get(i).getEventID()%></td>
                                     <td class="fw-medium"><%= eventList.get(i).getName()%></td>
-                                    <td><%= eventList.get(i).getDate()%></td>
+                                    <td><%= date %></td>
                                     <td><%= eventList.get(i).getTime()%></td>
                                     <td><%= addressList.get(i).getState()%></td>
                                     <td class="text-center">
