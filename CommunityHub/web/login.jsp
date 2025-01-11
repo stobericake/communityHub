@@ -64,10 +64,10 @@
                             <%= error%>
                         </div>
                         <% } %>
-                        <button type="submit" class="btn btn-login btn-lg w-100 mb-3" style="background-color: #3A7CA5;color:white;">LOGIN</button>
+                        <button type="submit" class="btn btn-login btn-lg w-100 mb-3 mt-2" style="background-color: #3A7CA5;color:white;">LOGIN</button>
                         <div class="mb-3">
-                            <div class="row">
-                                <div class="col-6"><a href="#" class="text-decoration-none text-primary">Forgot password?</a></div>
+                            <div class="row justify-content-center">
+<!--                                <div class="col-6"><a href="#" class="text-decoration-none text-primary">Forgot password?</a></div>-->
                                 <div class="col-6"><a href="register.jsp" class="text-decoration-none text-primary">Register</a></div>
                             </div>
                         </div>

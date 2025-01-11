@@ -1,5 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+    <%@ page import="javax.servlet.http.HttpSession"%>
+    <%
+        String error = (String) request.getAttribute("error");
+        if (error != null) {
+            // Destroy the session
+            session = request.getSession(false); // Get the existing session (if any)
+            if (session != null) {
+                session.invalidate(); // Destroy the session
+            }
+        }
+    %>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,17 +45,17 @@
                 font-size: 24px;
                 color: #6c757d;
             }
-            .btn-register {
-                background-color: #2F6690;
-                color: #ffffff;
-                font-weight: bold;
+            #register {
+                transition: background-color 0.3s ease; /* Smooth transition */
             }
-            .btn-register:hover {
-                background-color: #1E4A68;
+            
+            #register:hover {
+                background-color: #1E4A68 !important
             }
         </style>
     </head>
     <body>
+        <%@ include file="header.jspf" %>
         <div class="signup-container">
             <div class="signup-header">
                 <h2>Welcome to</h2>
@@ -100,12 +111,12 @@
                     </div>
                 </div>
                 <div class="text-center">
-                    <button type="submit" class="btn btn-register btn-lg w-100">REGISTER</button>
+                    <button type="submit" class="btn btn-lg w-100" id="register" style="background-color: #2F6690; color: #ffffff;">REGISTER</button>
                 </div>
             </form>
-<!--            <div class="text-center">
-                <button type="submit" class="btn btn-lg w-100 text-info">LOGIN</button>
-            </div>-->
+            <!--            <div class="text-center">
+                            <button type="submit" class="btn btn-lg w-100 text-info">LOGIN</button>
+                        </div>-->
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
