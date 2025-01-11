@@ -9,51 +9,51 @@
         <title>Event Management</title>
 
         <style>
-            
-                    .table-dark th {
-            background-color: #2F6690 !important;
-        }
+
+            .table-dark th {
+                background-color: #2F6690 !important;
+            }
 
             /* Pagination styles */
-        .pagination {
-            justify-content: center;
-        }
+            .pagination {
+                justify-content: center;
+            }
 
-        .pagination .page-link {
-            color: #2F6690;
-            border-radius: 50%; /* Makes the button circular */
-            width: 40px;        /* Fixed width for circular shape */
-            height: 40px;       /* Fixed height for circular shape */
-            display: flex;      /* Center the content inside */
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #2F6690; /* Add border for clarity */
-            margin: 0 5px;     /* Add spacing between buttons */
-        }
+            .pagination .page-link {
+                color: #2F6690;
+                border-radius: 50%; /* Makes the button circular */
+                width: 40px;        /* Fixed width for circular shape */
+                height: 40px;       /* Fixed height for circular shape */
+                display: flex;      /* Center the content inside */
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #2F6690; /* Add border for clarity */
+                margin: 0 5px;     /* Add spacing between buttons */
+            }
 
-        .pagination .page-item.active .page-link {
-            background-color: #2F6690;
-            border-color: #2F6690;
-            color: #C3DFE6;
-        }
+            .pagination .page-item.active .page-link {
+                background-color: #2F6690;
+                border-color: #2F6690;
+                color: #C3DFE6;
+            }
 
-        .pagination-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        
-           .page-header {
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
+            .pagination-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
 
-        .page-subheader {
-            font-size: 1.0rem;
-            color: #6c757d;
-        }
+            .page-header {
+                font-weight: bold;
+                font-size: 1.5rem;
+            }
 
-        
+            .page-subheader {
+                font-size: 1.0rem;
+                color: #6c757d;
+            }
+
+
         </style>
     </head>
     <body>
@@ -67,73 +67,64 @@
                     <a href="beneficiary/createEvent.jsp" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>Create Event
                     </a>
-                    
-                
                 </div>
 
-                    <div class="col-md-4 offset-md-4">
+                <div class="col-md-4 offset-md-4">
                     <input type="text" id="searchInput" class="form-control rounded"
                            placeholder="Search by any field..." onkeyup="filterTable()"><br>
-
                 </div>
-
-
-
             </div>
 
+            <div class="card-body">
+                <form action="updateEvent.do" method="post">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="eventTable" >
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" width="5%">ID</th>
+                                    <th scope="col" width="25%">Event List</th>
+                                    <th scope="col" width="20%">Date</th>
+                                    <th scope="col" width="15%">Time</th>
+                                    <th scope="col" width="20%">Place</th>
+                                    <th scope="col" width="15%" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%
+                                    List<events> eventList = (List) request.getAttribute("event");
+                                    List<address> addressList = (List) request.getAttribute("address");
+                                    for (int i = 0; i < eventList.size(); i++) {
+                                %>
+                                <tr>
+                                    <td><%= eventList.get(i).getEventID()%></td>
+                                    <td class="fw-medium"><%= eventList.get(i).getName()%></td>
+                                    <td><%= eventList.get(i).getDate()%></td>
+                                    <td><%= eventList.get(i).getTime()%></td>
+                                    <td><%= addressList.get(i).getState()%></td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="updateEvent.do?editEventId=<%= eventList.get(i).getEventID()%>" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </a>
+                                            <a href="#" class="btn btn-outline-danger btn-sm delete-link"
+                                               data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                               data-event-id="<%= eventList.get(i).getEventID()%>">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <%
+                                    }
+                                %>
+                            </tbody>
+                        </table>
+                    </div>
 
+                </form>
+            </div>
 
-            
-                <div class="card-body">
-                    <form action="updateEvent.do" method="post">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped" id="eventTable" >
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th scope="col" width="5%">ID</th>
-                                        <th scope="col" width="25%">Event List</th>
-                                        <th scope="col" width="20%">Date</th>
-                                        <th scope="col" width="15%">Time</th>
-                                        <th scope="col" width="20%">Place</th>
-                                        <th scope="col" width="15%" class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <%
-                                        List<events> eventList = (List) request.getAttribute("event");
-                                        List<address> addressList = (List) request.getAttribute("address");
-                                        for (int i = 0; i < eventList.size(); i++) {
-                                    %>
-                                    <tr>
-                                        <td><%= eventList.get(i).getEventID() %></td>
-                                        <td class="fw-medium"><%= eventList.get(i).getName()%></td>
-                                        <td><%= eventList.get(i).getDate()%></td>
-                                        <td><%= eventList.get(i).getTime()%></td>
-                                        <td><%= addressList.get(i).getState()%></td>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group">
-                                                <a href="updateEvent.do?editEventId=<%= eventList.get(i).getEventID()%>" 
-                                                   class="btn btn-outline-primary btn-sm">
-                                                    <i class="bi bi-pencil"></i> Edit
-                                                </a>
-                                                <a href="#" class="btn btn-outline-danger btn-sm delete-link"
-                                                   data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                                   data-event-id="<%= eventList.get(i).getEventID()%>">
-                                                    <i class="bi bi-trash"></i> Delete
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <%
-                                        }
-                                    %>
-                                </tbody>
-                            </table>
-                        </div>
-
-                    </form>
-                </div>
-            
 
             <!-- Delete Confirmation Modal -->
             <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -157,44 +148,39 @@
                 </div>
             </div>
 
-            <!-- Pagination Controls -->
+            <!-- Pagination -->
+            <%
+                Integer currentPage = (Integer) request.getAttribute("currentPage");
+                Integer totalPages = (Integer) request.getAttribute("totalPages");
+            %>
 
 
-  
-
-                
-                    <%
-                        Integer currentPage = (Integer) request.getAttribute("currentPage");
-                        Integer totalPages = (Integer) request.getAttribute("totalPages");
-                    %>
-                   
-                
-                  <div class="pagination-container">
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    <!-- Previous Button -->
-                    <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
-                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <!-- Page Numbers -->
-                    <% for (int i = 1; i <= totalPages; i++) { %>
-                        <li class="page-item <%= currentPage == i ? "active" : "" %>">
-                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+            <div class="pagination-container">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        
+                        <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
+                            <a class="page-link" href="?page=<%= currentPage - 1%>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
                         </li>
-                    <% } %>
-                    <!-- Next Button -->
-                    <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
-                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+                        
+                        <% for (int i = 1; i <= totalPages; i++) {%>
+                        <li class="page-item <%= currentPage == i ? "active" : ""%>">
+                            <a class="page-link" href="?page=<%= i%>"><%= i%></a>
+                        </li>
+                        <% }%>
+                        
+                        <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
+                            <a class="page-link" href="?page=<%= currentPage + 1%>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-      
+        </div>
+
 
         <script>
             function filterTable() {
@@ -207,22 +193,14 @@
                     row.style.display = match ? '' : 'none';
                 });
             }
-
-
-
-
-
-            document.addEventListener("DOMContentLoaded", function () {
-                // Add a click event listener to the document
+            
+            document.addEventListener("DOMContentLoaded", function () {     
                 document.addEventListener("click", function (event) {
-                    // Check if the clicked element has the class "delete-link"
                     if (event.target.closest('.delete-link')) {
-                        // Get the delete-link element (use closest for nested elements like icons)
                         const deleteLink = event.target.closest('.delete-link');
-                        // Retrieve the event ID from the data-event-id attribute
                         const eventId = deleteLink.getAttribute('data-event-id');
-                        console.log("Event ID:", eventId); // Debugging output
-                        // Set the value of the hidden input field
+                        console.log("Event ID:", eventId); 
+                       
                         const eventIdInput = document.getElementById('eventIdToDelete');
                         if (eventIdInput) {
                             eventIdInput.value = eventId;
