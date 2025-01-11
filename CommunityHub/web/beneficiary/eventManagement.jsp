@@ -22,14 +22,14 @@
 
             .pagination .page-link {
                 color: #2F6690;
-                border-radius: 50%; /* Makes the button circular */
-                width: 40px;        /* Fixed width for circular shape */
-                height: 40px;       /* Fixed height for circular shape */
-                display: flex;      /* Center the content inside */
+                border-radius: 50%; 
+                width: 40px;     
+                height: 40px;       
+                display: flex;     
                 justify-content: center;
                 align-items: center;
-                border: 1px solid #2F6690; /* Add border for clarity */
-                margin: 0 5px;     /* Add spacing between buttons */
+                border: 1px solid #2F6690; 
+                margin: 0 5px;    
             }
 
             .pagination .page-item.active .page-link {
