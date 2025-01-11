@@ -32,21 +32,20 @@
             max-width: 300px;
         }
 
-        /* Pagination styles */
         .pagination {
             justify-content: center;
         }
 
         .pagination .page-link {
             color: #2F6690;
-            border-radius: 50%; /* Makes the button circular */
-            width: 40px;        /* Fixed width for circular shape */
-            height: 40px;       /* Fixed height for circular shape */
-            display: flex;      /* Center the content inside */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
             justify-content: center;
             align-items: center;
-            border: 1px solid #2F6690; /* Add border for clarity */
-            margin: 0 5px;     /* Add spacing between buttons */
+            border: 1px solid #2F6690;
+            margin: 0 5px;
         }
 
         .pagination .page-item.active .page-link {
@@ -64,7 +63,7 @@
         .section-spacing {
             margin-top: 20px;
         }
-        
+
         .table-spacing {
             margin-top: 30px;
         }
@@ -79,15 +78,13 @@
             const rows = document.querySelectorAll('#donorTable tbody tr');
 
             rows.forEach(row => {
-                const id = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-                const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const contact = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
-                const amount = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
-                const event = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
-                const date = row.querySelector('td:nth-child(6)').textContent.toLowerCase();
+                const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                const contact = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const amount = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                const event = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                const date = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
 
                 if (
-                    id.includes(input) ||
                     name.includes(input) ||
                     contact.includes(input) ||
                     amount.includes(input) ||
@@ -105,14 +102,12 @@
 <body>
     <%@ include file="../header.jspf" %>
     <div class="container my-4">
-        <!-- Donor List Overview Header -->
         <div class="row align-items-center mb-4">
             <div class="col-md-4">
                 <h1 class="page-header">DONORS OVERVIEW</h1>
                 <p class="page-subheader">Donors List</p>
             </div>
-            
-            <!-- Search Bar -->
+
             <div class="col-md-4 offset-md-4">
                 <input type="text" id="searchInput" class="form-control rounded" 
                        placeholder="Search by any field..." onkeyup="filterTable()">
@@ -127,13 +122,11 @@
             int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
             String searchName = (String) request.getAttribute("searchName");
         %>
-        
-        <!-- donors List Table -->
+
         <div class="table-spacing table-responsive">
             <table id="donorTable" class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Contact Info</th>
                         <th>Amount (RM)</th>
@@ -143,41 +136,37 @@
                 </thead>
                 <tbody>
                 <% 
-                    for(int i = 0; i < donorList.size(); i++){
+                    java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd-MM-yyyy");
+                    for (int i = 0; i < donorList.size(); i++) {
                         donor donor = donorList.get(i);
                         donation donation = donationList.get(i);
                         events event = eventList.get(i);
                 %>
                     <tr>
-                        <td><%= donor.getDonorID() %></td>
                         <td><%= donor.getName() %></td>
                         <td><%= donor.getContactInfo() %></td>
                         <td><%= donation.getAmount() %></td>
                         <td><%= event.getName() %></td>
-                        <td><%= donation.getDate() %></td>
+                        <td><%= dateFormat.format(donation.getDate()) %></td>
                     </tr>
-                <% } // end while %>
+                <% } %>
                 </tbody>
             </table>
         </div>
-                
-         <!-- Pagination -->
+
         <div class="pagination-container">
             <nav aria-label="Page navigation">
                 <ul class="pagination">
-                    <!-- Previous Button -->
                     <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
                         <a class="page-link" href="?page=<%= currentPage - 1 %>&searchName=<%= searchName != null ? searchName : "" %>" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
-                    <!-- Page Numbers -->
                     <% for (int i = 1; i <= totalPages; i++) { %>
                         <li class="page-item <%= currentPage == i ? "active" : "" %>">
                             <a class="page-link" href="?page=<%= i %>&searchName=<%= searchName != null ? searchName : "" %>"><%= i %></a>
                         </li>
                     <% } %>
-                    <!-- Next Button -->
                     <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
                         <a class="page-link" href="?page=<%= currentPage + 1 %>&searchName=<%= searchName != null ? searchName : "" %>" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>

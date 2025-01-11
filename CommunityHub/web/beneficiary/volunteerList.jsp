@@ -132,7 +132,6 @@
             <table id="volunteerTable" class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
-                        <th>ID</th>
                         <th>Name</th>
                         <th>Contact Info</th>
                         <th>Username</th>
@@ -142,13 +141,13 @@
                 </thead>
                 <tbody>
                     <% 
+                        java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("dd-MM-yyyy");
                         for (int i = 0; i < volunteerList.size(); i++) {
                             volunteer vol = volunteerList.get(i);
                             eventsVolunteer evVol = eventsVolunteerList.get(i);
                             events event = eventList.get(i);
                     %>
                     <tr>
-                        <td><%= vol.getVolunteerID() %></td>
                         <td><%= vol.getName() %></td>
                         <td><%= vol.getContactInfo() %></td>
                         <td><%= vol.getUsername() %></td>
