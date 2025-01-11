@@ -176,7 +176,7 @@
                                 </ul>
                             </nav>
                         </div>
-                        <button id="generateEventReports" class="btn btn-info bg-purple rounded-4">
+                        <button id="generateEventReports" class="btn btn-info  rounded-4">
                             Generate Reports for Selected Events
                         </button>
                     </div>
