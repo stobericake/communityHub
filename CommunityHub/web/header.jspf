@@ -156,7 +156,7 @@
                 <a href="<%=userRole.equals("admin") ? request.getContextPath() + "/adminList.do"
                         : userRole.equals("volunteer") ? request.getContextPath() + "/vEventList.do"
                         : userRole.equals("beneficiary") ? request.getContextPath() + "/listEventMgmt.do"
-                        : request.getContextPath() + "/index.html"%>" class="text-decoration-none">
+                        : request.getContextPath() + "/login.jsp"%>" class="text-decoration-none">
                     <div class="d-flex align-items-center">
                         <img src="<%=request.getContextPath()%>/assets/logo.png" alt="Logo" style="height: 60px; vertical-align: middle;" class="me-2 mb-3">
                         <h1 class="h5 text-white font-weight-bold" style="font-size: 30px; -webkit-text-stroke-width: 1px;">CommUNITYHub</h1>

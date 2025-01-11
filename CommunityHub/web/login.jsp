@@ -2,18 +2,19 @@
 <%@ page import="javax.servlet.http.HttpSession"%>
 <%
     HttpSession checkSession = request.getSession(false); // Check if session already exists
+    String error = (String) request.getAttribute("error");
     if (checkSession != null) {
         String userRole = (String) checkSession.getAttribute("userRole");
         if (userRole != null) {
             // Redirect based on the user role
             if (userRole.equals("volunteer")) {
-                response.sendRedirect(request.getContextPath()+ "/volunteer/newListingEvent.jsp"); // Redirect to volunteer page
+                response.sendRedirect(request.getContextPath() + "/volunteer/newListingEvent.jsp"); // Redirect to volunteer page
                 return;
             } else if (userRole.equals("admin")) {
-                response.sendRedirect(request.getContextPath()+ "/admin/adminListing.jsp"); // Redirect to admin page
+                response.sendRedirect(request.getContextPath() + "/admin/adminListing.jsp"); // Redirect to admin page
                 return;
             } else if (userRole.equals("beneficiary")) {
-                response.sendRedirect(request.getContextPath()+ "/beneficiary/eventmanagement.jsp"); // Redirect to beneficiary page
+                response.sendRedirect(request.getContextPath() + "/beneficiary/eventmanagement.jsp"); // Redirect to beneficiary page
                 return;
             }
         }
@@ -29,6 +30,12 @@
             body {
                 background: linear-gradient(to bottom, #2F6690, #C3DFE6);
                 min-height: 100vh;
+            }
+            
+            .error-message {
+                color: red; /* Red color for the error message */
+                font-size: 14px;
+                text-align: left; /* Align text to the left */
             }
         </style>
     </head>
@@ -48,9 +55,15 @@
                         <div class="mb-3">
                             <input type="text" class="form-control" placeholder="Username" name="username" required>
                         </div>
-                        <div class="mb-3">
+                        <div class="mb-1">
                             <input type="password" class="form-control" placeholder="Password" name="password" required>
                         </div>
+                        <!-- Error message display -->
+                        <% if (error != null) {%>
+                        <div class="error-message mb-2">
+                            <%= error%>
+                        </div>
+                        <% } %>
                         <button type="submit" class="btn btn-login btn-lg w-100 mb-3" style="background-color: #3A7CA5;color:white;">LOGIN</button>
                         <div class="mb-3">
                             <div class="row">
