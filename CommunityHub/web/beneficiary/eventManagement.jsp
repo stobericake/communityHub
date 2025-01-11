@@ -8,21 +8,70 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Event Management</title>
 
+        <style>
+            
+                    .table-dark th {
+            background-color: #2F6690 !important;
+        }
+
+            /* Pagination styles */
+        .pagination {
+            justify-content: center;
+        }
+
+        .pagination .page-link {
+            color: #2F6690;
+            border-radius: 50%; /* Makes the button circular */
+            width: 40px;        /* Fixed width for circular shape */
+            height: 40px;       /* Fixed height for circular shape */
+            display: flex;      /* Center the content inside */
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #2F6690; /* Add border for clarity */
+            margin: 0 5px;     /* Add spacing between buttons */
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #2F6690;
+            border-color: #2F6690;
+            color: #C3DFE6;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+           .page-header {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .page-subheader {
+            font-size: 1.0rem;
+            color: #6c757d;
+        }
+
+        
+        </style>
     </head>
     <body>
         <%@ include file="../header.jspf" %>
 
-        <div class="container my-3">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="text-dark mb-2">Event Management</h1>
-                    <h6 class="text-secondary">The tables below show all of the events</h6>
+        <div class="container my-4">
+            <div class="row align-items-center mb-4">
+                <div class="col-md-4">
+                    <h1 class="page-header">EVENT MANAGEMENT</h1>
+                    <h6 class="page-subheader">The tables below show all of the events</h6>
                     <a href="beneficiary/createEvent.jsp" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>Create Event
                     </a>
+                    
+                
                 </div>
 
-                <div class="col-md-4 offset-md-4">
+                    <div class="col-md-4 offset-md-4">
                     <input type="text" id="searchInput" class="form-control rounded"
                            placeholder="Search by any field..." onkeyup="filterTable()"><br>
 
@@ -34,19 +83,19 @@
 
 
 
-            <div class="card shadow-sm">
+            
                 <div class="card-body">
                     <form action="updateEvent.do" method="post">
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped align-middle mb-0" id="eventTable" >
-                                <thead class="table" style="background-color: #2F6690; color: white">
+                            <table class="table table-bordered table-striped" id="eventTable" >
+                                <thead class="table-dark">
                                     <tr>
-                                        <th scope="col" width="5%">NO</th>
-                                        <th scope="col" width="25%">EVENT LIST</th>
-                                        <th scope="col" width="20%">DATE</th>
-                                        <th scope="col" width="15%">TIME</th>
-                                        <th scope="col" width="20%">PLACE</th>
-                                        <th scope="col" width="15%" class="text-center">ACTION</th>
+                                        <th scope="col" width="5%">ID</th>
+                                        <th scope="col" width="25%">Event List</th>
+                                        <th scope="col" width="20%">Date</th>
+                                        <th scope="col" width="15%">Time</th>
+                                        <th scope="col" width="20%">Place</th>
+                                        <th scope="col" width="15%" class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -56,7 +105,7 @@
                                         for (int i = 0; i < eventList.size(); i++) {
                                     %>
                                     <tr>
-                                        <td><%= i + 1%></td>
+                                        <td><%= eventList.get(i).getEventID() %></td>
                                         <td class="fw-medium"><%= eventList.get(i).getName()%></td>
                                         <td><%= eventList.get(i).getDate()%></td>
                                         <td><%= eventList.get(i).getTime()%></td>
@@ -84,7 +133,7 @@
 
                     </form>
                 </div>
-            </div>
+            
 
             <!-- Delete Confirmation Modal -->
             <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -111,34 +160,41 @@
             <!-- Pagination Controls -->
 
 
-            <div class="d-flex justify-content-between align-items-center mt-4">
+  
 
-                <div>
+                
                     <%
                         Integer currentPage = (Integer) request.getAttribute("currentPage");
                         Integer totalPages = (Integer) request.getAttribute("totalPages");
                     %>
-                    <span>Page <%= currentPage%> of <%= totalPages%></span>
-                </div>
-                <div>
-                    <nav>
-                        <ul class="pagination">
-                            <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
-                                <a class="page-link" href="?page=<%= currentPage - 1%>">Previous</a>
-                            </li>
-                            <% for (int i = 1; i <= totalPages; i++) {%>
-                            <li class="page-item <%= i == currentPage ? "active" : ""%>">
-                                <a class="page-link" href="?page=<%= i%>"><%= i%></a>
-                            </li>
-                            <% }%>
-                            <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
-                                <a class="page-link" href="?page=<%= currentPage + 1%>">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
+                   
+                
+                  <div class="pagination-container">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <!-- Previous Button -->
+                    <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <!-- Page Numbers -->
+                    <% for (int i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item <%= currentPage == i ? "active" : "" %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <!-- Next Button -->
+                    <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
+            </div>
+      
 
         <script>
             function filterTable() {
