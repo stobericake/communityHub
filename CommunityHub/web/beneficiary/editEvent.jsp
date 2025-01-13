@@ -207,13 +207,11 @@
                                                    style="height: auto;">
 
                                             <!-- Upload status -->
-                                            <div id="uploadStatus" class="mt-2 small text-muted d-none">
+                                            <div id="uploadStatus" class="mt-2 small text-muted">
                                                 <i class="bi bi-info-circle me-1"></i>
                                                 <span id="fileInfo">No file selected</span>
                                             </div>
                                         </div>
-
-
                                     </div>
 
                                     <!-- Image preview container -->
@@ -476,6 +474,38 @@
              */
 
 
+
+            const eventImage = document.getElementById('eventImage');
+            const imagePreview = document.getElementById('imagePreview');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const fileInfo = document.getElementById('fileInfo');
+
+            // Event listener for file input change
+            eventImage.addEventListener('change', (event) => {
+                const file = event.target.files[0]; // Get the selected file
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    // Update the preview once the file is loaded
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result; // Set image preview
+                        imagePreview.classList.remove('p-2'); // Ensure placeholder styling is removed
+                    };
+
+                    reader.readAsDataURL(file); // Read the file as a Data URL
+
+                    // Update the upload status
+                    fileInfo.textContent = `Selected file: ${file.name}`;
+                    uploadStatus.classList.remove('d-none');
+                } else {
+                    // Reset to default placeholder if no file is selected
+                    imagePreview.src = 'default-placeholder.jpg';
+                    imagePreview.classList.add('p-2');
+                    fileInfo.textContent = 'No file selected';
+                    uploadStatus.classList.remove('d-none');
+                }
+            });
 
             let currentStep = 1;
             const totalSteps = 5;
