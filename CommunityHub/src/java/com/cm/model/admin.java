@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.sql.Blob;
 
 public class admin implements Serializable {
+
     private int adminID;
     private String name;
     private String email;
@@ -20,7 +21,16 @@ public class admin implements Serializable {
     private String username;
     private String password;
     private Blob image;
-
+    
+    public admin(int adminID, String name, String email, int contactInfo, String username, String password, Blob image) {
+        this.adminID = adminID;
+        this.name = name;
+        this.email = email;
+        this.contactInfo = contactInfo;
+        this.username = username;
+        this.password = password;
+        this.image = image;
+    }
     /**
      * @return the adminID
      */
