@@ -66,12 +66,12 @@
     <body class="d-flex justify-content-center align-items-center vh-100">
         <%
            
-        String h = "guest/eventListingGuest.jsp";
+        String h = "listGuestEvent.do";
         String role = (String) session.getAttribute("userRole");
         if (role != null) {
             // Redirect based on the user role
             if (role.equals("volunteer")) {
-                h = "volunteer/eventListingVolunteer.jsp";
+                h = "vEventList.do";
             } else if (role.equals("admin")) {
                h = "adminList.do";
             } else if (role.equals("beneficiary")) {

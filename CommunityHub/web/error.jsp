@@ -23,8 +23,8 @@
                 height: 120px;
                 margin: 0 auto; 
             }
-            
-              .btn-home:hover {
+
+            .btn-home:hover {
                 background-color: black; 
                 color: white; 
             }
@@ -65,20 +65,19 @@
     </head>
     <body class="d-flex justify-content-center align-items-center vh-100">
         <%
-                  String h = "guest/eventListingGuest.jsp";
-                  String role = (String) session.getAttribute("userRole");
-                if (role != null) {
-                    // Redirect based on the user role
-                    if (role.equals("volunteer")) {
-                        h = "volunteer/eventListingVolunteer.jsp";
-                    } else if (role.equals("admin")) {
-                       h = "admin/adminListing.jsp";
-                    } else if (role.equals("beneficiary")) {
-                        h = "beneficiary/eventManagement.jsp";
-                    }
+            String h = "listGuestEvent.do";
+            String role = (String) session.getAttribute("userRole");
+            if (role != null) {
+                // Redirect based on the user role
+                if (role.equals("volunteer")) {
+                    h = "vEventList.do";
+                } else if (role.equals("admin")) {
+                    h = "adminList.do";
+                } else if (role.equals("beneficiary")) {
+                    h = "listEventMgmt.do";
                 }
-               
-                
+            }
+
             String message = request.getParameter("msg");
         %>
         <div class="container text-center rounded-card p-4 w-25">
@@ -88,14 +87,14 @@
                     <i class="bi bi-x-circle-fill error-icon"></i>
                 </div>
                 <p class="fw-bold fs-4">Process Failed</p>
-                <% if (message != null && !message.isEmpty()) { %>
-                    <p class="text-muted">Message: <strong><%= message %></strong></p>
+                <% if (message != null && !message.isEmpty()) {%>
+                <p class="text-muted">Message: <strong><%= message%></strong></p>
                 <% } else { %>
-                    <p class="text-muted">The process encountered an error.</p>
-                <% } %>
+                <p class="text-muted">The process encountered an error.</p>
+                <% }%>
             </div>
             <div class="mt-4">
-                <a href=<%= h %> class="btn btn-home">Home</a>
+                <a href=<%= h%> class="btn btn-home">Home</a>
             </div>
             <div class="divider-bottom bottom-divider"></div>
         </div>

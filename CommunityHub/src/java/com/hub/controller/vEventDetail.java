@@ -29,6 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -53,7 +54,7 @@ public class vEventDetail extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet vEventDetail</title>");            
+            out.println("<title>Servlet vEventDetail</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet vEventDetail at " + request.getContextPath() + "</h1>");
@@ -74,16 +75,23 @@ public class vEventDetail extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
-//        if (volunteerId == 0) {
-//            response.sendRedirect(request.getContextPath() + "/login.jsp");
-//            return;
-//        } 
+
+        HttpSession session = request.getSession();
+        Integer volunteerID = (Integer) session.getAttribute("volunteer");
+
+        // Check if volunteerID is null or 0
+        if (volunteerID == null || volunteerID == 0) {
+            // Redirect to login page if not logged in
+            response.sendRedirect(request.getContextPath() + "/login.jsp?message=Please login to volunteer for this event.");
+            return; // Stop further execution
+        }
+
         int eventID = Integer.parseInt(request.getParameter("eventID"));
 //        if (eventID == 0) {
 //            response.sendRedirect(request.getContextPath() + "/volunteer/newListingEvent.jsp");
 //            return;
 //        } 
+
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -93,55 +101,54 @@ public class vEventDetail extends HttpServlet {
         PreparedStatement donationStmt = null;
         ResultSet donationRs = null;
         List<task> taskList = new ArrayList<>();
-        
-        if (eventID != 0 ) {
-                try {
-                    conn = dbconnection.getConnection();
-                    String sql = "SELECT * FROM events e " +
-                                 "INNER JOIN address a ON e.addressID = a.addressID " +
-                                 "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
-                    stmt = conn.prepareStatement(sql);
-                    stmt.setInt(1, eventID);
-                    rs = stmt.executeQuery();
+
+        if (eventID != 0) {
+            try {
+                conn = dbconnection.getConnection();
+                String sql = "SELECT * FROM events e "
+                        + "INNER JOIN address a ON e.addressID = a.addressID "
+                        + "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
+                stmt = conn.prepareStatement(sql);
+                stmt.setInt(1, eventID);
+                rs = stmt.executeQuery();
 
                 if (rs.next()) {
-                event = new events(
-                                rs.getInt("e.eventID"),
-                                rs.getString("e.name"),
-                                rs.getDate("date"),
-                                rs.getTime("time"),
-                                rs.getTime("duration"),
-                                rs.getString("description"),
-                                rs.getInt("volunteerNeeded"),
-                                rs.getString("status"),
-                                rs.getBlob("image"),
-                                rs.getDouble("donationLimit"),
-                                rs.getInt("addressID")
-                        );
-                address = new address(
-                                rs.getInt("addressID"),
-                                rs.getString("country"),
-                                rs.getInt("postalCode"),
-                                rs.getString("street"),
-                                rs.getString("city"),
-                                rs.getString("state")
-                        );
+                    event = new events(
+                            rs.getInt("e.eventID"),
+                            rs.getString("e.name"),
+                            rs.getDate("date"),
+                            rs.getTime("time"),
+                            rs.getTime("duration"),
+                            rs.getString("description"),
+                            rs.getInt("volunteerNeeded"),
+                            rs.getString("status"),
+                            rs.getBlob("image"),
+                            rs.getDouble("donationLimit"),
+                            rs.getInt("addressID")
+                    );
+                    address = new address(
+                            rs.getInt("addressID"),
+                            rs.getString("country"),
+                            rs.getInt("postalCode"),
+                            rs.getString("street"),
+                            rs.getString("city"),
+                            rs.getString("state")
+                    );
 
-                beneficiary = new beneficiary(
-                        rs.getInt("beneficiaryID"), 
-                        rs.getString("b.name")
-                );
+                    beneficiary = new beneficiary(
+                            rs.getInt("beneficiaryID"),
+                            rs.getString("b.name")
+                    );
 
-                String taskSql = "SELECT * FROM task WHERE eventID = ?";
-                PreparedStatement taskStmt = conn.prepareStatement(taskSql);
-                taskStmt.setInt(1, eventID);
-                ResultSet taskRs = taskStmt.executeQuery();
-                while (taskRs.next()) {
-                    int taskId = taskRs.getInt("taskID");
-                    String taskDescription = taskRs.getString("description");
-                    taskList.add(new task(taskId, taskDescription, volunteerId));
-                }
-                
+                    String taskSql = "SELECT * FROM task WHERE eventID = ? AND status = 1";
+                    PreparedStatement taskStmt = conn.prepareStatement(taskSql);
+                    taskStmt.setInt(1, eventID);
+                    ResultSet taskRs = taskStmt.executeQuery();
+                    while (taskRs.next()) {
+                        int taskId = taskRs.getInt("taskID");
+                        String taskDescription = taskRs.getString("description");
+                        taskList.add(new task(taskId, taskDescription));
+                    }
 
                     SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mma");
                     SimpleDateFormat inputDateFormat = new SimpleDateFormat("MM/dd/yyyy - ");
@@ -166,8 +173,8 @@ public class vEventDetail extends HttpServlet {
 
                     // Calculate days left from the current date to the event date
                     LocalDate currentDate = LocalDate.now();
-                    long daysLeft = ChronoUnit.DAYS.between(currentDate, eventLocalDate); 
-                    
+                    long daysLeft = ChronoUnit.DAYS.between(currentDate, eventLocalDate);
+
                     request.setAttribute("formattedDate", formattedDate);
                     request.setAttribute("formattedStartTime", formattedStartTime);
                     request.setAttribute("formattedEndTime", formattedEndTime);
@@ -177,47 +184,66 @@ public class vEventDetail extends HttpServlet {
                     request.setAttribute("beneficiary", beneficiary);
                     request.setAttribute("tasks", taskList);
                 }
-      
-            
-            // Fetch donation details
-           double donationLimit  = rs.getDouble("donationLimit");
 
-            double totalDonation = 0;
-            String donationSql = "SELECT SUM(amount) AS totalDonation FROM donation WHERE eventID = ?";
-            donationStmt = conn.prepareStatement(donationSql);
-            donationStmt.setInt(1, eventID);
-            donationRs = donationStmt.executeQuery();
-            if (donationRs.next()) {
-                totalDonation = donationRs.getDouble("totalDonation");
+                // Fetch donation details
+                double donationLimit = rs.getDouble("donationLimit");
+
+                double totalDonation = 0;
+                String donationSql = "SELECT SUM(amount) AS totalDonation FROM donation WHERE eventID = ?";
+                donationStmt = conn.prepareStatement(donationSql);
+                donationStmt.setInt(1, eventID);
+                donationRs = donationStmt.executeQuery();
+                if (donationRs.next()) {
+                    totalDonation = donationRs.getDouble("totalDonation");
                 }
-                        
-            // Fetch the total number of contributors (donors)
-            String contributorsQuery = "SELECT COUNT(DISTINCT donorID) AS totalContributors FROM donation WHERE eventID = ?";
-            PreparedStatement contributorsStmt = conn.prepareStatement(contributorsQuery);
-            contributorsStmt.setInt(1, eventID);
-            ResultSet contributorsRs = contributorsStmt.executeQuery();
-            int totalContributors = 0;
-            if (contributorsRs.next()) {
-            totalContributors = contributorsRs.getInt("totalContributors");
+
+                // Fetch the total number of contributors (donors)
+                String contributorsQuery = "SELECT COUNT(DISTINCT donorID) AS totalContributors FROM donation WHERE eventID = ?";
+                PreparedStatement contributorsStmt = conn.prepareStatement(contributorsQuery);
+                contributorsStmt.setInt(1, eventID);
+                ResultSet contributorsRs = contributorsStmt.executeQuery();
+                int totalContributors = 0;
+                if (contributorsRs.next()) {
+                    totalContributors = contributorsRs.getInt("totalContributors");
+                }
+                double remainingAmount = donationLimit - totalDonation;
+                double progress = (totalDonation / donationLimit) * 100;
+
+                request.setAttribute("totalDonation", totalDonation);
+                request.setAttribute("totalContributors", totalContributors);
+                request.setAttribute("remainingAmount", remainingAmount);
+                request.setAttribute("progress", progress);
+
+                request.getRequestDispatcher("/eventDetail.jsp").forward(request, response);
+            } catch (Exception e) {
+                e.printStackTrace();
+                request.setAttribute("msg", "An error occurred while fetching events.");
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
+            } finally {
+                try {
+                    if (rs != null) {
+                        rs.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (stmt != null) {
+                        stmt.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (conn != null) {
+                        conn.close();
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-            double remainingAmount = donationLimit - totalDonation;
-            double progress = (totalDonation / donationLimit) * 100;
-            
-            request.setAttribute("totalDonation", totalDonation);
-            request.setAttribute("totalContributors", totalContributors);
-            request.setAttribute("remainingAmount", remainingAmount);
-            request.setAttribute("progress", progress);
-            
-            request.getRequestDispatcher("/eventDetail.jsp").forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "An error occurred while fetching events.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
-        } finally {
-            try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-            try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-            try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-        }    }}
+        }
+    }
 
     /**
      * Handles the HTTP <code>POST</code> method.

@@ -333,7 +333,7 @@
             }
 
             selectedVolunteers.forEach(volunteerID => {
-                const url = new URL("http://localhost:16113/CommunityHub/admin/reportVolunteer.jsp");
+                const url = new URL("http://localhost:16113/CommunityHub/AdminVolunteer");
                 url.searchParams.append("volunteerID", volunteerID);
                 window.open(url.toString(), '_blank');
             });

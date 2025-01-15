@@ -28,26 +28,26 @@
             body {
                 background-color: #f8f9fa !important;
             }
-            
+
             .event-card {
                 margin-bottom: 20px;
                 transition: transform 0.2s;
             }
-            
+
             .event-card:hover {
                 transform: translateY(-5px);
             }
-            
+
             .card-img-top {
                 height: 200px;
                 object-fit: cover;
             }
-            
+
             .action-buttons {
                 display: flex;
                 gap: 10px;
             }
-            
+
             .action-buttons .btn {
                 flex: 1;
             }
@@ -121,9 +121,9 @@
                 <div class="col-md-4">
                     <div class="card h-100 event-card shadow" data-title="<%= name%>" data-description="<%= desc%>" data-location="<%= city%>">
                         <img src="getImage.do?type=events&id=<%= eventID%>" class="card-img-top" alt="Event Image">
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title fw-bold"><%= name%></h5>
-                            <p class="card-text"><%= desc%></p>
+                            <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= desc%></p>
                             <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-geo-alt-fill me-2"></i>
                                 <small class="text-body-secondary"><%= city%></small>
@@ -132,7 +132,8 @@
                                 <i class="bi bi-clock-fill me-2"></i>
                                 <small class="text-body-secondary"><%= formattedDate%> <%= formattedTime%></small>
                             </div>
-                            <div class="action-buttons">
+                            <!-- Action Buttons at the Bottom -->
+                            <div class="action-buttons mt-auto">
                                 <button onclick="updateStatus(<%= eventID%>, 2)" class="btn btn-primary">
                                     <i class="bi bi-calendar-check me-2"></i>Approve
                                 </button>
@@ -148,7 +149,7 @@
                 <div class="col-12 text-center">
                     <p>No events found.</p>
                 </div>
-                <% } %>
+                <% }%>
             </div>
 
             <!-- Updated Pagination -->
@@ -194,7 +195,7 @@
                 var input = document.getElementById('searchInput').value.toLowerCase();
                 var eventCards = document.querySelectorAll('.event-card');
 
-                eventCards.forEach(function(card) {
+                eventCards.forEach(function (card) {
                     var title = card.getAttribute('data-title').toLowerCase();
                     var description = card.getAttribute('data-description').toLowerCase();
                     var location = card.getAttribute('data-location').toLowerCase();

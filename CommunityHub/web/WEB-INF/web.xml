@@ -92,6 +92,14 @@
         <servlet-name>donationHistory</servlet-name>
         <servlet-class>com.hub.controller.donationHistory</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>volunteerServlet1</servlet-name>
+        <servlet-class>com.hub.controller.volunteerServlet1</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>serviceFormServlet</servlet-name>
+        <servlet-class>com.hub.controller.serviceFormServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -207,6 +215,14 @@
     <servlet-mapping>
         <servlet-name>donationHistory</servlet-name>
         <url-pattern>/donation_history.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>volunteerServlet1</servlet-name>
+        <url-pattern>/volunteerServlet1</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>serviceFormServlet</servlet-name>
+        <url-pattern>/serviceForm</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

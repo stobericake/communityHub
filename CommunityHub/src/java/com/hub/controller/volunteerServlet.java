@@ -6,7 +6,6 @@
 package com.hub.controller;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +16,6 @@ import javax.servlet.http.HttpSession;
  *
  * @author Rina
  */
-@WebServlet(name = "volunteerServlet", urlPatterns = {"/volunteer_servlet.do"})
 public class volunteerServlet extends HttpServlet {
 
     /**
@@ -93,23 +91,22 @@ public class volunteerServlet extends HttpServlet {
             insertStmt.setInt(1, Integer.parseInt(eventID));
             insertStmt.setInt(2, Integer.parseInt(volunteerID));
             
-            String sqlTask = "UPDATE events SET status = ?, volunteerID = ? WHERE description = ?";
+            String sqlTask = "UPDATE task SET status = ?, volunteerID = ? WHERE taskID = ?";
             updateStmt = conn.prepareStatement(sqlTask);
             updateStmt.setInt(1, status);
             updateStmt.setInt(2, Integer.parseInt(volunteerID));
             updateStmt.setInt(3, Integer.parseInt(taskID));
             
-            
             int rowsInserted = insertStmt.executeUpdate();
             if (rowsInserted > 0) {
-                response.sendRedirect("../success.jsp");
+                response.sendRedirect("/success.jsp");
             } else {
-                response.sendRedirect("../error.jsp");
+                response.sendRedirect("/error.jsp");
             }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("../error.jsp");
+            response.sendRedirect("/error.jsp");
         } finally {
             try { if (insertStmt != null) insertStmt.close(); } catch (Exception e) { e.printStackTrace(); }
             try { if (updateStmt != null) updateStmt.close(); } catch (Exception e) { e.printStackTrace(); }

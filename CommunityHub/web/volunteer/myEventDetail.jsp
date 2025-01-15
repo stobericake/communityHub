@@ -230,7 +230,7 @@
                             <p class="card-text text-muted">
                                 Tell us about your experience and suggestions to improve our service and enhance our system.
                             </p>
-                            <a href="volunteer/serviceForm.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                            <a href="serviceForm?eventID=<%= eventID %>" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
                                 FILL IN FORM? <i class="bi bi-pencil-square"></i>
                             </a>
                         </div>

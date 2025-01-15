@@ -114,7 +114,7 @@
                 <div class="card h-100 event-card" data-title="<%= event.getName() %>" 
                      data-description="<%= event.getDescription() %>" data-location="<%= address.get(index).getCity() %>">
                     <div style="width: 100%; height:200px;">
-                        <img src="../getImage.do?type=events&id=<%= event.getEventID() %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
+                        <img src="getImage.do?type=events&id=<%= event.getEventID() %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
                     </div>
                     <div class="card-body">
                         <h5 class="card-title styl"><%= event.getName() %></h5>
@@ -132,8 +132,8 @@
                         </div>
 
                         <div class="d-flex justify-content-end align-items-center">
-                            <a href="#" class="donate-btn"><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
-                            <a href="../eventDetail.jsp?eventID=<%= event.getEventID() %>" class="volunteer-button">View Details</a>
+                            <a href="addDonor.do?eventID=<%= event.getEventID() %>" class="donate-btn"><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
+                            <a href="vEvent.do?eventID=<%= event.getEventID() %>" class="volunteer-button">View Details</a>
                         </div>
                     </div>
                 </div>

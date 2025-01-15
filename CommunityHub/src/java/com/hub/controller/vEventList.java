@@ -113,7 +113,7 @@ public class vEventList extends HttpServlet {
                 int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
 
                 // Fetch events for the current page
-                String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? ";
+                String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? AND status = 2";
                 stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, postalCode);
                 rs = stmt.executeQuery();
@@ -153,12 +153,12 @@ public class vEventList extends HttpServlet {
 
                 request.getRequestDispatcher("/volunteer/newListingEvent.jsp").forward(request, response);
             } else {
-                request.setAttribute("errorMessage", "No postal code found for the volunteer.");
+                request.setAttribute("msg", "No postal code found for the volunteer.");
                 request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "An error occurred while fetching events.");
+            request.setAttribute("msg", "An error occurred while fetching events.");
             request.getRequestDispatcher("/error.jsp").forward(request, response);
         } finally {
             try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }

@@ -27,6 +27,11 @@ public class task implements Serializable  {
         this.description = description;
         this.volunteerID = volunteerID;
     }
+    
+    public task(int taskID, String description) {
+        this.taskID = taskID;
+        this.description = description;
+    }
 
     // Getters and setters for the attributes
     public int getTaskID() {

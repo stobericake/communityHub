@@ -77,12 +77,7 @@
     <body>
         <%@ include file="header.jspf" %>
         <%
-            String user = (String) session.getAttribute("userRole");
-            if (user == null) {
-                response.sendRedirect(request.getContextPath() + "/login.jsp");
-                return;
-            }
-            int eventID = Integer.parseInt(request.getParameter("eventID"));
+            Integer user = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
             // Access the attributes set by the servlet
             events event = (events) request.getAttribute("event");
             address addressObj = (address) request.getAttribute("address");
@@ -97,7 +92,7 @@
             double remainingAmount = Double.parseDouble(request.getAttribute("remainingAmount").toString());
             double progress = Double.parseDouble(request.getAttribute("progress").toString());
         %>
-            <img src="getImage.do?type=events&id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+            <img src="getImage.do?type=events&id=<%= event.getEventID() %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
                     <p class="h6"><%= event.getName() %></p>
@@ -128,7 +123,7 @@
                         <small class="text-muted"><%= totalContributors %> Contributors</small>
                     </div>
                     <hr>
-                    <button class="btn w-100 py-2" onclick="location.href='addDonor.do?eventID=<%= eventID %>'" style="background-color: #000; color: #fff; border-radius: 30px;">
+                    <button class="btn w-100 py-2" onclick="location.href='addDonor.do?eventID=<%= event.getEventID() %>'" style="background-color: #000; color: #fff; border-radius: 30px;">
                         DONATE <i class="bi bi-heart"></i>
                     </button>
                 </div>
@@ -159,7 +154,7 @@
             </small>
             </div>
                 <p><strong>Tasks Required:</strong></p>
-                <form action="volunteer_servlet.do" method="POST">
+                <form action="volunteerServlet1" method="POST">
                 <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
                 <% int i = 0; %>
                 <% for (task task : tasks) { %>
