@@ -9,7 +9,7 @@
         <%
             String name = (String) request.getAttribute("eventName");
             int id = (Integer) request.getAttribute("eventID");
-            int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
+            int volunteerId = (Integer) request.getSession().getAttribute("volunteer");
                                     
         %>
         <%@ include file="../header.jspf" %>

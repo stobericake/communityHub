@@ -73,7 +73,7 @@ public class serviceFormServlet extends HttpServlet {
 
             if (rs.next()) {
                 request.setAttribute("eventName", rs.getString("name"));
-                request.setAttribute("eventID", rs.getString("eventID"));
+                request.setAttribute("eventID", rs.getInt("eventID"));
             }
 
             // Forward to the JSP page
