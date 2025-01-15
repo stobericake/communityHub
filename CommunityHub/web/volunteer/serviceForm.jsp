@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Service Report</title>
+        <title>Feedback Report</title>
     </head>
     <body>
         <%
@@ -30,7 +30,7 @@
                             </div>
                         </div>
                         <div class="col-12 col-md">
-                            <label for="volunteer" class="form-label">ID</label>
+                            <label for="volunteer" class="form-label">Volunteer ID</label>
                             <input type="text" class="form-control" id="volunteer" name="volunteer" value="<%= volunteerId %>" readonly>
                             <div class="invalid-feedback">
                                 Insert ID

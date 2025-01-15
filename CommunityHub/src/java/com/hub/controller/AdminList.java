@@ -88,7 +88,7 @@ public class AdminList extends HttpServlet {
 
             String sql = "SELECT e.eventID, e.name, e.date, e.time, e.duration, e.description, e.volunteerNeeded, e.status, "
                     + "e.image, e.donationLimit, a.addressID, a.country, a.postalCode, a.street, a.city, a.state "
-                    + "FROM events e JOIN address a ON e.addressID = a.addressID WHERE e.status = 1 LIMIT ? OFFSET ?";
+                    + "FROM events e JOIN address a ON e.addressID = a.addressID WHERE e.status = 1 ORDER BY e.eventID DESC LIMIT ? OFFSET ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, eventsPerPage);
             stmt.setInt(2, offset);

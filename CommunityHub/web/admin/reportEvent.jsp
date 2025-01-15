@@ -151,13 +151,15 @@
                             <ul class="text-body-secondary">
                                 <li>Challenge:
                                     <% for (String challenge : (ArrayList<String>) request.getAttribute("challengeList")) {
-                                            System.out.print(challenge + ", ");
-                                        } %>
+                                            %>
+                                            
+                                            <%= challenge + ',' %> 
+                                       <% } %>
                                 </li>
                                 <li>Solutions:
-                                    <% for (String solution : (ArrayList<String>) request.getAttribute("solutionList")) {
-                                            System.out.print(solution + ", ");
-                                        } %>
+                                    <% for (String solution : (ArrayList<String>) request.getAttribute("solutionList")) { %>
+                                            <%= solution + ',' %> 
+                                      <%  } %>
                                 </li>
                             </ul>
                         </div>

@@ -133,7 +133,7 @@ public class donationFormServlet extends HttpServlet {
             String checkDonorSQL = "SELECT donorID FROM donor WHERE name = ? AND contactInfo = ?";
             stmt = conn.prepareStatement(checkDonorSQL);
             stmt.setString(1, donorName);
-            stmt.setString(2, contactInfo);
+            stmt.setInt(2, Integer.parseInt(contactInfo));
             rs = stmt.executeQuery();
 
             int donorID;
@@ -145,7 +145,7 @@ public class donationFormServlet extends HttpServlet {
                 String insertDonorSQL = "INSERT INTO donor (name, contactInfo) VALUES (?, ?)";
                 stmt = conn.prepareStatement(insertDonorSQL, PreparedStatement.RETURN_GENERATED_KEYS);
                 stmt.setString(1, donorName);
-                stmt.setString(2, contactInfo);
+                stmt.setInt(2, Integer.parseInt(contactInfo));
                 stmt.executeUpdate();
 
                 // Retrieve the generated donorID
