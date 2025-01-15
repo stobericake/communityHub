@@ -492,6 +492,7 @@
 
             // Edit task
             function editTask(button) {
+                event.preventDefault();
                 const row = button.closest('tr');
                 const nameSpan = row.querySelector('.task-name');
                 const nameInput = row.querySelector('.edit-input');
