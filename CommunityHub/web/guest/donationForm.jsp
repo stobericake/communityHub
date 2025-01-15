@@ -46,9 +46,9 @@
                         <div class="invalid-feedback">Please insert your name.</div>
                     </div>
                     <div class="col-12">
-                        <label for="contactInfo" class="form-label">Contact Information</label>
-                        <input type="tel" class="form-control" id="contactInfo" name="contactInfo" pattern="^[0-12]{13}$" required>
-                        <div class="invalid-feedback">Please insert a valid 13-digit contact number.</div>
+                        <label for="contactInfo" class="form-label">Contact Number (without '-')</label>
+                        <input type="tel" class="form-control" id="contactInfo" name="contactInfo" pattern="^[0-9]{10}$" required>
+                        <div class="invalid-feedback">Please insert a valid 10-digit contact number.</div>
                     </div>
 
                     <div class="col-12">
