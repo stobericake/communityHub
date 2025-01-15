@@ -46,6 +46,11 @@
                         <div class="invalid-feedback">Please insert your name.</div>
                     </div>
                     <div class="col-12">
+                        <label for="contactInfo" class="form-label">Contact Information</label>
+                        <input type="tel" class="form-control" id="contactInfo" name="contactInfo" pattern="^[0-9]{10}$" required>
+                        <div class="invalid-feedback">Please insert a valid contact number.</div>
+                    </div>
+                    <div class="col-12">
                         <label for="amount" class="form-label">Amount (RM)</label>
                         <input type="number" class="form-control" id="amount" name="amount" min="1" step="1" required>
                         <div class="invalid-feedback">Insert amount for your donation.</div>
