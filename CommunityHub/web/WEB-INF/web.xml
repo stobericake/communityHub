@@ -100,6 +100,10 @@
         <servlet-name>serviceFormServlet</servlet-name>
         <servlet-class>com.hub.controller.serviceFormServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>AdminEventDetails</servlet-name>
+        <servlet-class>com.hub.controller.AdminEventDetails</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -223,6 +227,10 @@
     <servlet-mapping>
         <servlet-name>serviceFormServlet</servlet-name>
         <url-pattern>/serviceForm</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AdminEventDetails</servlet-name>
+        <url-pattern>/adminEventDetail</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
