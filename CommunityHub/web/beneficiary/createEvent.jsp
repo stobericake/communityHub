@@ -150,10 +150,40 @@
 
 
 
-                            <div class="mb-3">
-                                <label for="eventImage" class="form-label">Event Image</label>
-                                <input type="file" class="form-control" id="eventImage" name="eventImage" accept="image/*">
-                            </div>
+                              <div class="mb-4">
+    <label for="eventImage" class="form-label fw-medium mb-2">Event Image</label>
+    <div class="d-flex align-items-start gap-4">
+        <!-- Image upload section -->
+        <div class="flex-grow-1">
+            <div class="upload-wrapper position-relative">
+                <!-- Hidden file input -->
+                <input type="file" 
+                       class="form-control"
+                       id="eventImage" 
+                       name="eventImage" 
+                       accept="image/*"
+                       style="height: auto;">
+                <!-- Upload status -->
+                <div id="uploadStatus" class="mt-2 small text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <span id="fileInfo">No file selected</span>
+                </div>
+            </div>
+        </div>
+        <!-- Image preview container -->
+        <div class="preview-container">
+            <div class="image-preview border rounded-3 overflow-hidden"id="imageContainer" 
+                 style="width: 120px; height: 120px; background-color: #f8f9fa; display:none">
+                <img id="imagePreview" 
+                     src="" 
+                     alt="Event Image" 
+                     class="w-100 h-100 object-fit-cover">
+                    
+            </div>
+        </div>
+                     
+    </div>
+</div>
                         </div>
 
                         <!-- Step 2: Location -->
@@ -184,8 +214,15 @@
                                 <!-- Postal Code and Country - Two Columns -->
                                 <div class="col-md-6">
                                     <label class="form-label fw-medium">Postal Code <span class="text-danger">*</span></label>
-                                    <input type="text" name="postalCode" class="form-control" placeholder="Enter your postal code" required 
-                                           pattern="[0-9]{5}" title="Please enter a valid 5-digit postal code" />
+                                    <input type="text" 
+                                           name="postalCode" 
+                                           class="form-control" 
+                                           placeholder="Enter your postal code" 
+                                           required 
+                                           pattern="[0-9]{5}" 
+                                           title="Please enter a valid 5-digit postal code" 
+                                           maxlength="5" 
+                                           inputmode="numeric" />
                                     <div class="form-text">5-digit postal code</div>
                                 </div>
 
@@ -322,7 +359,7 @@
                             <h5 class="mb-3">Verification</h5>
                             <p class="text-muted">Final verification step before submitting the form.</p>
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="termsCheck">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
                                 <label class="form-check-label" for="termsCheck">
                                     I confirm that all the details provided are correct.
                                 </label>
@@ -342,6 +379,19 @@
 
 
         <script>
+            document.querySelector('input[name="postalCode"]').addEventListener('input', function (event) {
+                const postalCodeInput = event.target;
+                const postalCodeValue = postalCodeInput.value;
+
+                // Ensure only digits are entered
+                postalCodeInput.value = postalCodeValue.replace(/\D/g, '');
+
+                // Limit to 5 digits
+                if (postalCodeValue.length > 5) {
+                    postalCodeInput.value = postalCodeValue.slice(0, 5);
+                }
+            });
+
             let currentStep = 1;
             const totalSteps = 5;
 
@@ -400,8 +450,17 @@
                     currentStep++;
                     updateSteps();
                 } else {
+                    // Check if the verification checkbox is checked
+                    const termsCheck = document.getElementById('termsCheck');
+                    if (!termsCheck.checked) {
+                        alert('Please confirm that all the details provided are correct before submitting.');
+                        return;
+                    }
+
+                    // If the checkbox is checked, submit the form
                     const nextBtn = document.getElementById('nextBtn');
                     nextBtn.setAttribute('type', 'submit');
+                    document.querySelector('form').submit(); // Submit the form
                 }
             }
 
@@ -445,6 +504,8 @@
             function addTask(event) {
                 event.preventDefault();
 
+                if(taskCount == 0)
+                    taskCount =1;
                 const taskList = document.getElementById('taskList');
                 const taskInput = document.getElementById('taskInput');
                 const taskName = taskInput.value.trim();
@@ -586,6 +647,36 @@
                         form.appendChild(nameInput);
                     });
                 });
+            });
+
+            document.querySelector('form').addEventListener('submit', function (event) {
+                const termsCheck = document.getElementById('termsCheck');
+                if (!termsCheck.checked) {
+                    event.preventDefault(); // Prevent form submission
+                    alert('Please confirm that all the details provided are correct before submitting.');
+                }
+            });
+
+            document.getElementById('eventImage').addEventListener('change', function (event) {
+                const file = event.target.files[0]; // Get the selected file
+                const imagePreview = document.getElementById('imagePreview');
+                const imageContainer = document.getElementById('imageContainer');
+
+                if (file) {
+                    const reader = new FileReader(); // Create a FileReader to read the file
+
+                    // Set up the FileReader onload event
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result; // Set the image source to the file data
+                        imagePreview.style.display = 'block'; // Show the image preview
+                         imageContainer.style.display = 'block';
+                    };
+
+                    reader.readAsDataURL(file); // Read the file as a Data URL
+                } else {
+                    imagePreview.src = '#'; // Reset the image source if no file is selected
+                    imagePreview.style.display = 'none'; // Hide the image preview
+                }
             });
         </script>
     </body>

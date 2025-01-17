@@ -192,41 +192,39 @@
 
 
                             <div class="mb-4">
-                                <label for="eventImage" class="form-label fw-medium mb-2">Event Image</label>
-
-                                <div class="d-flex align-items-start gap-4">
-                                    <!-- Image upload section -->
-                                    <div class="flex-grow-1">
-                                        <div class="upload-wrapper position-relative">
-                                            <!-- Hidden file input -->
-                                            <input type="file" 
-                                                   class="form-control"
-                                                   id="eventImage" 
-                                                   name="eventImage" 
-                                                   accept="image/*"
-                                                   style="height: auto;">
-
-                                            <!-- Upload status -->
-                                            <div id="uploadStatus" class="mt-2 small text-muted">
-                                                <i class="bi bi-info-circle me-1"></i>
-                                                <span id="fileInfo">No file selected</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Image preview container -->
-                                    <div class="preview-container">
-                                        <div class="image-preview border rounded-3 overflow-hidden" 
-                                             style="width: 120px; height: 120px; background-color: #f8f9fa;">
-                                            <img id="imagePreview" 
-                                                 src="getImage.do?type=events&id=<%= event.getEventID()%>" 
-                                                 alt="Event Image" 
-                                                 class="w-100 h-100 object-fit-cover"
-                                                 onerror="this.src='default-placeholder.jpg'; this.classList.add('p-2');">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+    <label for="eventImage" class="form-label fw-medium mb-2">Event Image</label>
+    <div class="d-flex align-items-start gap-4">
+        <!-- Image upload section -->
+        <div class="flex-grow-1">
+            <div class="upload-wrapper position-relative">
+                <!-- Hidden file input -->
+                <input type="file" 
+                       class="form-control"
+                       id="eventImage" 
+                       name="eventImage" 
+                       accept="image/*"
+                       style="height: auto;">
+                <!-- Upload status -->
+                <div id="uploadStatus" class="mt-2 small text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <span id="fileInfo">No file selected</span>
+                </div>
+            </div>
+        </div>
+        <!-- Image preview container -->
+        <div class="preview-container">
+            <div class="image-preview border rounded-3 overflow-hidden" 
+                 style="width: 120px; height: 120px; background-color: #f8f9fa;">
+                <img id="imagePreview" 
+                     src="getImage.do?type=events&id=<%= event.getEventID()%>" 
+                     alt="Event Image" 
+                     class="w-100 h-100 object-fit-cover"
+                     onerror="this.src='default-placeholder.jpg'; this.classList.add('p-2');">
+            </div>
+        </div>
+                     
+    </div>
+</div>
 
                         </div>
 
@@ -258,8 +256,17 @@
                                 <!-- Postal Code and Country - Two Columns -->
                                 <div class="col-md-6">
                                     <label class="form-label fw-medium">Postal Code <span class="text-danger">*</span></label>
-                                    <input type="text" name="postalCode" class="form-control" placeholder="Enter your postal code" value=<%= address.getPostalCode()%>  required 
-                                           pattern="[0-9]{5}" title="Please enter a valid 5-digit postal code" />
+                                    <input type="text" 
+                                           name="postalCode" 
+                                           class="form-control" 
+                                           placeholder="Enter your postal code" 
+                                           value="<%= address.getPostalCode()%>" 
+                                           required 
+                                           pattern="[0-9]{5}" 
+                                           title="Please enter a valid 5-digit postal code" 
+                                           maxlength="5"
+                                           inputmode="numeric" />
+
                                     <div class="form-text">5-digit postal code</div>
                                 </div>
 
@@ -441,7 +448,7 @@
                             <h5 class="mb-3">Verification</h5>
                             <p class="text-muted">Final verification step before submitting the form.</p>
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="termsCheck">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
                                 <label class="form-check-label" for="termsCheck">
                                     I confirm that all the details provided are correct.
                                 </label>
@@ -475,37 +482,37 @@
 
 
 
-            const eventImage = document.getElementById('eventImage');
-            const imagePreview = document.getElementById('imagePreview');
-            const uploadStatus = document.getElementById('uploadStatus');
-            const fileInfo = document.getElementById('fileInfo');
+const eventImage = document.getElementById('eventImage');
+const imagePreview = document.getElementById('imagePreview');
+const uploadStatus = document.getElementById('uploadStatus');
+const fileInfo = document.getElementById('fileInfo');
 
-            // Event listener for file input change
-            eventImage.addEventListener('change', (event) => {
-                const file = event.target.files[0]; // Get the selected file
+// Event listener for file input change
+eventImage.addEventListener('change', (event) => {
+    const file = event.target.files[0]; // Get the selected file
 
-                if (file) {
-                    const reader = new FileReader();
+    if (file) {
+        const reader = new FileReader();
 
-                    // Update the preview once the file is loaded
-                    reader.onload = function (e) {
-                        imagePreview.src = e.target.result; // Set image preview
-                        imagePreview.classList.remove('p-2'); // Ensure placeholder styling is removed
-                    };
+        // Update the preview once the file is loaded
+        reader.onload = function (e) {
+            imagePreview.src = e.target.result; // Set image preview
+            imagePreview.classList.remove('p-2'); // Ensure placeholder styling is removed
+        };
 
-                    reader.readAsDataURL(file); // Read the file as a Data URL
+        reader.readAsDataURL(file); // Read the file as a Data URL
 
-                    // Update the upload status
-                    fileInfo.textContent = `Selected file: ${file.name}`;
-                    uploadStatus.classList.remove('d-none');
-                } else {
-                    // Reset to default placeholder if no file is selected
-                    imagePreview.src = 'default-placeholder.jpg';
-                    imagePreview.classList.add('p-2');
-                    fileInfo.textContent = 'No file selected';
-                    uploadStatus.classList.remove('d-none');
-                }
-            });
+        // Update the upload status
+        fileInfo.textContent = `Selected file: ${file.name}`;
+        uploadStatus.classList.remove('d-none');
+    } else {
+        // Reset to the existing image if no file is selected
+        imagePreview.src = "getImage.do?type=events&id=<%= event.getEventID()%>";
+        imagePreview.classList.remove('p-2');
+        fileInfo.textContent = 'No file selected';
+        uploadStatus.classList.remove('d-none');
+    }
+});
 
             let currentStep = 1;
             const totalSteps = 5;
@@ -565,8 +572,17 @@
                     currentStep++;
                     updateSteps();
                 } else {
+                    // Check if the verification checkbox is checked
+                    const termsCheck = document.getElementById('termsCheck');
+                    if (!termsCheck.checked) {
+                        alert('Please confirm that all the details provided are correct before submitting.');
+                        return;
+                    }
+
+                    // If the checkbox is checked, submit the form
                     const nextBtn = document.getElementById('nextBtn');
                     nextBtn.setAttribute('type', 'submit');
+                    document.querySelector('form').submit(); // Submit the form
                 }
             }
 
@@ -614,13 +630,13 @@
                 taskCount = taskTotal + 1;
             }
 
-            // Toggle Empty State Visibility// Toggle Empty State Visibility
+
             function toggleEmptyState() {
                 const taskList = document.getElementById('taskList');
                 const emptyStateRow = taskList.querySelector('#emptyState');
                 const taskRows = taskList.querySelectorAll('tr .task-name');
                 if (taskRows.length === 0 && !emptyStateRow) {
-                    // Create and append the empty state row
+
                     const row = document.createElement('tr');
                     row.id = 'emptyState';
                     row.innerHTML = `
@@ -631,7 +647,6 @@
         `;
                     taskList.appendChild(row);
                 } else if (taskRows.length > 0 && emptyStateRow) {
-                    // Remove the empty state row if there are task rows
                     taskList.removeChild(emptyStateRow);
                 }
             }
@@ -767,6 +782,26 @@
             }
 
 
+            document.querySelector('form').addEventListener('submit', function (event) {
+                const termsCheck = document.getElementById('termsCheck');
+                if (!termsCheck.checked) {
+                    event.preventDefault(); // Prevent form submission
+                    alert('Please confirm that all the details provided are correct before submitting.');
+                }
+            });
+
+            document.querySelector('input[name="postalCode"]').addEventListener('input', function (event) {
+                const postalCodeInput = event.target;
+                const postalCodeValue = postalCodeInput.value;
+
+                // Ensure only digits are entered
+                postalCodeInput.value = postalCodeValue.replace(/\D/g, '');
+
+                // Limit to 5 digits
+                if (postalCodeValue.length > 5) {
+                    postalCodeInput.value = postalCodeValue.slice(0, 5);
+                }
+            });
 
         </script>
     </body>
