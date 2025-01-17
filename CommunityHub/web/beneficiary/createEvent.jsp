@@ -114,19 +114,19 @@
                     <div class="px-4">
                         <!-- Step 1: User Name -->
                         <div class="form-section active" data-step="1">
-                            <h5 class="mb-2">EVENT INFORMATION</h5>
+                            <h5 class="mb-2 fw-bold">EVENT INFORMATION</h5>
                             <p class="text-muted mb-4">Provide your event details</p>
                             <div class="mb-3">
-                                <label for="eventName" class="form-label">Event Name</label>
+                                <label for="eventName" class="form-label">Event Name<span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="eventName" name="eventName" placeholder="Enter your event name" required>
                             </div>
                             <div class="mb-3">
-                                <label for="eventDescription" class="form-label">Event Description</label>
+                                <label for="eventDescription" class="form-label">Event Description<span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="eventDescription" name="eventDescription" rows="3" placeholder="Enter your event description" ></textarea>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label for="numParticipants" class="form-label">Total Participants</label>
+                                    <label for="numParticipants" class="form-label">Total Participants<span class="text-danger">*</span></label>
                                     <input type="number" 
                                            class="form-control" 
                                            id="numParticipants" 
@@ -135,7 +135,7 @@
                                            placeholder="Enter total participants">   
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="donationLimit" class="form-label">Donation Limit</label>
+                                    <label for="donationLimit" class="form-label">Donation Limit <span class="text-danger">*</span> </label>
                                     <input type="number" 
                                            class="form-control" 
                                            id="donationLimit" 
@@ -151,7 +151,7 @@
 
 
                             <div class="mb-4">
-                                <label for="eventImage" class="form-label fw-medium mb-2">Event Image</label>
+                                <label for="eventImage" class="form-label fw-medium mb-2"> Event Image<span class="text-danger">*</span></label>
                                 <div class="d-flex align-items-start gap-4">
                                     <!-- Image upload section -->
                                     <div class="flex-grow-1">
@@ -189,7 +189,7 @@
                         <!-- Step 2: Location -->
                         <div class="form-section" data-step="2">
                             <div class="border-bottom mb-4">
-                                <h5 class="mb-2">LOCATION INFORMATION</h5>
+                                <h5 class="mb-2 fw-bold">LOCATION INFORMATION</h5>
                                 <p class="text-muted mb-4">Provide your address details</p>
                             </div>
 
@@ -208,8 +208,27 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-medium">State <span class="text-danger">*</span></label>
-                                    <input type="text" name="state" class="form-control" placeholder="Enter your state" required />
+                                    <select name="state" class="form-control" required>
+                                        <option value="" disabled selected>Select your state</option>
+                                        <option value="Johor">Johor</option>
+                                        <option value="Kedah">Kedah</option>
+                                        <option value="Kelantan">Kelantan</option>
+                                        <option value="Melaka">Melaka</option>
+                                        <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                        <option value="Pahang">Pahang</option>
+                                        <option value="Penang">Penang</option>
+                                        <option value="Perak">Perak</option>
+                                        <option value="Perlis">Perlis</option>
+                                        <option value="Sabah">Sabah</option>
+                                        <option value="Sarawak">Sarawak</option>
+                                        <option value="Selangor">Selangor</option>
+                                        <option value="Terengganu">Terengganu</option>
+                                        <option value="Kuala Lumpur">Kuala Lumpur</option>
+                                        <option value="Labuan">Labuan</option>
+                                        <option value="Putrajaya">Putrajaya</option>
+                                    </select>
                                 </div>
+
 
                                 <!-- Postal Code and Country - Two Columns -->
                                 <div class="col-md-6">
@@ -228,8 +247,16 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-medium">Country</label>
-                                    <input type="text" name="country" class="form-control"  value="Malaysia" readonly />
+                                    <input 
+                                        type="text" 
+                                        name="country" 
+                                        class="form-control"  
+                                        value="Malaysia" 
+                                        readonly 
+                                        style="background-color: #f8f9fa; color: #6c757d; border: 1px solid #ced4da;" 
+                                        />
                                 </div>
+
                             </div>
 
                             <!-- Optional Hint Text -->
@@ -241,7 +268,7 @@
 
                         <div class="form-section" data-step="3">
                             <div class="border-bottom mb-4">
-                                <h5 class="mb-2">EVENT DETAILS</h5>
+                                <h5 class="mb-2 fw-bold">DATE & TIME DETAILS</h5>
                                 <p class="text-muted mb-4">Please provide your event schedule information</p>
                             </div>
 

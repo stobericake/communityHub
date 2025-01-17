@@ -133,7 +133,7 @@
 
                         <div class="d-flex justify-content-end align-items-center">
                             <a href="addDonor.do?eventID=<%= event.getEventID() %>" class="donate-btn"><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
-                            <a href="vEvent.do?eventID=<%= event.getEventID() %>" class="volunteer-button">View Details</a>
+                            <a href="eventDetailGuest?eventID=<%= event.getEventID() %>" class="volunteer-button">View Details</a>
                         </div>
                     </div>
                 </div>

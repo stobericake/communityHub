@@ -153,20 +153,20 @@
                     <div class="px-4">
                         <!-- Step 1: User Name -->
                         <div class="form-section active" data-step="1">
-                            <h5 class="mb-2">EVENT INFORMATION</h5>
+                            <h5 class="mb-2 fw-bold">EVENT INFORMATION</h5>
                             <p class="text-muted mb-4">Update your event details</p>
                             <div class="mb-3">
-                                <label for="eventName" class="form-label">Event Name</label>
+                                <label for="eventName" class="form-label">Event Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="eventName" name="eventName" placeholder="Enter your event name" value=<%= event.getName()%> required>
 
                             </div>
                             <div class="mb-3">
-                                <label for="eventDescription" class="form-label">Event Description</label>
+                                <label for="eventDescription" class="form-label">Event Description <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="eventDescription" name="eventDescription" rows="3" placeholder="Enter your event description"><%= event.getDescription()%></textarea>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-6">
-                                    <label for="numParticipants" class="form-label">Total Participants</label>
+                                    <label for="numParticipants" class="form-label">Total Participants <span class="text-danger">*</span></label>
                                     <input type="number" 
                                            class="form-control" 
                                            id="numParticipants" 
@@ -176,7 +176,7 @@
                                            value="<%= event.getVolunteersNeeded()%>">
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="donationLimit" class="form-label">Donation Limit</label>
+                                    <label for="donationLimit" class="form-label">Donation Limit <span class="text-danger">*</span></label>
                                     <input type="number" 
                                            class="form-control" 
                                            id="donationLimit" 
@@ -192,46 +192,46 @@
 
 
                             <div class="mb-4">
-    <label for="eventImage" class="form-label fw-medium mb-2">Event Image</label>
-    <div class="d-flex align-items-start gap-4">
-        <!-- Image upload section -->
-        <div class="flex-grow-1">
-            <div class="upload-wrapper position-relative">
-                <!-- Hidden file input -->
-                <input type="file" 
-                       class="form-control"
-                       id="eventImage" 
-                       name="eventImage" 
-                       accept="image/*"
-                       style="height: auto;">
-                <!-- Upload status -->
-                <div id="uploadStatus" class="mt-2 small text-muted">
-                    <i class="bi bi-info-circle me-1"></i>
-                    <span id="fileInfo">No file selected</span>
-                </div>
-            </div>
-        </div>
-        <!-- Image preview container -->
-        <div class="preview-container">
-            <div class="image-preview border rounded-3 overflow-hidden" 
-                 style="width: 120px; height: 120px; background-color: #f8f9fa;">
-                <img id="imagePreview" 
-                     src="getImage.do?type=events&id=<%= event.getEventID()%>" 
-                     alt="Event Image" 
-                     class="w-100 h-100 object-fit-cover"
-                     onerror="this.src='default-placeholder.jpg'; this.classList.add('p-2');">
-            </div>
-        </div>
-                     
-    </div>
-</div>
+                                <label for="eventImage" class="form-label fw-medium mb-2">Event Image <span class="text-danger">*</span> </label>
+                                <div class="d-flex align-items-start gap-4">
+                                    <!-- Image upload section -->
+                                    <div class="flex-grow-1">
+                                        <div class="upload-wrapper position-relative">
+                                            <!-- Hidden file input -->
+                                            <input type="file" 
+                                                   class="form-control"
+                                                   id="eventImage" 
+                                                   name="eventImage" 
+                                                   accept="image/*"
+                                                   style="height: auto;">
+                                            <!-- Upload status -->
+                                            <div id="uploadStatus" class="mt-2 small text-muted">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                <span id="fileInfo">No file selected</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Image preview container -->
+                                    <div class="preview-container">
+                                        <div class="image-preview border rounded-3 overflow-hidden" 
+                                             style="width: 120px; height: 120px; background-color: #f8f9fa;">
+                                            <img id="imagePreview" 
+                                                 src="getImage.do?type=events&id=<%= event.getEventID()%>" 
+                                                 alt="Event Image" 
+                                                 class="w-100 h-100 object-fit-cover"
+                                                 onerror="this.src='default-placeholder.jpg'; this.classList.add('p-2');">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
 
                         </div>
 
                         <!-- Step 2: Location -->
                         <div class="form-section" data-step="2">
                             <div class="border-bottom mb-4">
-                                <h5 class="mb-2">LOCATION INFORMATION</h5>
+                                <h5 class="mb-2 fw-bold">LOCATION INFORMATION</h5>
                                 <p class="text-muted mb-4">Provide your address details</p>
                             </div>
 
@@ -250,8 +250,27 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-medium">State <span class="text-danger">*</span></label>
-                                    <input type="text" name="state" class="form-control" placeholder="Enter your state" value=<%= address.getState()%>  required />
+                                    <select name="state" class="form-control" required>
+                                        <option value="" disabled selected>Select your state</option>
+                                        <option value="Johor" <%= address.getState().equals("Johor") ? "selected" : ""%>>Johor</option>
+                                        <option value="Kedah" <%= address.getState().equals("Kedah") ? "selected" : ""%>>Kedah</option>
+                                        <option value="Kelantan" <%= address.getState().equals("Kelantan") ? "selected" : ""%>>Kelantan</option>
+                                        <option value="Melaka" <%= address.getState().equals("Melaka") ? "selected" : ""%>>Melaka</option>
+                                        <option value="Negeri Sembilan" <%= address.getState().equals("Negeri Sembilan") ? "selected" : ""%>>Negeri Sembilan</option>
+                                        <option value="Pahang" <%= address.getState().equals("Pahang") ? "selected" : ""%>>Pahang</option>
+                                        <option value="Penang" <%= address.getState().equals("Penang") ? "selected" : ""%>>Penang</option>
+                                        <option value="Perak" <%= address.getState().equals("Perak") ? "selected" : ""%>>Perak</option>
+                                        <option value="Perlis" <%= address.getState().equals("Perlis") ? "selected" : ""%>>Perlis</option>
+                                        <option value="Sabah" <%= address.getState().equals("Sabah") ? "selected" : ""%>>Sabah</option>
+                                        <option value="Sarawak" <%= address.getState().equals("Sarawak") ? "selected" : ""%>>Sarawak</option>
+                                        <option value="Selangor" <%= address.getState().equals("Selangor") ? "selected" : ""%>>Selangor</option>
+                                        <option value="Terengganu" <%= address.getState().equals("Terengganu") ? "selected" : ""%>>Terengganu</option>
+                                        <option value="Kuala Lumpur" <%= address.getState().equals("Kuala Lumpur") ? "selected" : ""%>>Kuala Lumpur</option>
+                                        <option value="Labuan" <%= address.getState().equals("Labuan") ? "selected" : ""%>>Labuan</option>
+                                        <option value="Putrajaya" <%= address.getState().equals("Putrajaya") ? "selected" : ""%>>Putrajaya</option>
+                                    </select>
                                 </div>
+
 
                                 <!-- Postal Code and Country - Two Columns -->
                                 <div class="col-md-6">
@@ -272,7 +291,9 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-medium">Country</label>
-                                    <input type="text" name="country" class="form-control"  value="Malaysia" value=<%= address.getCountry()%>  readonly />
+                                    <input type="text" name="country" class="form-control"  value="Malaysia"   
+                                           style="background-color: #f8f9fa; color: #6c757d; border: 1px solid #ced4da;"  
+                                           value=<%= address.getCountry()%>  readonly />
                                 </div>
                             </div>
 
@@ -285,7 +306,7 @@
 
                         <div class="form-section" data-step="3">
                             <div class="border-bottom mb-4">
-                                <h5 class="mb-2">EVENT DETAILS</h5>
+                                <h5 class="mb-2 fw-bold">DATE & TIME DETAILS</h5>
                                 <p class="text-muted mb-4">Please provide your event schedule information</p>
                             </div>
 
@@ -445,7 +466,7 @@
                         </div>
 
                         <div class="form-section" data-step="5">
-                            <h5 class="mb-3">Verification</h5>
+                            <h5 class="mb-3 fw-bold">Verification</h5>
                             <p class="text-muted">Final verification step before submitting the form.</p>
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" id="termsCheck" required>
@@ -482,37 +503,37 @@
 
 
 
-const eventImage = document.getElementById('eventImage');
-const imagePreview = document.getElementById('imagePreview');
-const uploadStatus = document.getElementById('uploadStatus');
-const fileInfo = document.getElementById('fileInfo');
+            const eventImage = document.getElementById('eventImage');
+            const imagePreview = document.getElementById('imagePreview');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const fileInfo = document.getElementById('fileInfo');
 
 // Event listener for file input change
-eventImage.addEventListener('change', (event) => {
-    const file = event.target.files[0]; // Get the selected file
+            eventImage.addEventListener('change', (event) => {
+                const file = event.target.files[0]; // Get the selected file
 
-    if (file) {
-        const reader = new FileReader();
+                if (file) {
+                    const reader = new FileReader();
 
-        // Update the preview once the file is loaded
-        reader.onload = function (e) {
-            imagePreview.src = e.target.result; // Set image preview
-            imagePreview.classList.remove('p-2'); // Ensure placeholder styling is removed
-        };
+                    // Update the preview once the file is loaded
+                    reader.onload = function (e) {
+                        imagePreview.src = e.target.result; // Set image preview
+                        imagePreview.classList.remove('p-2'); // Ensure placeholder styling is removed
+                    };
 
-        reader.readAsDataURL(file); // Read the file as a Data URL
+                    reader.readAsDataURL(file); // Read the file as a Data URL
 
-        // Update the upload status
-        fileInfo.textContent = `Selected file: ${file.name}`;
-        uploadStatus.classList.remove('d-none');
-    } else {
-        // Reset to the existing image if no file is selected
-        imagePreview.src = "getImage.do?type=events&id=<%= event.getEventID()%>";
-        imagePreview.classList.remove('p-2');
-        fileInfo.textContent = 'No file selected';
-        uploadStatus.classList.remove('d-none');
-    }
-});
+                    // Update the upload status
+                    fileInfo.textContent = `Selected file: ${file.name}`;
+                    uploadStatus.classList.remove('d-none');
+                } else {
+                    // Reset to the existing image if no file is selected
+                    imagePreview.src = "getImage.do?type=events&id=<%= event.getEventID()%>";
+                    imagePreview.classList.remove('p-2');
+                    fileInfo.textContent = 'No file selected';
+                    uploadStatus.classList.remove('d-none');
+                }
+            });
 
             let currentStep = 1;
             const totalSteps = 5;

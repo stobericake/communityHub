@@ -90,7 +90,7 @@ public class listEventMgmt extends HttpServlet {
                         + "e.description, e.volunteerNeeded, e.status, e.addressID, "
                         + "a.city, a.state, a.country, a.street, a.postalCode, a.addressID "
                         + "FROM events e JOIN address a ON e.addressID = a.addressID "
-                        + "WHERE e.beneficiaryID = ?")) {
+                        + "WHERE e.beneficiaryID = ?  AND  CURDATE() < e.date")) {
 
             stmt.setInt(1, Integer.parseInt(beneficiaryID));
             try (ResultSet rs = stmt.executeQuery()) {
