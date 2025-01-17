@@ -150,40 +150,40 @@
 
 
 
-                              <div class="mb-4">
-    <label for="eventImage" class="form-label fw-medium mb-2">Event Image</label>
-    <div class="d-flex align-items-start gap-4">
-        <!-- Image upload section -->
-        <div class="flex-grow-1">
-            <div class="upload-wrapper position-relative">
-                <!-- Hidden file input -->
-                <input type="file" 
-                       class="form-control"
-                       id="eventImage" 
-                       name="eventImage" 
-                       accept="image/*"
-                       style="height: auto;">
-                <!-- Upload status -->
-                <div id="uploadStatus" class="mt-2 small text-muted">
-                    <i class="bi bi-info-circle me-1"></i>
-                    <span id="fileInfo">No file selected</span>
-                </div>
-            </div>
-        </div>
-        <!-- Image preview container -->
-        <div class="preview-container">
-            <div class="image-preview border rounded-3 overflow-hidden"id="imageContainer" 
-                 style="width: 120px; height: 120px; background-color: #f8f9fa; display:none">
-                <img id="imagePreview" 
-                     src="" 
-                     alt="Event Image" 
-                     class="w-100 h-100 object-fit-cover">
-                    
-            </div>
-        </div>
-                     
-    </div>
-</div>
+                            <div class="mb-4">
+                                <label for="eventImage" class="form-label fw-medium mb-2">Event Image</label>
+                                <div class="d-flex align-items-start gap-4">
+                                    <!-- Image upload section -->
+                                    <div class="flex-grow-1">
+                                        <div class="upload-wrapper position-relative">
+                                            <!-- Hidden file input -->
+                                            <input type="file" 
+                                                   class="form-control"
+                                                   id="eventImage" 
+                                                   name="eventImage" 
+                                                   accept="image/*"
+                                                   style="height: auto;">
+                                            <!-- Upload status -->
+                                            <div id="uploadStatus" class="mt-2 small text-muted">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                <span id="fileInfo">No file selected</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Image preview container -->
+                                    <div class="preview-container">
+                                        <div class="image-preview border rounded-3 overflow-hidden"id="imageContainer" 
+                                             style="width: 120px; height: 120px; background-color: #f8f9fa; display:none">
+                                            <img id="imagePreview" 
+                                                 src="" 
+                                                 alt="Event Image" 
+                                                 class="w-100 h-100 object-fit-cover">
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Step 2: Location -->
@@ -504,8 +504,8 @@
             function addTask(event) {
                 event.preventDefault();
 
-                if(taskCount == 0)
-                    taskCount =1;
+                if (taskCount == 0)
+                    taskCount = 1;
                 const taskList = document.getElementById('taskList');
                 const taskInput = document.getElementById('taskInput');
                 const taskName = taskInput.value.trim();
@@ -669,7 +669,7 @@
                     reader.onload = function (e) {
                         imagePreview.src = e.target.result; // Set the image source to the file data
                         imagePreview.style.display = 'block'; // Show the image preview
-                         imageContainer.style.display = 'block';
+                        imageContainer.style.display = 'block';
                     };
 
                     reader.readAsDataURL(file); // Read the file as a Data URL
