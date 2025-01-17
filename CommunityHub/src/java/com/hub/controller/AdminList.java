@@ -42,7 +42,7 @@ public class AdminList extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet adminList2</title>");            
+            out.println("<title>Servlet adminList2</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet adminList2 at " + request.getContextPath() + "</h1>");
@@ -63,20 +63,31 @@ public class AdminList extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-         Connection conn = null;
+
+        Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try {
             conn = dbconnection.getConnection();
-            if (conn == null) {
-                System.out.println("DB Connection: " + (conn != null));
-                return;
+            String sortBy = request.getParameter("sortBy") != null ? request.getParameter("sortBy") : "eventID";
+            String monthFilter = request.getParameter("month");
+
+            // Base SQL for counting total events
+            StringBuilder countSql = new StringBuilder(
+                    "SELECT COUNT(*) as total FROM events WHERE status = 1 AND (date > CURDATE() OR (date = CURDATE() AND time > CURTIME()))"
+            );
+
+            // Add month filter if selected
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                countSql.append(" AND MONTH(date) = ?");
             }
 
-            String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE e.status = 1";
-            stmt = conn.prepareStatement(countSql);
+            stmt = conn.prepareStatement(countSql.toString());
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                stmt.setInt(1, Integer.parseInt(monthFilter));
+            }
+
             rs = stmt.executeQuery();
             rs.next();
             int totalEvents = rs.getInt("total");
@@ -86,16 +97,53 @@ public class AdminList extends HttpServlet {
             int offset = (currentPage - 1) * eventsPerPage;
             int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
 
-            String sql = "SELECT e.eventID, e.name, e.date, e.time, e.duration, e.description, e.volunteerNeeded, e.status, "
-                    + "e.image, e.donationLimit, a.addressID, a.country, a.postalCode, a.street, a.city, a.state "
-                    + "FROM events e JOIN address a ON e.addressID = a.addressID WHERE e.status = 1 ORDER BY e.eventID DESC LIMIT ? OFFSET ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, eventsPerPage);
-            stmt.setInt(2, offset);
+            // Base SQL for fetching events
+            StringBuilder sql = new StringBuilder(
+                    "SELECT e.*, a.* FROM events e "
+                    + "JOIN address a ON e.addressID = a.addressID "
+                    + "WHERE e.status = 1 AND (e.date > CURDATE() OR (e.date = CURDATE() AND e.time > CURTIME()))"
+            );
+
+            // Add month filter if selected
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                sql.append(" AND MONTH(e.date) = ?");
+            }
+
+            // Add sorting
+            sql.append(" ORDER BY ");
+            switch (sortBy) {
+                case "eventID":
+                    sql.append("e.eventID ASC"); // Earlier created events first
+                    break;
+                case "date":
+                    sql.append("e.date ASC, e.time ASC");
+                    break;
+                case "donationLimit":
+                    sql.append("e.donationLimit DESC");
+                    break;
+                case "volunteerNeeded":
+                    sql.append("e.volunteerNeeded DESC");
+                    break;
+                default:
+                    sql.append("e.eventID ASC");
+            }
+
+            sql.append(" LIMIT ? OFFSET ?");
+
+            stmt = conn.prepareStatement(sql.toString());
+            int paramIndex = 1;
+
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+            stmt.setInt(paramIndex++, eventsPerPage);
+            stmt.setInt(paramIndex, offset);
+
             rs = stmt.executeQuery();
 
             ArrayList<events> events = new ArrayList<>();
             ArrayList<address> addresses = new ArrayList<>();
+
             while (rs.next()) {
                 address address = new address(
                         rs.getInt("addressID"),
@@ -105,8 +153,6 @@ public class AdminList extends HttpServlet {
                         rs.getString("city"),
                         rs.getString("state")
                 );
-
-                // Add address object to the addresses list
                 addresses.add(address);
 
                 events event = new events(
@@ -122,24 +168,18 @@ public class AdminList extends HttpServlet {
                         rs.getDouble("donationLimit"),
                         rs.getInt("addressID")
                 );
-
-                // Add event object to the events list
                 events.add(event);
             }
 
-            System.out.println("Events size: " + events.size());
-            System.out.println("Total pages: " + totalPages);
-            // Set attributes for both lists
             request.setAttribute("events", events);
             request.setAttribute("addresses", addresses);
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("currentPage", currentPage);
+            request.setAttribute("sortBy", sortBy);
+            request.setAttribute("monthFilter", monthFilter);
 
             request.getRequestDispatcher("admin/adminListing.jsp").forward(request, response);
-                 
-                    
 
-              
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException ex) {
@@ -172,10 +212,7 @@ public class AdminList extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-       
 
-      
     }
 
     /**

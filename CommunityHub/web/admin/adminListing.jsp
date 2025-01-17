@@ -97,6 +97,27 @@
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="sortBy" onchange="updateFilters()">
+                        <option value="eventID" <%= "eventID".equals(request.getAttribute("sortBy")) ? "selected" : ""%>>Sort by Creation Order</option>
+                        <option value="date" <%= "date".equals(request.getAttribute("sortBy")) ? "selected" : ""%>>Sort by Event Date</option>
+                        <option value="donationLimit" <%= "donationLimit".equals(request.getAttribute("sortBy")) ? "selected" : ""%>>Sort by Donation Limit</option>
+                        <option value="volunteerNeeded" <%= "volunteerNeeded".equals(request.getAttribute("sortBy")) ? "selected" : ""%>>Sort by Volunteers Needed</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="monthFilter" onchange="updateFilters()">
+                        <option value="">All Months</option>
+                        <%
+                            String[] months = {"January", "February", "March", "April", "May", "June",
+                                "July", "August", "September", "October", "November", "December"};
+                            for (int i = 0; i < months.length; i++) {
+                                String selected = String.valueOf(i + 1).equals(request.getAttribute("monthFilter")) ? "selected" : "";
+                        %>
+                        <option value="<%= i + 1%>" <%= selected%>><%= months[i]%></option>
+                        <% } %>
+                    </select>
+                </div>
             </div>
 
             <!-- Events Grid -->
@@ -120,7 +141,9 @@
                 %>
                 <div class="col-md-4">
                     <div class="card h-100 event-card shadow" data-title="<%= name%>" data-description="<%= desc%>" data-location="<%= city%>">
-                        <img src="getImage.do?type=events&id=<%= eventID%>" class="card-img-top" alt="Event Image">
+                        <a href="adminEventDetail?eventID=<%= eventID%>">
+                            <img src="getImage.do?type=events&id=<%= eventID%>" class="card-img-top" alt="Event Image">
+                        </a>
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title fw-bold"><%= name%></h5>
                             <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= desc%></p>
@@ -206,6 +229,21 @@
                         card.closest('.col-md-4').style.display = 'none';
                     }
                 });
+            }
+
+            function updateFilters() {
+                const sortBy = document.getElementById('sortBy').value;
+                const monthFilter = document.getElementById('monthFilter').value;
+
+                let url = new URL(window.location.href);
+                url.searchParams.set('sortBy', sortBy);
+                if (monthFilter) {
+                    url.searchParams.set('month', monthFilter);
+                } else {
+                    url.searchParams.delete('month');
+                }
+                url.searchParams.set('page', '1'); // Reset to first page when filters change
+                window.location.href = url.toString();
             }
 
             document.getElementById('searchInput').addEventListener('input', filterEvents);
