@@ -1,3 +1,5 @@
+<%@page import="java.text.DecimalFormat"%>
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.cm.model.donation"%>
 <%@page import="com.cm.model.events"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -226,7 +228,9 @@
                     int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
 
                     int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
-                    
+                    DecimalFormat df = new DecimalFormat("#.00");
+                    String totalDon = df.format(totalDonation);
+                    String latestDon = df.format(latestDonation);
                 %>
                 <!-- Total Donation Section -->
                 <div class="donation-section">
@@ -234,7 +238,7 @@
                         <i class="bi bi-bank2"></i>
                     </div>
                     <div>
-                        <p class="donation-amount">RM<%= totalDonation %></p>
+                        <p class="donation-amount">RM<%= totalDon %></p>
                         <p class="donation-text">Total Donation</p>
                     </div>
                 </div>
@@ -245,7 +249,7 @@
                         <i class="bi bi-receipt"></i>
                     </div>
                     <div>
-                        <p class="donation-amount">RM<%= latestDonation %></p>
+                        <p class="donation-amount">RM<%= latestDon %></p>
                         <p class="donation-text">Latest Donation</p>
                     </div>
                 </div>
@@ -268,15 +272,17 @@
             <%
                 for (int i = 0; i < events.size(); i++) {
                     events event = events.get(i);
-                    donation donation = donations.get(i);      
+                    donation donation = donations.get(i);  
+                    String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(donation.getDate());
+                    String amount = df.format(donation.getAmount());
             %>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <table class="event-table">
                         <tr>
-                            <td><%= i %>.</td>
+                            <td><%= i+1 %>.</td>
                             <td><%= event.getName() %></td>
-                            <td><%= donation.getDate() %></td>
-                            <td>RM<%=  donation.getAmount() %></td>
+                            <td><%= formattedDate %></td>
+                            <td>RM<%=  amount %></td>
                             <td><button class="view-details-button" data-bs-toggle="modal" data-bs-target="#receiptOverlay">View Receipt</button></td>
                         </tr>
                     </table>
