@@ -84,7 +84,7 @@
             <div class="row align-items-center mb-4">
                 <div class="col-md-4">
                     <h1 class="page-header">MY EVENT</h1>
-                    <h6 class="page-subheader">The tables below show all of the events</h6>
+                    <h6 class="page-subheader">The tables below show all of the events that you joined</h6>
             </div>
 
                 <div class="col-md-4 offset-md-4">
