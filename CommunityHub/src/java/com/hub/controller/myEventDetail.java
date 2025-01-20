@@ -9,6 +9,7 @@ package com.hub.controller;
 import com.cm.model.address;
 import com.cm.model.beneficiary;
 import com.cm.model.events;
+import com.cm.model.eventsVolunteer;
 import com.cm.model.task;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -82,6 +83,7 @@ public class myEventDetail extends HttpServlet {
             address address = null;
             beneficiary beneficiary = null;
             task tasks = null;
+            eventsVolunteer ev = null;
 
             if (eventID != 0) {
                 try {
@@ -109,14 +111,21 @@ public class myEventDetail extends HttpServlet {
                                 rs.getDouble("donationLimit"),
                                 rs.getInt("addressID")
                         );
+                        eventsVolunteer eventsVolunteer = new eventsVolunteer(
+                                rs.getInt("eventsVolunteerID"),
+                                rs.getInt("eventID"),
+                                rs.getInt("volunteerID"),
+                                rs.getInt("attendance")
+                        );
+                        
                         address = new address(
-                                        rs.getInt("addressID"),
-                                        rs.getString("country"),
-                                        rs.getInt("postalCode"),
-                                        rs.getString("street"),
-                                        rs.getString("city"),
-                                        rs.getString("state")
-                                );
+                                rs.getInt("addressID"),
+                                rs.getString("country"),
+                                rs.getInt("postalCode"),
+                                rs.getString("street"),
+                                rs.getString("city"),
+                                rs.getString("state")
+                        );
 
                         beneficiary = new beneficiary(
                                 rs.getInt("beneficiaryID"), 
@@ -129,7 +138,7 @@ public class myEventDetail extends HttpServlet {
                         );
 
                         SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mma");
-                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("MM/dd/yyyy - ");
+                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
                         // Convert `eventDate` to LocalDate (compatible approach)
                         LocalDate eventLocalDate = new java.util.Date(rs.getDate("date").getTime())
@@ -156,6 +165,7 @@ public class myEventDetail extends HttpServlet {
                         request.setAttribute("address", address);
                         request.setAttribute("beneficiary", beneficiary);
                         request.setAttribute("task", tasks);
+                        request.setAttribute("eventsVolunteer", eventsVolunteer);
                         
                         request.getRequestDispatcher("/volunteer/myEventDetail.jsp").forward(request, response);
                         } 
@@ -204,10 +214,78 @@ public class myEventDetail extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            // Check if eventId and status are provided
+            String eventIdParam = request.getParameter("eventId");
+            String attendanceParam = request.getParameter("attendance");
+
+            if (eventIdParam == null || attendanceParam == null) {
+                response.sendRedirect("index.jsp?msg=missing_params");
+                return;
+            }
+
+            // Parse eventId and status, handling invalid input
+            int eventId = 0;
+            int attendance = 0;
+
+            try {
+                eventId = Integer.parseInt(eventIdParam);
+                attendance = Integer.parseInt(attendanceParam);
+            } catch (NumberFormatException e) {
+                response.sendRedirect("index.jsp?msg=invalid_input");
+                return;
+            }
+
+            if (attendance != 0 && attendance != 1 && attendance != 2) {
+                response.sendRedirect("index.jsp?msg=invalid_status");
+                return;
+            }
+
+            Integer volunteerID = (Integer) request.getSession().getAttribute("volunteer");
+            if (volunteerID == null) {
+                response.sendRedirect("index.jsp?msg=not_logged_in");
+                return;
+            }
+            
+            // Database connection
+            conn = dbconnection.getConnection();
+            String sql = "UPDATE eventsVolunteer SET attendance = ? WHERE eventID = ? AND volunteerID = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, attendance);
+            stmt.setInt(2, eventId);
+            stmt.setInt(3, volunteerID);
+
+            // Execute the update
+            int rowsUpdated = stmt.executeUpdate();
+            if (rowsUpdated > 0) {
+                response.sendRedirect("success.jsp?msg=SAttendance Recorded");
+//                RequestDispatcher view = request.getRequestDispatcher("/success.jsp");
+//                view.forward(request, response);
+            } else {
+                response.sendRedirect("index.jsp?msg=error");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("index.jsp?msg=exception");
+        } finally {
+            // Clean up resources
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
+
 
     /**
      * Returns a short description of the servlet.

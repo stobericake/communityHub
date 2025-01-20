@@ -47,5 +47,13 @@ public class eventsVolunteer implements Serializable{
     public void setVolunteerID(int volunteerID) {
         this.volunteerID = volunteerID;
     }
+    
+    public int getAttendance() {
+        return attendance;
+    }
+
+    public void setAttendance(int attendance) {
+        this.attendance = attendance;
+    }
 }
 

@@ -16,33 +16,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
-        body {
-                font-family: 'Poppins', sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f8f9fa;
-            }
-        .container {
-                margin: auto;
-                padding: 10px;
-            }
-        header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-               
-            }
-
-            header h1, header h2 {
-                font-family: 'Poppins', sans-serif;
-                margin: 0;
-            }
-            
-            
+        .table-dark th {
+           background-color: #2F6690 !important;
+        }
+                
         .donation-card {
             width: 1000px;
             border: 1px solid #e6e6f2;
-            border-radius: 12px;
+            border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 30px;
             display: flex;
@@ -53,7 +34,7 @@
         .center-card {
             display: flex;
             justify-content: center; /* Center horizontally */
-        align-items: center; /* Center vertically */
+            align-items: center; /* Center vertically */
         }
 
 
@@ -105,53 +86,15 @@
             width: 1px;
             background-color: #ccc;
         }
-        .event-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .event-table th, .event-table td {
-            text-align: left;
-        }
-            
-        /* Define fixed column widths */
-        .event-table th:nth-child(1),
-        .event-table td:nth-child(1) {
-            width: 5%; /* First column is 10% */
-        }
-
-        .event-table th:nth-child(2),
-        .event-table td:nth-child(2) {
-            width: 40%; /* Second column is 30% */
-        }
-
-        .event-table th:nth-child(3),
-        .event-table td:nth-child(3) {
-            width: 20%; /* Third column is 20% */
-        }
-
-        .event-table th:nth-child(4),
-        .event-table td:nth-child(4) {
-            width: 15%; /* Fourth column is 20% */
-        }
-
-        .event-table th:nth-child(5),
-        .event-table td:nth-child(5) {
-            width: 15%; /* Fifth column is 20% */
-        }
                       
         .view-details-button {
             background-color: #C3DFE6;
-            border-radius: 15px;
+            border-radius: 5px;
             border: none;
             color: black;
-            padding: 10px 20px;
             text-align: center;
             text-decoration: none;
             display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
             }
@@ -187,37 +130,62 @@
             color: #fff;
             border-radius: 30px;
         }
-        .pagination {
-            justify-content: center;
-        }
+        /* Pagination styles */
+            .pagination {
+                justify-content: center;
+            }
 
             .pagination .page-link {
                 color: #2F6690;
-                border-radius: 50%; /* Makes the button circular */
-                width: 40px;        /* Fixed width for circular shape */
-                height: 40px;       /* Fixed height for circular shape */
-                display: flex;      /* Center the content inside */
+                border-radius: 50%; 
+                width: 40px;     
+                height: 40px;       
+                display: flex;     
                 justify-content: center;
                 align-items: center;
-                border: 1px solid #2F6690; /* Add border for clarity */
-                margin: 0 5px;     /* Add spacing between buttons */
+                border: 1px solid #2F6690; 
+                margin: 0 5px;    
             }
+
             .pagination .page-item.active .page-link {
                 background-color: #2F6690;
                 border-color: #2F6690;
                 color: #C3DFE6;
             }
-            </style>
+
+            .pagination-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
+
+            .page-header {
+                font-weight: bold;
+                font-size: 1.5rem;
+            }
+
+            .page-subheader {
+                font-size: 1.0rem;
+                color: #6c757d;
+            }
+    </style>
 </head>
 <body>
     <%@ include file="../header.jspf" %>
-    <div class="container">
-        <header>
-            <h2>Donation History</h2>        
-        </header>
+    <div class="container my-4">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-4">
+                <h1 class="page-header">Donation History</h1>    
+            </div>
+
+            <div class="col-md-4 offset-md-4">
+                <input type="text" id="searchInput" class="form-control rounded"
+                    placeholder="Search by any field..." onkeyup="filterTable()"><br>
+            </div>
+         </div>
         <div class="container">
         <div class="center-card">
-            <div class="donation-card">
+            <div class="donation-card mb-3">
                 <%
                     List<events> events = (List) request.getAttribute("eventList");
                     List<donation> donations = (List) request.getAttribute("donationList");
@@ -256,19 +224,18 @@
             </div>
         </div>
         </div>
-        <div class="container">
-        <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #2F6690; color: white;">
-                <table class="event-table">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="eventTable" >
+                <thead class="table-dark">
                     <tr>
-                        <th>No.</th>
-                        <th>Events</th>
-                        <th>Date & Time</th>
+                        <th scope="col" width="25%">Events</th>
+                        <th>Date</th>
                         <th>Amount</th>
-                        <th>View Receipts</th>
-                    </tr>
-                </table>
-            </li>
+                        <th scope="col" width="15%" class="text-center">View Receipt</th>
+                  </tr>
+                </thead>
+                <tbody>
             <%
                 for (int i = 0; i < events.size(); i++) {
                     events event = events.get(i);
@@ -276,17 +243,18 @@
                     String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(donation.getDate());
                     String amount = df.format(donation.getAmount());
             %>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <table class="event-table">
-                        <tr>
-                            <td><%= i+1 %>.</td>
-                            <td><%= event.getName() %></td>
-                            <td><%= formattedDate %></td>
-                            <td>RM<%=  amount %></td>
-                            <td><button class="view-details-button" data-bs-toggle="modal" data-bs-target="#receiptOverlay">View Receipt</button></td>
-                        </tr>
-                    </table>
-                </li>
+                <tr>
+                    <td class="fw-medium"><%= event.getName() %></td>
+                    <td><%= formattedDate %></td>
+                    <td>RM<%=  amount %></td>
+                    <td class="text-center">
+                        <button class="view-details-button" data-bs-toggle="modal" data-bs-target="#receiptOverlay">
+                        <i class="bi bi-receipt-cutoff"></i>
+                        </button>
+                    </td>
+                </tr>
+            </table>
+                
                 
                 <!-- Fullscreen Overlay -->
                <div class="modal fade" id="receiptOverlay" tabindex="-1" aria-labelledby="receiptOverlayLabel" aria-hidden="true">
@@ -336,6 +304,17 @@
             </nav>
         </div>
     </div>
-                           
+      <script>
+    function filterTable() {
+                const input = document.getElementById('searchInput').value.toLowerCase();
+                const rows = document.querySelectorAll('#eventTable tbody tr');
+
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    const match = cells.some(cell => cell.textContent.toLowerCase().includes(input));
+                    row.style.display = match ? '' : 'none';
+                });
+            }
+</script>   
 </body>
 </html>
