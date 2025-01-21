@@ -106,43 +106,13 @@
             <div class="col-md-4">
                 <h2>Featured Events</h2>
             </div>
-            <div class="col-md-4 offset-md-4">
+                <div class="col-md-4 offset-md-4">
                     <div class="input-group">
                         <input type="text" id="searchInput" class="form-control" placeholder="Search events...">
                         <span class="input-group-text"><i class="bi bi-search"></i></span>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="sortBy" onchange="updateFilters()">
-                        <option value="eventID" <%= "eventID".equals(request.getAttribute("sortBy")) ? "selected" : ""%>>Sort by Creation Order</option>
-                        <option value="date" <%= "date".equals(request.getAttribute("sortBy")) ? "selected" : ""%>>Sort by Event Date</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="monthFilter" onchange="updateFilters()">
-                        <option value="">All Months</option>
-                        <%
-                            String[] months = {"January", "February", "March", "April", "May", "June",
-                                "July", "August", "September", "October", "November", "December"};
-                            for (int i = 0; i < months.length; i++) {
-                                String selected = String.valueOf(i + 1).equals(request.getAttribute("monthFilter")) ? "selected" : "";
-                        %>
-                        <option value="<%= i + 1%>" <%= selected%>><%= months[i]%></option>
-                        <% } %>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="yearFilter" onchange="updateFilters()">
-                        <option value="">All Years</option>
-                        <%
-                            int currentYear = java.time.Year.now().getValue();
-                            for (int year = currentYear - 5; year <= currentYear + 5; year++) {
-                                String selected = String.valueOf(year).equals(request.getAttribute("yearFilter")) ? "selected" : "";
-                        %>
-                        <option value="<%= year%>" <%= selected%>><%= year%></option>
-                        <% } %>
-                    </select>
-                </div>
+            </div>
        
         <!-- Events Grid -->
         <div class="row g-4">
@@ -232,12 +202,10 @@
             function filterEvents() {
                 var input = document.getElementById('searchInput').value.toLowerCase();
                 var eventCards = document.querySelectorAll('.event-card');
-
                 eventCards.forEach(function (card) {
                     var title = card.getAttribute('data-title').toLowerCase();
                     var description = card.getAttribute('data-description').toLowerCase();
                     var location = card.getAttribute('data-location').toLowerCase();
-
                     if (title.includes(input) || description.includes(input) || location.includes(input)) {
                         card.closest('.col-md-4').style.display = '';
                     } else {
@@ -246,28 +214,7 @@
                 });
             }
 
-            function updateFilters() {
-                const sortBy = document.getElementById('sortBy').value;
-                const monthFilter = document.getElementById('monthFilter').value;
-                const yearFilter = document.getElementById('yearFilter').value; // New year filter
-
-                let url = new URL(window.location.href);
-                url.searchParams.set('sortBy', sortBy);
-                if (monthFilter) {
-                    url.searchParams.set('month', monthFilter);
-                } else {
-                    url.searchParams.delete('month');
-                }
-                if (yearFilter) {
-                    url.searchParams.set('year', yearFilter); // Add year filter to URL
-                } else {
-                    url.searchParams.delete('year');
-                }
-                url.searchParams.set('page', '1'); // Reset to first page when filters change
-                window.location.href = url.toString();
-            }
-
             document.getElementById('searchInput').addEventListener('input', filterEvents);
-    </script>
+        </script>
 </body>
 </html>
