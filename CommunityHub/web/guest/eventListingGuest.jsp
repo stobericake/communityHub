@@ -1,194 +1,221 @@
+<%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.cm.model.address"%>
+<%@ page import="java.util.ArrayList" %>
 <%@page import="com.cm.model.events"%>
 <%@page import="java.util.List"%>
+<%@page import="java.io.IOException"%>
+<%@page import="java.util.Base64"%>
+<%@page import="java.io.ByteArrayOutputStream"%>
+<%@page import="java.io.InputStream"%>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Events Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-             body {
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Events Dashboard</title>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+        <style>
+            body {
                 background-color: #f8f9fa !important;
             }
 
-        .event-card {
-            margin-bottom: 10px;
-            transition: transform 0.2s;
-        }
+            .event-card {
+                margin-bottom: 20px;
+                transition: transform 0.2s;
+            }
 
-        .event-card:hover {
-            transform: translateY(-5px);
-        }
+            .event-card:hover {
+                transform: translateY(-5px);
+            }
 
-        .search-bar {
-            display: flex;
-            justify-content: flex-end;
-            margin: 20px 0;
-        }
+            .card-img-top {
+                height: 200px;
+                object-fit: cover;
+            }
 
-        .search-bar input {
-            border-radius: 20px;
-            padding: 10px;
-            width: 100%;
-            max-width: 300px;
-        }
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+            }
 
-        .category-badge {
-            font-size: 0.8rem;
-            padding: 5px 10px;
-            border-radius: 15px;
-        }
+            .action-buttons .btn {
+                flex: 1;
+            }
 
-        .event-price {
-            color: #ff6600;
-            font-weight: bold;
-        }
+            .btn-donor{
+                background-color: blue;
+            }
 
-        .event-image {
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-   
-        .volunteer-button {
-            padding: 10px;
-            border: none;
-            border-radius: 20px;
-            background-color: #C3DFE6; 
-            color: black;
-            text-decoration: none;
-        }
-        .donate-btn {
-            margin-right: 10px;
-            color: black;
-        }
+            btn-view {
+                background-color: pink;
+            }
 
-        .pagination {
-            justify-content: center;
-        }
+            /* Updated Pagination Styles */
+            .pagination {
+                justify-content: center;
+            }
 
-        .pagination .page-link {
-            color: #2F6690;
-            border-radius: 50%; 
-            width: 40px;       
-            height: 40px;       
-            display: flex;      
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #2F6690; 
-            margin: 0 5px;     
-        }
-        .pagination .page-item.active .page-link {
-            background-color: #2F6690;
-            border-color: #2F6690;
-            color: #C3DFE6;
-        }
-    </style>
-</head>
-<body>
-     <%@ include file="../header.jspf" %>
-    <div class="container mt-4">
-        <!-- Header Section -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <h2>Featured Events</h2>
-            </div>
-            <div class="col-md-4 offset-md-4">
-                  <div class="input-group">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search events...">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+            .pagination .page-link {
+                color: #2F6690;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #2F6690;
+                margin: 0 5px;
+            }
+
+            .pagination .page-item.active .page-link {
+                background-color: #2F6690;
+                border-color: #2F6690;
+                color: #C3DFE6;
+            }
+
+            .pagination .page-item.disabled .page-link {
+                color: #6c757d;
+                border-color: #6c757d;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <%
+            List<events> events = (List) request.getAttribute("events");
+            List<address> addresses = (List) request.getAttribute("address");
+           
+            Integer currentPage = (Integer) request.getAttribute("currentPage");
+            Integer totalPages = (Integer) request.getAttribute("totalPages");
+        %>
+        <%@ include file="../header.jspf" %>
+        <div class="container mt-4">
+            <!-- Header Section -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <h2>Featured Events</h2>
                 </div>
-         
-            </div>
-        </div>
-
-        <!-- Events Grid -->
-        <div class="row g-4">
-            <% 
-                List<events> events = (List) request.getAttribute("events");
-                List<address> address = (List) request.getAttribute("address");
-                
-                int index=0;
-                for (events event : events) {
-            %>
-            <div class="col-md-3">
-                <div class="card h-100 event-card" data-title="<%= event.getName() %>" 
-                     data-description="<%= event.getDescription() %>" data-location="<%= address.get(index).getCity() %>">
-                    <div style="width: 100%; height:200px;">
-                        <img src="getImage.do?type=events&id=<%= event.getEventID() %>" alt="Image" class="w-100 h-100" style="object-fit: cover;" />
+                <div class="col-md-4 offset-md-4">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search events...">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title styl"><%= event.getName() %></h5>
-                        <p class="card-text text-truncate"><%= event.getDescription() %></p>
-
-                        <div class="mb-3">
+                </div>
+            </div>
+            <!-- Events Grid -->
+            <div class="row g-4">
+                <%
+                    if (events != null && !events.isEmpty()) {
+                        int num = (currentPage - 1) * 5 + 1;// Start number for pagination
+                        for (events event : events) {
+                            int eventID = event.getEventID();
+                            String name = event.getName();
+                            String desc = event.getDescription();
+                            String city = "";
+                            for (address addr : addresses) {
+                                if (addr.getAddressID() == event.getAddressID()) {
+                                    city = addr.getCity();
+                                    break; // Exit the loop once the match is found
+                                }
+                            }
+                            String formattedDate = new SimpleDateFormat("dd/MM:").format(event.getDate());
+                            String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
+                %>            
+                <div class="col-md-4">
+                    <div class="card h-100 event-card shadow" data-title="<%= name%>" data-description="<%= desc%>" data-location="<%= city%>">
+                        <a href="vEvent.do?eventID=<%= eventID%>">
+                            <img src="getImage.do?type=events&id=<%= eventID%>"   class="card-img-top" alt="Event Image">
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold"><%= name%></h5>
+                            <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= desc%></p>
                             <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-geo-alt-fill me-2"></i>
-                                <small><%= address.get(index).getCity() %></small>
+                                <small class="text-body-secondary"><%= city%></small>
                             </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="bi bi-calendar-date me-2"></i>
-                                <small><%= event.getDate() %> <%= event.getTime() %></small>
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-clock-fill me-2"></i>
+                                <small class="text-body-secondary"><%= formattedDate%> <%= formattedTime%></small>
                             </div>
-                        </div>
 
-                        <div class="d-flex justify-content-end align-items-center">
-                            <a href="addDonor.do?eventID=<%= event.getEventID() %>" class="donate-btn"><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
-                            <a href="eventDetailGuest?eventID=<%= event.getEventID() %>" class="volunteer-button">View Details</a>
+                            <div class="action-buttons mt-auto">
+                                <button 
+                                    class="btn btn-dark" 
+                                    onclick="location.href = 'guest/donationForm.jsp?eventID=<%= eventID%>'">
+                                    <i class="bi bi-coin me-2"></i>
+                                    Donate
+                                </button>
+                                <button 
+                                    class="btn btn-primary" 
+                                    onclick="location.href = 'vEvent.do?eventID=<%= eventID%>'">
+                                    <i class="bi bi-arrow-up-right-circle me-2"></i>
+                                    View Details
+                                </button>      
+                            </div>
+
                         </div>
                     </div>
                 </div>
-            </div>
-            <% index++; } %>
+                <% }
+                } else {
+                %>
+                <div class="col-12 text-center">
+                    <p>No events found.</p>
+                </div>
 
-            <!-- Pagination -->
-            <div class="col-12">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <li class="page-item <%= Integer.parseInt(request.getAttribute("currentPage").toString()) == 1 ? "disabled" : "" %>">
-                            <a class="page-link" href="?page=<%= Integer.parseInt(request.getAttribute("currentPage").toString()) - 1 %>" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
+                <% }%>
 
-                        <% 
-                            int totalPages = Integer.parseInt(request.getAttribute("totalPages").toString());
-                            for (int i = 1; i <= totalPages; i++) { 
-                        %>
-                            <li class="page-item <%= Integer.parseInt(request.getAttribute("currentPage").toString()) == i ? "active" : "" %>">
-                                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                            </li>
-                        <% } %>
+                <!-- Updated Pagination -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                      
 
-                        <li class="page-item <%= Integer.parseInt(request.getAttribute("currentPage").toString()) == totalPages ? "disabled" : "" %>">
-                            <a class="page-link" href="?page=<%= Integer.parseInt(request.getAttribute("currentPage").toString()) + 1 %>" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+                        <div class="pagination-container">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
+                                        <a class="page-link" href="?page=<%= currentPage - 1%>" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+
+                                    <% for (int i = 1; i <= totalPages; i++) {%>
+                                    <li class="page-item <%= currentPage == i ? "active" : ""%>">
+                                        <a class="page-link" href="?page=<%= i%>"><%= i%></a>
+                                    </li>
+                                    <% }%>
+
+                                    <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
+                                        <a class="page-link" href="?page=<%= currentPage + 1%>" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div> 
+                </div>
             </div>
         </div>
-    </div>
+        <!-- Keep your existing filterEvents() function -->
+        <script>
+            function filterEvents() {
+                var input = document.getElementById('searchInput').value.toLowerCase();
+                var eventCards = document.querySelectorAll('.event-card');
+                eventCards.forEach(function (card) {
+                    var title = card.getAttribute('data-title').toLowerCase();
+                    var description = card.getAttribute('data-description').toLowerCase();
+                    var location = card.getAttribute('data-location').toLowerCase();
+                    if (title.includes(input) || description.includes(input) || location.includes(input)) {
+                        card.closest('.col-md-4').style.display = '';
+                    } else {
+                        card.closest('.col-md-4').style.display = 'none';
+                    }
+                });
+            }
 
-    <script>
-        function filterEvents() {
-            var input = document.getElementById('searchInput').value.toLowerCase();
-            var eventCards = document.querySelectorAll('.event-card');
-
-            eventCards.forEach(function(card) {
-                var title = card.getAttribute('data-title').toLowerCase();
-                var description = card.getAttribute('data-description').toLowerCase();
-                var location = card.getAttribute('data-location').toLowerCase();
-
-                if (title.includes(input) || description.includes(input) || location.includes(input)) {
-                    card.closest('.col-md-3').style.display = ''; // Show the card
-                } else {
-                    card.closest('.col-md-3').style.display = 'none'; // Hide the card
-                }
-            });
-        }
-    </script>
-</body>
+            document.getElementById('searchInput').addEventListener('input', filterEvents);
+        </script>
+    </body>
 </html>
