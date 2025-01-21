@@ -18,92 +18,72 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Events Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Poppins', sans-serif !important;
-            background-color: #f8f9fa !important;
-        }
+                background-color: #f8f9fa !important;
+            }
 
-        /* Keep your existing styles */
-        .event-card {
-            margin-bottom: 10px;
-            transition: transform 0.2s;
-        }
+            .event-card {
+                margin-bottom: 20px;
+                transition: transform 0.2s;
+            }
 
-        .event-card:hover {
-            transform: translateY(-5px);
-        }
+            .event-card:hover {
+                transform: translateY(-5px);
+            }
 
-        .search-bar {
-            display: flex;
-            justify-content: flex-end;
-            margin: 20px 0;
-        }
+            .card-img-top {
+                height: 200px;
+                object-fit: cover;
+            }
 
-        .search-bar input {
-            border-radius: 20px;
-            padding: 10px;
-            width: 100%;
-            max-width: 300px;
-        }
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+            }
 
-        .category-badge {
-            font-size: 0.8rem;
-            padding: 5px 10px;
-            border-radius: 15px;
-        }
+            .action-buttons .btn {
+                flex: 1;
+            }
+            
+            .btn-donor{
+                background-color: blue;
+            }
+            
+            btn-view {
+                background-color: pink;
+            }
 
-        .event-price {
-            color: #ff6600;
-            font-weight: bold;
-        }
+            /* Updated Pagination Styles */
+            .pagination {
+                justify-content: center;
+            }
 
-        .event-image {
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        .text-truncate {
-            white-space: nowrap;         
-            overflow: hidden;            
-            text-overflow: ellipsis;     
-            display: block;              
-        }
-        .volunteer-button {
-            padding: 10px;
-            border: none;
-            border-radius: 20px;
-            background-color: #C3DFE6; /* Orange */
-            color: black;
-            text-decoration: none;
-        }
-        .donate-btn {
-            margin-right: 10px;
-            color: black;
-        }
-        /* Add pagination styles */
-        .pagination {
-            justify-content: center;
-        }
+            .pagination .page-link {
+                color: #2F6690;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #2F6690;
+                margin: 0 5px;
+            }
 
-        .pagination .page-link {
-            color: #2F6690;
-            border-radius: 50%; /* Makes the button circular */
-            width: 40px;        /* Fixed width for circular shape */
-            height: 40px;       /* Fixed height for circular shape */
-            display: flex;      /* Center the content inside */
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #2F6690; /* Add border for clarity */
-            margin: 0 5px;     /* Add spacing between buttons */
-        }
-        .pagination .page-item.active .page-link {
-            background-color: #2F6690;
-            border-color: #2F6690;
-            color: #C3DFE6;
-        }
+            .pagination .page-item.active .page-link {
+                background-color: #2F6690;
+                border-color: #2F6690;
+                color: #C3DFE6;
+            }
+
+            .pagination .page-item.disabled .page-link {
+                color: #6c757d;
+                border-color: #6c757d;
+                pointer-events: none;
+            }
     </style>
 </head>
 <body>
@@ -122,20 +102,21 @@
 <%@ include file="../header.jspf" %>
     <div class="container mt-4">
         <!-- Header Section -->
-        <div class="row align-items-center mb-4">
+        <div class="row mb-4">
             <div class="col-md-4">
                 <h2>Featured Events</h2>
             </div>
-             <div class="col-md-4 offset-md-4">
-                <input type="text" id="searchInput" class="form-control rounded" 
-                       placeholder="Search events..." onkeyup="filterEvents()">
+            <div class="col-md-4 offset-md-4">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search events...">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                </div>
             </div>
         </div>
         <!-- Events Grid -->
         <div class="row g-4">
-            
-            <%
-                if (events != null && !events.isEmpty()) {
+        <%
+            if (events != null && !events.isEmpty()) {
                                         int num = (currentPage - 1) * 4 + 1; // Start number for pagination
                                         for (events event : events) {
                                             int eventID = event.getEventID();
@@ -151,41 +132,52 @@
                                             String formattedDate = new SimpleDateFormat("dd/MM:").format(event.getDate());
                                             String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
             %>            
-            <div class="col-md-3">
-                <div class="card h-100 event-card" data-title="<%= name%>" 
-                     data-description="<%= desc %>" data-location="<%= city%>">
-                    <div class="position-relative">
-                        <img src="getImage.do?type=events&id=<%= eventID %>" alt="Image" class="w-100 h-100" style="object-fit: cover;">
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title styl"><%= name %></h5>
-                        <p class="card-text text-truncate"><%= desc %></p>
-                        
-                        <div class="mb-3">
-                            <div class="d-flex align-items-center mb-2">
+            <div class="col-md-4">
+                 <div class="card h-100 event-card shadow" data-title="<%= name%>" data-description="<%= desc%>" data-location="<%= city%>">
+                    <a href="vEvent.do?eventID=<%= eventID %>">
+                        <img src="getImage.do?type=events&id=<%= eventID %>"   class="card-img-top" alt="Event Image">
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold"><%= name %></h5>
+                        <p class="card-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><%= desc %></p>
+                        <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-geo-alt-fill me-2"></i>
-                                <small><%= city %></small>
+                                <small class="text-body-secondary"><%= city %></small>
                             </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="bi bi-calendar-date me-2"></i>
-                                <small><%= formattedDate %> <%= formattedTime %></small>
+                           <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-clock-fill me-2"></i>
+                                <small class="text-body-secondary"><%= formattedDate %> <%= formattedTime %></small>
                             </div>
-                        </div>
-<div class="d-flex justify-content-end align-items-center">                     
-                            <a href="guest/donationForm.jsp?eventID=<%= eventID %>" class="donate-btn" ><i class="bi bi-coin" style="margin-right: 5px; color: black"></i>Donate</a>
-                            <a href="vEvent.do?eventID=<%= eventID %>" class="volunteer-button">View Details</a>      
-                        </div>
+                       
+                        <div class="action-buttons mt-auto">
+                        <button 
+                            class="btn btn-dark" 
+                            onclick="location.href='guest/donationForm.jsp?eventID=<%= eventID %>'">
+                            <i class="bi bi-coin me-2"></i>
+                            Donate
+                        </button>
+                        <button 
+                            class="btn btn-primary" 
+                            onclick="location.href='vEvent.do?eventID=<%= eventID %>'">
+                            <i class="bi bi-arrow-up-right-circle me-2"></i>
+                            View Details
+                        </button>      
+                    </div>
+
                     </div>
                 </div>
             </div>
                 <% }
                   } else {
                 %>
-            <div> No events found.</div>
+                <div class="col-12 text-center">
+                    <p>No events found.</p>
+                </div>
                                
                 <% }%>
           
-            <!-- Pagination -->
+            <!-- Updated Pagination -->
+            <div class="row mt-4">
             <div class="col-12">
                 <nav aria-label="Page navigation">
                     <ul class="pagination">
@@ -209,9 +201,9 @@
                     </ul>
                 </nav>
             </div> 
-            
+            </div>
         </div>
-    </div>
+   </div>
     <!-- Keep your existing filterEvents() function -->
     <script>
         function filterEvents() {

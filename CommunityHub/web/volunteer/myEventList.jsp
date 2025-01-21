@@ -15,127 +15,53 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Events</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to CSS file -->
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+    
         <style>
-            body {
-                font-family: 'Poppins', sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f8f9fa;
+           .table-dark th {
+                background-color: #2F6690 !important;
             }
 
-            .container {
-                margin: auto;
-                padding: 10px;
-            }
-
-            header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 10px 0;
-            }
-
-            .input-group {
-                max-width: 250px; 
-            }  
-            .search-bar {
-            display: flex;
-            justify-content: flex-end;
-            margin: 20px 0;
-        }
-
-        .search-bar input {
-            border-radius: 20px;
-            padding: 10px;
-            width: 100%;
-            max-width: 300px;
-        }
-
-                     
-            .volunteerTable {
-            width: 100%;
-            border-collapse: collapse;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .volunteerTable td {
-            
-        }
-            
-       /* Define fixed column widths */
-        .volunteerTable th:nth-child(1),
-        .volunteerTable td:nth-child(1) {
-            width: 5%; /* First column is 10% */
-            text-align: left;
-        }
-
-        .volunteerTable th:nth-child(2),
-        .volunteerTable td:nth-child(2) {
-            width: 30%; /* Second column is 30% */
-            text-align: left;
-        }
-
-        .volunteerTable th:nth-child(3),
-        .volunteerTable td:nth-child(3) {
-            width: 25%; /* Third column is 20% */
-            text-align: center;
-        }
-
-        .volunteerTable th:nth-child(4),
-        .volunteerTable td:nth-child(4) {
-            width: 25%; /* Fourth column is 20% */
-            text-align: center;
-        }
-
-        .volunteerTable th:nth-child(5),
-        .volunteerTable td:nth-child(5) {
-            width: 15%; /* Fifth column is 20% */
-            text-align: center;
-            
-        }
-                                  
-            .view-details-button {
-                background-color: #C3DFE6;
-                border-radius: 15px;
-                border: none;
-                color: black;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                cursor: pointer;
-            }
-            .view-detail-button:hover{
-                background-color: #F56476;
-            }
+            /* Pagination styles */
             .pagination {
-            justify-content: center;
-        }
+                justify-content: center;
+            }
 
-        .pagination .page-link {
-            color: #2F6690;
-            border-radius: 50%; /* Makes the button circular */
-            width: 40px;        /* Fixed width for circular shape */
-            height: 40px;       /* Fixed height for circular shape */
-            display: flex;      /* Center the content inside */
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #2F6690; /* Add border for clarity */
-            margin: 0 5px;     /* Add spacing between buttons */
-        }
-        .pagination .page-item.active .page-link {
-            background-color: #2F6690;
-            border-color: #2F6690;
-            color: #C3DFE6;
-        }
+            .pagination .page-link {
+                color: #2F6690;
+                border-radius: 50%; 
+                width: 40px;     
+                height: 40px;       
+                display: flex;     
+                justify-content: center;
+                align-items: center;
+                border: 1px solid #2F6690; 
+                margin: 0 5px;    
+            }
+
+            .pagination .page-item.active .page-link {
+                background-color: #2F6690;
+                border-color: #2F6690;
+                color: #C3DFE6;
+            }
+
+            .pagination-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 20px;
+            }
+
+            .page-header {
+                font-weight: bold;
+                font-size: 1.5rem;
+            }
+
+            .page-subheader {
+                font-size: 1.0rem;
+                color: #6c757d;
+            }
     </style>
 </head>
 <body>
@@ -154,31 +80,31 @@
                     }
     %>
     <%@ include file="../header.jspf" %>
-    <div class="container">
-        <header>
-            <div class="col">
-                <h3>MY EVENT</h3>
-                <p>Events List</p>
+     <div class="container my-4">
+            <div class="row align-items-center mb-4">
+                <div class="col-md-4">
+                    <h1 class="page-header">MY EVENT</h1>
+                    <h6 class="page-subheader">The tables below show all of the events that you joined</h6>
             </div>
-            <div class="col-md-4 offset-md-4">
-                <input type="text" id="searchInput" class="form-control rounded" 
-                       placeholder="Search events..." onkeyup="filterTable()">
+
+                <div class="col-md-4 offset-md-4">
+                    <input type="text" id="searchInput" class="form-control rounded"
+                           placeholder="Search by any field..." onkeyup="filterTable()"><br>
+                </div>
             </div>
-        </header>
-        <div class="container">
-        <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: #2F6690; color: white;">
-                <table class="volunteerTable">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="eventTable" >
+                <thead class="table-dark">
                     <tr>
-                    <th>No.</th>
-                    <th>Events</th>
-                    <th>Date & Time</th>
-                    <th>Task</th>
-                    <th>View Details</th>
-                </tr>
-                </table>
-            </li>
-                
+                        <th scope="col" width="25%">Events</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Task</th>
+                        <th scope="col" width="10%" class="text-center">View Detail</th>
+                    </tr>
+                </thead>
+                <tbody>
                 <%
                 if (events != null && !events.isEmpty()) {
                     int index = 1;
@@ -188,22 +114,22 @@
                         events event = events.get(i);
                         task task = tasks.get(i); // Assuming tasks and events are aligned
             
-         String formattedDate = new SimpleDateFormat("MM/dd/yyyy -").format(event.getDate());
-         String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
-            %>         
-               <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <table class="volunteerTable">
-                        <tr>
-                           <td><%= index++%>.</td>
-                           <td><%= event.getName() %></td>
-                           <td><%= formattedDate %><%= formattedTime %></td>
-                           <td><%= task.getDescription() %></td>
-                           
-                            <td><a href="myDetail.do?eventID=<%= event.getEventID() %>" class="view-details-button">View Details</a></td>
-                        </tr>                                       
+                String formattedDate = new SimpleDateFormat("MM/dd/yyyy -").format(event.getDate());
+                String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
+                %>         
+               <tr>
+                   <td class="fw-medium"><%= event.getName() %></td>
+                   <td><%= formattedDate %></td>
+                   <td><%= formattedTime %></td>
+                   <td><%= task.getDescription() %></td>
+                   <td class="text-center">
+                       <a href="myDetail.do?eventID=<%= event.getEventID() %>">
+                           <i class="bi bi-arrow-right-circle"></i>
+                       </a>
+                   </td>
+               </tr>                                       
 
-                </table>
-               </li>
+               </table>
                     
                  <% }
                         } else {
@@ -211,7 +137,7 @@
             <div> No events found.</div>
                                
                 <% }
-}%>
+                }%>
         <!-- Pagination -->
         <div class="container  mb-3">
             <nav aria-label="Page navigation">
@@ -240,16 +166,15 @@
 
     <script>
     function filterTable() {
-        const input = document.getElementById('searchInput').value.toLowerCase();
-        const rows = document.querySelectorAll('.list-group-item:not(:first-child)'); // Skip the header row
+                const input = document.getElementById('searchInput').value.toLowerCase();
+                const rows = document.querySelectorAll('#eventTable tbody tr');
 
-        rows.forEach(row => {
-            const textContent = row.textContent.toLowerCase(); // Get all text content in the row
-            row.style.display = textContent.includes(input) ? '' : 'none'; // Show/Hide row based on match
-        });
-    }
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    const match = cells.some(cell => cell.textContent.toLowerCase().includes(input));
+                    row.style.display = match ? '' : 'none';
+                });
+            }
 </script>
-
-
 </body>
 </html>

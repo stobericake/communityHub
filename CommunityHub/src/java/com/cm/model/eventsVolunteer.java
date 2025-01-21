@@ -13,14 +13,16 @@ import java.io.Serializable;
  */
 public class eventsVolunteer implements Serializable{
 
-    public eventsVolunteer(int eventsVolunteerID, int eventID, int volunteerID) {
+    public eventsVolunteer(int eventsVolunteerID, int eventID, int volunteerID, int attendance) {
         this.eventsVolunteerID = eventsVolunteerID;
         this.eventID = eventID;
         this.volunteerID = volunteerID;
+        this.attendance = attendance;
     }
     private int eventsVolunteerID;
     private int eventID;
     private int volunteerID;
+    private int attendance;
 
     public int getEventsVolunteerID() {
         return eventsVolunteerID;
@@ -44,6 +46,14 @@ public class eventsVolunteer implements Serializable{
 
     public void setVolunteerID(int volunteerID) {
         this.volunteerID = volunteerID;
+    }
+    
+    public int getAttendance() {
+        return attendance;
+    }
+
+    public void setAttendance(int attendance) {
+        this.attendance = attendance;
     }
 }
 

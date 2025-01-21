@@ -4,6 +4,8 @@
     Author     : Rina
 --%>
 
+<%@page import="java.time.format.DateTimeFormatter"%>
+<%@page import="com.cm.model.eventsVolunteer"%>
 <%@page import="com.cm.model.task"%>
 <%@page import="com.cm.model.beneficiary"%>
 <%@page import="com.cm.model.events"%>
@@ -76,6 +78,9 @@
                 color: #fff; /* White text */
                 border-radius: 30px; /* Rounded edges */
             }
+            .start-date-gap {
+                margin-right: 20px; /* Adjust the value as needed */
+            }
             @media print {
                 body * {
                     visibility: hidden;
@@ -133,14 +138,33 @@
             address addressObj = (address) request.getAttribute("address");
             beneficiary beneficiaryObj = (beneficiary) request.getAttribute("beneficiary");
             task tasks = (task) request.getAttribute("task");
+            eventsVolunteer ev = (eventsVolunteer) request.getAttribute("eventsVolunteer");
+
             
             String formattedDate = request.getAttribute("formattedDate").toString();
             String formattedStartTime = request.getAttribute("formattedStartTime").toString();
             String formattedEndTime = request.getAttribute("formattedEndTime").toString();
             
             int eventID = event.getEventID();
+            
+            LocalDate currentDate = LocalDate.now();
+            LocalTime currentTime = LocalTime.now();
+
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mma");
+            LocalDate eventDate = LocalDate.parse(formattedDate, dateFormatter);
+            LocalTime eventStartTime = LocalTime.parse(formattedStartTime, timeFormatter);
+            LocalTime eventEndTime = LocalTime.parse(formattedEndTime, timeFormatter);
+
+            boolean isEventOngoing = currentDate.isEqual(eventDate) &&
+                                     currentTime.isAfter(eventStartTime) &&
+                                     currentTime.isBefore(eventEndTime);
+
+            boolean isEventEnded = currentDate.isAfter(eventDate) ||
+                               (currentDate.isEqual(eventDate) && currentTime.isAfter(eventEndTime));
                         
         %>
+        <div class="container mt-4">
         <img src="getImage.do?type=events&id=<%= eventID %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
         <figure class="text-center">
             <blockquote class="blockquote">
@@ -163,14 +187,17 @@
                         <p class="text-muted"><%= addressObj.getState() %></p>
                     </div>
                     <p><strong>Event Date.</strong></p>
-                    <div class="d-flex justify-content-between mb-3">
-                        <small>Start Date
-
-                            <br><div class="d-flex align-items-start justify-content-start">
+                    <div class="d-flex justify-content-start mb-3">
+                        <!-- Start Date -->
+                        <small class="start-date-gap"> <!-- Custom class for margin -->
+                            Start Date
+                            <br>
+                            <div class="d-flex align-items-start justify-content-start">
                                 <i class="bi bi-calendar-event me-2"></i>
-                                <p class="text-muted"><%=formattedDate%> <%=formattedStartTime%></p>
+                                <p class="text-muted"><%=formattedDate%> <%= event.getTime()%></p>
                             </div>
                         </small>
+
                         <small>End Date
                             <br><div class="d-flex align-items-start justify-content-start">
                                 <i class="bi bi-calendar-event me-2"></i>
@@ -179,7 +206,20 @@
                         </small>
                     </div>
                     <p><strong>Selected Task:</strong> <%= tasks.getDescription()%></p>
+                    <!-- Confirm Attendance Button -->
+                    <%  if (isEventOngoing) { %>
+                        <!-- Action Buttons at the Bottom -->
+                            <div class="action-buttons mt-auto">
+                                <button onclick="confirmAttendance(<%= eventID%>, 1)" class="btn btn-primary">
+                                    <i class="bi bi-calendar-check me-2"></i>Attend
+                                </button>
+                                <button onclick="confirmAttendance(<%= eventID%>, 2)" class="btn btn-danger">
+                                    <i class="bi bi-x-circle me-2"></i>Absent
+                                </button>
+                            </div>
+                    <% } %>
                 </div>
+                
 
                 <!-- Right Column: Cards -->
                 <div class="col-md-4">
@@ -189,11 +229,17 @@
                                 <img src="assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
                                 <p><strong>DOWNLOAD CERTIFICATE</strong></p>
                             </div>
-                            <a href="javascript:void(0)" onclick="showCertificateModal(<%= eventID%>)" 
-                               class="btn w-100 py-2" 
-                               style="background-color: #000; color: #fff; border-radius: 30px;">
-                                DOWNLOAD <i class="bi bi-download"></i>
-                            </a>
+                            <% if ( isEventEnded  && ev.getAttendance() == 1) { %>
+                                <a href="javascript:void(0)" onclick="showCertificateModal(<%= eventID %>)" 
+                                   class="btn w-100 py-2" 
+                                   style="background-color: #000; color: #fff; border-radius: 30px;">
+                                    DOWNLOAD <i class="bi bi-download"></i>
+                                </a>
+                            <% } else { %>
+                                <button class="btn w-100 py-2" style="background-color: #ccc; color: #666; border-radius: 30px;" disabled>
+                                    Certificate Unavailable
+                                </button>
+                            <% } %>
                         </div>
                     </div>
 
@@ -238,36 +284,52 @@
                 </div>
             </div>
         </div>
+        </div>
+                                
+                                <!--Hidden Form-->
+        <form id="confirmAttendance" method="post" action="myDetail.do" style="display:none;">
+            <input type="hidden" id="eventIdInput" name="eventId">
+            <input type="hidden" id="attendaceInput" name="attendance">
+        </form>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function confirmAttendance(eventId, attendance ) {
+                        
+                document.getElementById('eventIdInput').value = eventId;
+                document.getElementById('attendaceInput').value = attendance;
+                document.getElementById('confirmAttendance').submit();
+            }
+        </script>
+        <script>
+            function printCertificate() {
+                var iframe = document.getElementById('certificatePreview');
+
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.focus(); // Focus on the iframe content
+                    iframe.contentWindow.print(); // Trigger the print dialog for the iframe content
+                } else {
+                    alert("Failed to load certificate content for printing.");
+                }
+            }
+
+            function showCertificateModal(eventID) {
+                var contextPath = '<%= request.getContextPath()%>';
+                var iframe = document.getElementById('certificatePreview');
+
+                // Set the iframe source
+                iframe.src = contextPath + '/certificate?eventID=' + eventID;
+
+                // Adjust iframe height once content is fully loaded
+                iframe.onload = function () {
+                    var contentHeight = iframe.contentWindow.document.body.scrollHeight;
+                    iframe.style.height = contentHeight + 'px';
+                };
+
+                // Show the modal
+                var certificateModal = new bootstrap.Modal(document.getElementById('certificateOverlay'));
+                certificateModal.show();
+            }
+        </script>
+
     </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    function printCertificate() {
-        var iframe = document.getElementById('certificatePreview');
-
-        if (iframe.contentWindow) {
-            iframe.contentWindow.focus(); // Focus on the iframe content
-            iframe.contentWindow.print(); // Trigger the print dialog for the iframe content
-        } else {
-            alert("Failed to load certificate content for printing.");
-        }
-    }
-
-    function showCertificateModal(eventID) {
-        var contextPath = '<%= request.getContextPath()%>';
-        var iframe = document.getElementById('certificatePreview');
-
-        // Set the iframe source
-        iframe.src = contextPath + '/certificate?eventID=' + eventID;
-
-        // Adjust iframe height once content is fully loaded
-        iframe.onload = function () {
-            var contentHeight = iframe.contentWindow.document.body.scrollHeight;
-            iframe.style.height = contentHeight + 'px';
-        };
-
-        // Show the modal
-        var certificateModal = new bootstrap.Modal(document.getElementById('certificateOverlay'));
-        certificateModal.show();
-    }
-</script>

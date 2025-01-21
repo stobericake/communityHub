@@ -124,7 +124,8 @@ public class myEventList extends HttpServlet {
                     eventsVolunteer eventsv = new eventsVolunteer(
                             rs.getInt("eventsVolunteerID"), 
                             rs.getInt("eventID"), 
-                            rs.getInt("volunteerID")
+                            rs.getInt("volunteerID"),
+                            rs.getInt("attendance")
                     );
                     
                     eventsVolList.add(eventsv);

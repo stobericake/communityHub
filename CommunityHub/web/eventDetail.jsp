@@ -30,16 +30,16 @@
             }
 
             .event-image {
-                width: 350px; /* Set the width */
-                height: auto; /* Keep the aspect ratio */
-                margin: 10px
+                width: 350px;
+                height: auto;
+                margin: 10px;
             }
 
             .divider {
-                height: 1px; 
-                width: 95%; /* Set width to 80% of the screen size */
-                background-color: black; 
-                margin: 0 auto; /* Center the divider horizontally */
+                height: 1px;
+                width: 95%;
+                background-color: black;
+                margin: 0 auto;
             }
 
             .progress-bar {
@@ -91,8 +91,9 @@
             double totalDonation = Double.parseDouble(request.getAttribute("totalDonation").toString());
             double remainingAmount = Double.parseDouble(request.getAttribute("remainingAmount").toString());
             double progress = Double.parseDouble(request.getAttribute("progress").toString());
-        %>
-            <img src="getImage.do?type=events&id=<%= event.getEventID() %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+        %>    
+        <div class="container mt-4">
+            <img src="getImage.do?type=events&id=<%= event.getEventID() %>" class="rounded mx-auto d-block event-image" alt="Event Image">
             <figure class="text-center">
                 <blockquote class="blockquote">
                     <p class="h6"><%= event.getName() %></p>
@@ -106,13 +107,13 @@
             <div class="clearfix">
                 <div class="card col-md-3 float-md-end mb-4 ms-md-3" style="border-radius: 10px;">
                     <div class="card-body text-start">
-                        <h2 class="fw-bold">RM<%= totalDonation %></h2>
+                        <h2 class="fw-bold">RM<%= String.format("%.2f", totalDonation) %></h2>
                         <div class="progress mb-3" style="height: 8px; border-radius: 5px;">
                             <div class="progress-bar" role="progressbar" style="width: <%= progress %>%;" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
-                            <small class="text-muted text-start">Goal<br>RM<%= event.getDonationLimit() %></small>
-                            <small class="text-muted text-end">Remaining<br>RM<%= remainingAmount %></small>
+                            <small class="text-muted text-start">Goal<br>RM<%= String.format("%.2f", event.getDonationLimit()) %></small>
+                            <small class="text-muted text-end">Remaining<br>RM<%= String.format("%.2f", remainingAmount) %></small>
                         </div>
                         <div class="d-flex align-items-start justify-content-start">
                         <i class="bi bi-clock me-2"></i>
@@ -129,31 +130,38 @@
                 </div>
                     </div>
        
-            <p><strong>About.</strong></p>
-            <p><%= event.getDescription() %></p>
-            <p><strong>Location.</strong></p>
-            <div class="d-flex align-items-start justify-content-start">
+            <div class="mb-4">
+                <h5>About</h5>
+                <p><%= event.getDescription() %></p>
+            </div>
+            <div class="mb-4">
+                <h5>Location</h5>
+                <div class="d-flex align-items-start">
                 <i class="bi bi-geo-alt me-2"></i>
-                <p class="text-muted"><%= addressObj.getState() %></p>
+                <p class="mb-0"><%= addressObj.getState() %></p>
+                </div>
             </div>
-            <p><strong>Event Date.</strong></p>
-            <div class="d-flex justify-content-between md-3">
-            <small>Start Date
-            
-                <br><div class="d-flex align-items-start justify-content-start">
-                <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"><%=formattedDate%> <%=formattedStartTime%></p>
-            </div>
-            </small>
-            <small>End Date
-            
-                <br><div class="d-flex align-items-start justify-content-start">
-                <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"><%=formattedDate%> <%=formattedEndTime%></p>
-            </div>
-            </small>
-            </div>
-                <p><strong>Tasks Required:</strong></p>
+                        <div class="mb-4">
+                            <h5>Event Date</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">Start Time</small>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-calendar-event me-2"></i>
+                                        <p class="mb-0"><%= formattedDate%> <%= formattedStartTime%></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">End Time</small>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-calendar-event me-2"></i>
+                                        <p class="mb-0"><%= formattedDate%> <%= formattedEndTime%></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                <div class="mb-4">
+                            <h5>Tasks Required:</h5>
                 <form action="volunteerServlet1" method="POST">
                 <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
                 <% int i = 0; %>
@@ -185,5 +193,6 @@
             </form>
             </div>
         </div>
+            </div> 
     </body>
 </html>

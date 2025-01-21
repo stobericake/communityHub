@@ -113,9 +113,10 @@ public class vEventList extends HttpServlet {
                 int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
 
                 // Fetch events for the current page
-                String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? AND status = 2";
+                String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? AND status = 2 AND e.eventID NOT IN (SELECT eventID FROM eventsVolunteer WHERE volunteerID = ?)";
                 stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, postalCode);
+                stmt.setInt(2, volunteerId);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
