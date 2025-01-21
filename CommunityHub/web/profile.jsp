@@ -1,4 +1,7 @@
-
+<%@page import="com.cm.model.address"%>
+<%@page import="com.cm.model.beneficiary"%>
+<%@page import="com.cm.model.volunteer"%>
+<%@page import="com.cm.model.admin"%>
 <%@page import="java.text.SimpleDateFormat"%>
 
 <!DOCTYPE html>
@@ -34,25 +37,55 @@
     <body>
         <%@ include file="header.jspf" %>
         <%
-            int userID = 1;
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-
-            conn = dbconnection.getConnection(); // Get DB connection
-
-            String sql = "SELECT * FROM admin WHERE adminID = ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, userID); // Set the eventID
-            rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                // Access the data in the first row
-                String name = rs.getString("name");
-                String email = rs.getString("email");
-                int contact = rs.getInt("contactInfo");
-                String username = rs.getString("username");
-                String password = rs.getString("password");
+            String userRole1 = (String)session.getAttribute("userRole");
+            volunteer volunteerObj = null;
+            beneficiary beneficiaryObj = null;
+            admin adminObj = null;
+            
+            String name = "";
+            String email = "";
+            int contact = 0;
+            String street = "";
+            int postcode = 0;
+            String city = "";
+            String state = "";
+            String country = "";
+            String username = "";
+            String password = "";
+           address addressObj = (address) request.getAttribute("addressObj");
+            if(userRole1.equals("admin")) {
+                adminObj = (admin) request.getAttribute("adminObj");
+                name = adminObj.getName();
+                email = adminObj.getEmail();
+                contact = adminObj.getContactInfo();
+             
+                username = adminObj.getUsername();
+                password = adminObj.getPassword();
+            } else if(userRole1.equals("volunteer")) {
+                volunteerObj = (volunteer) request.getAttribute("volunteerObj");
+                name = volunteerObj.getName();
+                contact = volunteerObj.getContactInfo();
+                street = addressObj.getStreet();
+                postcode = addressObj.getPostalCode();
+                city = addressObj.getCity();
+                state = addressObj.getState();
+                country = addressObj.getCountry();
+                username = volunteerObj.getUsername();
+                password = volunteerObj.getPassword();
+            } else {
+                beneficiaryObj = (beneficiary) request.getAttribute("beneficiaryObj");
+                name = beneficiaryObj.getName();
+                
+                contact = beneficiaryObj.getContactInfo();
+                street = addressObj.getStreet();
+                postcode = addressObj.getPostalCode();
+                city = addressObj.getCity();
+                state = addressObj.getState();
+                country = addressObj.getCountry();
+                username = beneficiaryObj.getUsername();
+                password = beneficiaryObj.getPassword();
+            }
+            
         %>
         <div class="container mt-4 mb-4">
             <h3 class="fw-bold">ACCOUNT INFORMATION</h3>
@@ -70,67 +103,138 @@
                     </div>
                 </div>
 
-                <!-- Update User Info Form -->
-                <form class="border mt-3 p-3" action="<%=request.getContextPath()%>/updateprofile?type=basic" method="POST">
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label for="Username" class="form-label">Username</label>
-                            <input type="text" name="username" class="form-control" id="Username" value="<%=username%>">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-control" id="email" value="<%=email%>">
-                    </div>
-                    <div class="mb-3">
-                        <label for="contactNumber" class="form-label">Contact Number</label>
-                        <input type="text" name="phone_number" class="form-control" id="contactNumber" value="<%=contact%>">
-                    </div>
-                    <div class="d-flex justify-content-start">
-                        <button type="submit" class="btn btn-primary me-2">Update Info</button>
-                        <button type="button"  class="btn btn-danger">Cancel</button>
-                    </div>
-                </form>
+                <!-- Tab Navigation -->
+                <ul class="nav nav-tabs mt-4" id="profileTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="user-info-tab" data-bs-toggle="tab" data-bs-target="#user-info" type="button" role="tab" aria-controls="user-info" aria-selected="true">
+                            Update User Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab" aria-controls="password" aria-selected="false">
+                            Change Password
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab" aria-controls="address" aria-selected="false">
+                            Address
+                        </button>
+                    </li>
 
-                <!-- Change Password Form -->
-                <form class="border mt-3 p-3" action="<%=request.getContextPath()%>/updateprofile?type=password" method="POST">
-                    <div class="mb-3">
-                        <label for="currentPassword" class="form-label">Current Password</label>
-                        <div class="position-relative">
-                            <input type="password" class="form-control" id="currentPassword" value="<%=password%>">
-                            <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#currentPassword">
+                </ul>
 
-                            </button>
-                        </div>
+                <!-- Tab Content -->
+                <div class="tab-content border border-top-0 p-3" id="profileTabsContent">
+                    <!-- Update User Info Tab -->
+                    <div class="tab-pane fade show active" id="user-info" role="tabpanel" aria-labelledby="user-info-tab">
+                        <form action="<%=request.getContextPath()%>/updateprofile?type=basic" method="POST">
+                            <div class="row mb-3">
+                                <div class="col">
+                                    <label for="Username" class="form-label">Username</label>
+                                    <input type="text" name="username" class="form-control" id="Username" value="<%=username%>">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" name="email" class="form-control" id="email" value="<%=email%>">
+                            </div>
+                            <div class="mb-3">
+                                <label for="contactNumber" class="form-label">Contact Number</label>
+                                <input type="text" name="phone_number" class="form-control" id="contactNumber" value="<%=contact%>">
+                            </div>
+                            <div class="d-flex justify-content-start">
+                                <button type="submit" class="btn btn-primary me-2">Update Info</button>
+                                <button type="button" class="btn btn-danger">Cancel</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="mb-3">
-                        <label for="newPassword" class="form-label">New Password</label>
-                        <div class="position-relative">
-                            <input type="password" name="password" class="form-control" id="newPassword">
-                            <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#newPassword">
 
-                            </button>
-                        </div>
+                    <!-- Change Password Tab -->
+                    <div class="tab-pane fade" id="password" role="tabpanel" aria-labelledby="password-tab">
+                        <form action="<%=request.getContextPath()%>/updateprofile?type=password" method="POST">
+                            <div class="mb-3">
+                                <label for="currentPassword" class="form-label">Current Password</label>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control" id="currentPassword" value="<%=password%>">
+                                    <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#currentPassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">New Password</label>
+                                <div class="position-relative">
+                                    <input type="password" name="password" class="form-control" id="newPassword">
+                                    <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#newPassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <div class="position-relative">
+                                    <input type="password" name="password" class="form-control" id="confirmPassword">
+                                    <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#confirmPassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-start">
+                                <button type="submit" class="btn btn-primary me-2">Update Password</button>
+                                <button type="button" class="btn btn-danger">Cancel</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Confirm Password</label>
-                        <div class="position-relative">
-                            <input type="password" name="password" class="form-control" id="confirmPassword">
-                            <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#confirmPassword">
+                    <!-- Address Tab -->
+                    <% if(userRole != "admin"){ %>
+                    <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
+                        <form action="<%=request.getContextPath()%>/updateprofile?type=address" method="POST" class="mt-3">
+                            <div class="mb-3">
+                                <label for="street" class="form-label">Street</label>
+                                <input type="text" class="form-control" id="street" name="street" value="<%=street%>">
+                            </div>
+                            <div class="mb-3">
+                                <label for="postcode" class="form-label">Postcode</label>
+                                <input type="text" class="form-control" id="postcode" name="postcode" value="<%=postcode%>">
 
-                            </button>
-                        </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="city" value="<%=city%>">
+                            </div>
+                            <div class="mb-3">
+                                <label for="state" class="form-label">State</label>
+                                <input type="text" class="form-control" id="state" name="state" value="<%=state%>">
+                            </div>
+                            <div class="mb-3">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country" name="country" value="<%=country%>">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Address</button>
+                            <button type="button" class="btn btn-danger">Cancel</button>
+                        </form>
                     </div>
-                    <div class="d-flex justify-content-start">
-                        <button type="submit" class="btn btn-primary me-2">Update Password</button>
-                        <button type="button" class="btn btn-danger">Cancel</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <%
-            }
-        %>
+                           <% } %>
+                    <script>
+                        // Add event listeners to toggle password visibility
+                        document.querySelectorAll('.toggle-password').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const target = document.querySelector(this.getAttribute('data-target'));
+                                if (target) {
+                                    if (target.type === 'password') {
+                                        target.type = 'text';
+                                        this.innerHTML = '<i class="bi bi-eye-slash"></i>'; // Change icon to "eye-slash"
+                                    } else {
+                                        target.type = 'password';
+                                        this.innerHTML = '<i class="bi bi-eye"></i>'; // Change icon back to "eye"
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+                <%
 
-    </body>
-</html>
+                %>
+                </body>
+                </html>
