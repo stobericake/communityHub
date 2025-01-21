@@ -118,6 +118,18 @@
                         <% } %>
                     </select>
                 </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="yearFilter" onchange="updateFilters()">
+                        <option value="">All Years</option>
+                        <%
+                            int currentYear = java.time.Year.now().getValue();
+                            for (int year = currentYear - 5; year <= currentYear + 5; year++) {
+                                String selected = String.valueOf(year).equals(request.getAttribute("yearFilter")) ? "selected" : "";
+                        %>
+                        <option value="<%= year%>" <%= selected%>><%= year%></option>
+                        <% } %>
+                    </select>
+                </div>
             </div>
 
             <!-- Events Grid -->
@@ -234,6 +246,7 @@
             function updateFilters() {
                 const sortBy = document.getElementById('sortBy').value;
                 const monthFilter = document.getElementById('monthFilter').value;
+                const yearFilter = document.getElementById('yearFilter').value; // New year filter
 
                 let url = new URL(window.location.href);
                 url.searchParams.set('sortBy', sortBy);
@@ -241,6 +254,11 @@
                     url.searchParams.set('month', monthFilter);
                 } else {
                     url.searchParams.delete('month');
+                }
+                if (yearFilter) {
+                    url.searchParams.set('year', yearFilter); // Add year filter to URL
+                } else {
+                    url.searchParams.delete('year');
                 }
                 url.searchParams.set('page', '1'); // Reset to first page when filters change
                 window.location.href = url.toString();

@@ -106,13 +106,18 @@
                             <div class="col-5 col-md-2 text-center">
                                 <div class="dropdown">
                                     <button class="btn btn-light btn-outline-secondary dropdown-toggle" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Status
+                                        <!-- Display the currently selected status -->
+                                        <%= "All".equals(status) ? "All" : status%>
                                     </button>
                                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        <li><a class="dropdown-item" href="?status=All">All</a></li>    
-                                        <li><a class="dropdown-item" href="?status=Pending" >Pending</a></li>
-                                        <li><a class="dropdown-item" href="?status=Approved">Approved</a></li>
-                                        <li><a class="dropdown-item" href="?status=Rejected">Rejected</a></li>
+                                        <li><a class="dropdown-item" 
+                                               href="?status=All&page=<%= currentPage%>&page2=<%= currentPage1%>&activeTab=events">All</a></li>    
+                                        <li><a class="dropdown-item" 
+                                               href="?status=Pending&page=<%= currentPage%>&page2=<%= currentPage1%>&activeTab=events">Pending</a></li>
+                                        <li><a class="dropdown-item" 
+                                               href="?status=Approved&page=<%= currentPage%>&page2=<%= currentPage1%>&activeTab=events">Approved</a></li>
+                                        <li><a class="dropdown-item" 
+                                               href="?status=Rejected&page=<%= currentPage%>&page2=<%= currentPage1%>&activeTab=events">Rejected</a></li>
                                     </ul>
                                 </div>
                             </div>
