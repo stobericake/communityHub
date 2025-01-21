@@ -17,14 +17,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Event Detail</title>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
-            body {
-                font-family: 'Poppins', sans-serif !important;
-                margin: 0;
-                padding: 0;
-                background-color: #f8f9fa;
-            }
+    
 
             .container {
                 margin: 15px;
@@ -167,17 +162,16 @@
                     </div>
                     <% i++; %>
                 <% } %>
-            
+                </form>
+                
                 <p class="text-danger">Please log in to volunteer for this event.</p>
-                <a href="${pageContext.request.contextPath}/login.jsp" 
+<a href="${pageContext.request.contextPath}/login.jsp" 
    class="btn w-100 py-2" 
    style="background-color: #000; color: #fff; border-radius: 30px;">
     LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
 </a>
-
-              
                
-            </form>
+        
             </div>
         </div>
     </body>
