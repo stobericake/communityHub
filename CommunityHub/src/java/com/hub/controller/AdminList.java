@@ -72,6 +72,7 @@ public class AdminList extends HttpServlet {
             conn = dbconnection.getConnection();
             String sortBy = request.getParameter("sortBy") != null ? request.getParameter("sortBy") : "eventID";
             String monthFilter = request.getParameter("month");
+            String yearFilter = request.getParameter("year"); // New year filter
 
             // Base SQL for counting total events
             StringBuilder countSql = new StringBuilder(
@@ -83,9 +84,19 @@ public class AdminList extends HttpServlet {
                 countSql.append(" AND MONTH(date) = ?");
             }
 
+            // Add year filter if selected
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                countSql.append(" AND YEAR(date) = ?");
+            }
+
             stmt = conn.prepareStatement(countSql.toString());
+            int paramIndex = 1;
+
             if (monthFilter != null && !monthFilter.isEmpty()) {
-                stmt.setInt(1, Integer.parseInt(monthFilter));
+                stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
             }
 
             rs = stmt.executeQuery();
@@ -107,6 +118,11 @@ public class AdminList extends HttpServlet {
             // Add month filter if selected
             if (monthFilter != null && !monthFilter.isEmpty()) {
                 sql.append(" AND MONTH(e.date) = ?");
+            }
+
+            // Add year filter if selected
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                sql.append(" AND YEAR(e.date) = ?");
             }
 
             // Add sorting
@@ -131,10 +147,13 @@ public class AdminList extends HttpServlet {
             sql.append(" LIMIT ? OFFSET ?");
 
             stmt = conn.prepareStatement(sql.toString());
-            int paramIndex = 1;
+            paramIndex = 1;
 
             if (monthFilter != null && !monthFilter.isEmpty()) {
                 stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
             }
             stmt.setInt(paramIndex++, eventsPerPage);
             stmt.setInt(paramIndex, offset);
@@ -177,6 +196,7 @@ public class AdminList extends HttpServlet {
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("sortBy", sortBy);
             request.setAttribute("monthFilter", monthFilter);
+            request.setAttribute("yearFilter", yearFilter); // Pass year filter to JSP
 
             request.getRequestDispatcher("admin/adminListing.jsp").forward(request, response);
 
