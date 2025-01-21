@@ -125,7 +125,9 @@ public class AdminReportList extends HttpServlet {
                 events event = new events(
                         rs.getInt("eventID"),
                         rs.getString("name"),
-                        rs.getDate("date")
+                        rs.getDate("date"),
+                        rs.getTime("time"), // Retrieve time from the database
+                        rs.getTime("duration") // Retrieve duration from the database
                 );
                 eventsList.add(event);
             }

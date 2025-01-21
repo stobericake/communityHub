@@ -1,3 +1,7 @@
+<%@page import="java.time.temporal.ChronoUnit"%>
+<%@page import="java.time.LocalTime"%>
+<%@page import="java.time.LocalDateTime"%>
+<%@page import="java.time.format.DateTimeFormatter"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.cm.model.events"%>
@@ -152,7 +156,72 @@
                                     <td><%=event.getName()%></td>
                                     <td class="text-center"><%=formattedDate%></td>
                                     <td class="text-center">
+                                        <%
+                                            try {
+                                                // Get the event date and time
+                                                Date eventDate = event.getDate(); // This returns a java.sql.Date or java.util.Date object
+                                                Time eventTime = event.getTime(); // This returns a java.sql.Time object
+
+                                                // Convert java.sql.Date to a String in yyyy-MM-dd format
+                                                SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+                                                String eventDateStr = (eventDate != null) ? dateFormatter.format(eventDate) : "1970-01-01"; // Default date if null
+
+                                                // Convert java.sql.Time to a String in HH:mm:ss format
+                                                String eventTimeStr = (eventTime != null) ? eventTime.toString() : "00:00:00"; // Default time if null
+
+                                                // Combine date and time into a single datetime value
+                                                String eventDateTimeStr = eventDateStr + " " + eventTimeStr;
+                                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                                                LocalDateTime eventDateTime = LocalDateTime.parse(eventDateTimeStr, formatter);
+
+                                                // Debugging: Print event date, time, and combined datetime
+                                                System.out.println("Event ID: " + event.getEventID());
+                                                System.out.println("Date: " + eventDateStr);
+                                                System.out.println("Time: " + eventTimeStr);
+                                                System.out.println("Combined DateTime: " + eventDateTimeStr);
+
+                                                // Convert java.sql.Time to java.time.LocalTime
+                                                Time duration = event.getDuration();
+                                                if (duration == null) {
+                                                    throw new IllegalArgumentException("Duration is null for event ID: " + event.getEventID());
+                                                }
+                                                LocalTime durationTime = duration.toLocalTime();
+
+                                                // Calculate total duration in milliseconds
+                                                long durationInMillis = durationTime.getHour() * 60 * 60 * 1000L // Convert hours to milliseconds
+                                                        + durationTime.getMinute() * 60 * 1000L // Convert minutes to milliseconds
+                                                        + durationTime.getSecond() * 1000L;       // Convert seconds to milliseconds
+
+                                                // Debugging: Print duration and calculated milliseconds
+                                                System.out.println("Duration: " + durationTime);
+                                                System.out.println("Duration in Milliseconds: " + durationInMillis);
+
+                                                // Calculate the end time by adding the duration
+                                                LocalDateTime eventEndTime = eventDateTime.plus(durationInMillis, ChronoUnit.MILLIS);
+
+                                                // Debugging: Print event end time
+                                                System.out.println("Event End Time: " + eventEndTime);
+
+                                                // Get the current date and time
+                                                LocalDateTime currentDateTime = LocalDateTime.now();
+
+                                                // Debugging: Print current date and time
+                                                System.out.println("Current DateTime: " + currentDateTime);
+
+                                                // Check if the current time is after the event's end time
+                                                if (currentDateTime.isAfter(eventEndTime)) {
+                                        %>
                                         <a class="btn btn-info bg-purple rounded-3" href="<%= request.getContextPath()%>/AdminEvent?eventID=<%= event.getEventID()%>">Generate</a>
+                                        <% } else { %>
+                                        <button class="btn btn-info bg-purple rounded-3" disabled>Generate</button>
+                                        <% } %>
+                                        <%
+                                        } catch (Exception e) {
+                                            // Log the error and display a message
+                                            System.err.println("Error processing event ID " + event.getEventID() + ": " + e.getMessage());
+                                        %>
+                                        <button class="btn btn-info rounded-3" disabled>Error</button>
+                                        <% } %>
                                     </td>
                                 </tr>
                                 <% }
