@@ -133,6 +133,8 @@
                                         : event.getStatus().equals("2") ? "Approved" : "Rejected"%>
                             </span>
                         </div>
+                            
+                          
 
                         <div class="mb-4">
                             <h5>About</h5>
@@ -166,6 +168,13 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                                    
+                                      <div class="mb-4">
+                            <h5>Total Volunteer: </h5>
+                            <span class="status-badge">
+                                <%= request.getAttribute("totalVol")%>
+                            </span>
                         </div>
                     </div>
 

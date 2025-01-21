@@ -52,7 +52,7 @@ public class eventDetailMgmt extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet eventDetailMgmt</title>");            
+            out.println("<title>Servlet eventDetailMgmt</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet eventDetailMgmt at " + request.getContextPath() + "</h1>");
@@ -73,7 +73,7 @@ public class eventDetailMgmt extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-          HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
         String userRole = (String) session.getAttribute("userRole");
 
         // Check if user is admin
@@ -140,6 +140,18 @@ public class eventDetailMgmt extends HttpServlet {
                     ));
                 }
 
+                String volunteerSql = "SELECT COUNT(volunteerID) AS volunteerCount "
+                        + "FROM eventsvolunteer "
+                        + "WHERE eventID = ?";
+                PreparedStatement volunteerStmt = conn.prepareStatement(volunteerSql);
+                volunteerStmt.setInt(1, eventID);
+                ResultSet volunteerRs = volunteerStmt.executeQuery();
+
+                int volunteerCount = 0;
+                if (volunteerRs.next()) {
+                    volunteerCount = volunteerRs.getInt("volunteerCount");
+                }
+
                 // Format date and time
                 SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mma");
                 SimpleDateFormat inputDateFormat = new SimpleDateFormat("MM/dd/yyyy - ");
@@ -181,6 +193,7 @@ public class eventDetailMgmt extends HttpServlet {
                 // Set attributes
                 request.setAttribute("event", event);
                 request.setAttribute("address", address);
+                request.setAttribute("totalVol", volunteerCount);
                 request.setAttribute("beneficiary", beneficiary);
                 request.setAttribute("tasks", taskList);
                 request.setAttribute("formattedDate", formattedDate);

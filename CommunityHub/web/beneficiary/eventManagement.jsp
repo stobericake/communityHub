@@ -105,11 +105,11 @@
                         <% } %>
                     </select>
                 </div>
-                 <div class="col-md-3 text-end">
-        <a href="beneficiary/createEvent.jsp" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i>Create Event
-        </a>
-    </div>
+                <div class="col-md-3 text-end">
+                    <a href="beneficiary/createEvent.jsp" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Create Event
+                    </a>
+                </div>
 
             </div>
 
@@ -199,30 +199,28 @@
                 Integer totalPages = (Integer) request.getAttribute("totalPages");
             %>
 
-
-            <div class="pagination-container">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-
-                        <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
-                            <a class="page-link" href="?page=<%= currentPage - 1%>" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-
-                        <% for (int i = 1; i <= totalPages; i++) {%>
-                        <li class="page-item <%= currentPage == i ? "active" : ""%>">
-                            <a class="page-link" href="?page=<%= i%>"><%= i%></a>
-                        </li>
-                        <% }%>
-
-                        <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
-                            <a class="page-link" href="?page=<%= currentPage + 1%>" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+           <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
+                                <a class="page-link" href="?page=<%= currentPage - 1%>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <% for (int i = 1; i <= totalPages; i++) {%>
+                            <li class="page-item <%= currentPage == i ? "active" : ""%>">
+                                <a class="page-link" href="?page=<%= i%>"><%= i%></a>
+                            </li>
+                            <% }%>
+                            <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
+                                <a class="page-link" href="?page=<%= currentPage + 1%>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
 
@@ -239,7 +237,7 @@
                 });
             }
 
-                // Attach the filterTable function to the search input
+            // Attach the filterTable function to the search input
             document.getElementById('searchInput').addEventListener('input', filterTable);
 
             document.addEventListener("DOMContentLoaded", function () {

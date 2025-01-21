@@ -46,7 +46,7 @@ public class listHistoryEventMgmt extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet listHistoryEventMgmt</title>");            
+            out.println("<title>Servlet listHistoryEventMgmt</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet listHistoryEventMgmt at " + request.getContextPath() + "</h1>");
@@ -67,7 +67,7 @@ public class listHistoryEventMgmt extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-           List<events> eventList = new ArrayList<>();
+        List<events> eventList = new ArrayList<>();
         List<address> addressList = new ArrayList<>();
         HttpSession session = request.getSession();
         String beneficiaryID = session.getAttribute("beneficiary").toString();
@@ -89,7 +89,7 @@ public class listHistoryEventMgmt extends HttpServlet {
 
             // Base SQL for counting total events
             StringBuilder countSql = new StringBuilder(
-                    "SELECT COUNT(*) as total FROM events WHERE status = 1 AND (date > CURDATE() OR (date = CURDATE() AND time > CURTIME()))"
+                    "SELECT COUNT(*) as total FROM events WHERE status = 2 AND (date > CURDATE() OR (date = CURDATE() AND time > CURTIME()))"
             );
 
             // Add month filter if selected
@@ -116,7 +116,7 @@ public class listHistoryEventMgmt extends HttpServlet {
             rs.next();
             int totalEvents = rs.getInt("total");
 
-            int eventsPerPage = 3;
+            int eventsPerPage = 6;
             int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
             int offset = (currentPage - 1) * eventsPerPage;
             int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
@@ -226,7 +226,9 @@ public class listHistoryEventMgmt extends HttpServlet {
             request.setAttribute("currentPage", page);
             request.setAttribute("sortBy", sortBy);
             request.setAttribute("monthFilter", monthFilter);
-            request.setAttribute("yearFilter", yearFilter); // Pass year filter to JSP
+            request.setAttribute("yearFilter", yearFilter);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("currentPage", currentPage);// Pass year filter to JSP
 
             request.getRequestDispatcher("beneficiary/eventHistory.jsp").forward(request, response);
 
