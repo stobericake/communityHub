@@ -133,8 +133,8 @@ public class addEvent extends HttpServlet {
             conn = dbconnection.getConnection();
             conn.setAutoCommit(false);  // Start transaction
 
-            String sqlCheckAddress = "SELECT addressID FROM address WHERE UPPER(city) = UPPER(?) AND UPPER(country) = (?) "
-                    + "AND postalCode = ? AND UPPER(state = ?) AND UPPER(street) = (?)";
+            String sqlCheckAddress = "SELECT addressID FROM address WHERE UPPER(city) = UPPER(?) AND UPPER(country) = UPPER(?) "
+                    + "AND postalCode = ? AND UPPER(state) = UPPER(?) AND UPPER(street) = UPPER(?)";
             psAddress = conn.prepareStatement(sqlCheckAddress);
             psAddress.setString(1, city);
             psAddress.setString(2, country);

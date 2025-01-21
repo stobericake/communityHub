@@ -6,8 +6,12 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Events Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+             body {
+                background-color: #f8f9fa !important;
+            }
+
         .event-card {
             margin-bottom: 10px;
             transition: transform 0.2s;
@@ -46,12 +50,7 @@
             object-fit: cover;
             border-radius: 8px;
         }
-        .text-truncate {
-            white-space: nowrap;         
-            overflow: hidden;            
-            text-overflow: ellipsis;     
-            display: block;              
-        }
+   
         .volunteer-button {
             padding: 10px;
             border: none;
@@ -91,13 +90,16 @@
      <%@ include file="../header.jspf" %>
     <div class="container mt-4">
         <!-- Header Section -->
-        <div class="row align-items-center mb-4">
+        <div class="row mb-4">
             <div class="col-md-4">
                 <h2>Featured Events</h2>
             </div>
             <div class="col-md-4 offset-md-4">
-                <input type="text" id="searchInput" class="form-control rounded"
-                       placeholder="Search events..." onkeyup="filterEvents()">
+                  <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search events...">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                </div>
+         
             </div>
         </div>
 

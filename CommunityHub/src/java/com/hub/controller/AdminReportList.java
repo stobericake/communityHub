@@ -64,14 +64,30 @@ public class AdminReportList extends HttpServlet {
             conn = dbconnection.getConnection();
 
             // Get parameters
-            String status = request.getParameter("status") != null ? request.getParameter("status") : "all";
+            String status = request.getParameter("status") != null ? request.getParameter("status") : "All";
             int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
             int currentPage1 = request.getParameter("page2") != null ? Integer.parseInt(request.getParameter("page2")) : 1;
             String activeTab = request.getParameter("activeTab") != null ? request.getParameter("activeTab") : "events";
 
             // Events pagination
             String countSql = "SELECT COUNT(*) as total FROM events";
+            if (!"All".equalsIgnoreCase(status)) {
+                countSql += " WHERE status = ?";
+            }
+
             stmt = conn.prepareStatement(countSql);
+            if (!"All".equalsIgnoreCase(status)) {
+                int idstat = 0;
+                if (status.equalsIgnoreCase("Pending")) {
+                    idstat = 1;
+                } else if (status.equalsIgnoreCase("Approved")) {
+                    idstat = 2;
+                } else if (status.equalsIgnoreCase("Rejected")) {
+                    idstat = 3;
+                }
+                stmt.setInt(1, idstat);
+            }
+
             rs = stmt.executeQuery();
             rs.next();
             int totalEvents = rs.getInt("total");
@@ -82,18 +98,16 @@ public class AdminReportList extends HttpServlet {
 
             // Events retrieval
             ArrayList<events> eventsList = new ArrayList<>();
-            int idstat = 0;
             String sql = "SELECT * FROM events";
-
-            if (status != null && !"All".equalsIgnoreCase(status)) {
+            if (!"All".equalsIgnoreCase(status)) {
+                int idstat = 0;
                 if (status.equalsIgnoreCase("Pending")) {
                     idstat = 1;
                 } else if (status.equalsIgnoreCase("Approved")) {
                     idstat = 2;
-                } else {
+                } else if (status.equalsIgnoreCase("Rejected")) {
                     idstat = 3;
                 }
-
                 sql += " WHERE status = ? LIMIT ? OFFSET ?";
                 stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, idstat);
@@ -113,11 +127,10 @@ public class AdminReportList extends HttpServlet {
                         rs.getString("name"),
                         rs.getDate("date")
                 );
-                // Add event object to the events list
                 eventsList.add(event);
             }
 
-            // Volunteers pagination
+            // Volunteers pagination (unchanged)
             String countVol = "SELECT COUNT(*) as total FROM volunteer";
             stmt = conn.prepareStatement(countVol);
             rs = stmt.executeQuery();
@@ -128,7 +141,7 @@ public class AdminReportList extends HttpServlet {
             int totalPages1 = (int) Math.ceil((double) totalVolunteer / volunteerPerPage);
             int offset1 = (currentPage1 - 1) * volunteerPerPage;
 
-            // Volunteers retrieval
+            // Volunteers retrieval (unchanged)
             ArrayList<volunteer> volunteerList = new ArrayList<>();
             String sql1 = "SELECT * FROM volunteer LIMIT ? OFFSET ?";
             stmt = conn.prepareStatement(sql1);
@@ -138,9 +151,9 @@ public class AdminReportList extends HttpServlet {
             rs = stmt.executeQuery();
             while (rs.next()) {
                 volunteer vol = new volunteer(
-                    rs.getInt("volunteerID"),
-                    rs.getString("name"),
-                    rs.getInt("contactInfo")
+                        rs.getInt("volunteerID"),
+                        rs.getString("name"),
+                        rs.getInt("contactInfo")
                 );
                 volunteerList.add(vol);
             }
