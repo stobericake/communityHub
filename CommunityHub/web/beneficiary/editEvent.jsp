@@ -101,6 +101,9 @@
         <%
             events event = (events) request.getAttribute("event");
             address address = (address) request.getAttribute("address");
+            
+ address addr = (address)request.getAttribute("address");
+    System.out.println("JSP values - Country: " + addr.getCountry() + ", City: " + addr.getCity());
         %>
     </head>
     <body>
@@ -108,6 +111,7 @@
 
         <form action="updateEvent.do" method="POST"  enctype="multipart/form-data">
             <input type="hidden" name="id" class="form-control" value="<%= event.getEventID()%>">
+                    <input type="hidden" name="addressID" class="form-control" value="<%= address.getAddressID()%>">
             <div class="container py-5">
 
 
@@ -157,7 +161,8 @@
                             <p class="text-muted mb-4">Update your event details</p>
                             <div class="mb-3">
                                 <label for="eventName" class="form-label">Event Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="eventName" name="eventName" placeholder="Enter your event name" value=<%= event.getName()%> required>
+                                <input type="text" class="form-control" id="eventName" name="eventName" placeholder="Enter your event name" value="<%= event.getName()%>" required>
+                                
 
                             </div>
                             <div class="mb-3">
@@ -239,13 +244,13 @@
                                 <!-- Street Address - Full Width -->
                                 <div class="col-12">
                                     <label class="form-label fw-medium">Street Address <span class="text-danger">*</span></label>
-                                    <input type="text" name="street" class="form-control" placeholder="Enter your street address"    value=<%= address.getStreet()%> required />
+                                    <input type="text" name="street" class="form-control" placeholder="Enter your street address"    value="<%= address.getStreet()%>" required />
                                 </div>
 
                                 <!-- City and State - Two Columns -->
                                 <div class="col-md-6">
                                     <label class="form-label fw-medium">City <span class="text-danger">*</span></label>
-                                    <input type="text" name="city" class="form-control" placeholder="Enter your city" value=<%= address.getCity()%>  required />
+                                    <input type="text" name="city" class="form-control" placeholder="Enter your city" value="<%= address.getCity()%>"  required />
                                 </div>
 
                                 <div class="col-md-6">

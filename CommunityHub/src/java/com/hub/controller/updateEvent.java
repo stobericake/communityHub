@@ -123,6 +123,7 @@ public class updateEvent extends HttpServlet {
                     // Forward the request to the JSP
                     RequestDispatcher dispatcher = request.getRequestDispatcher("beneficiary/editEvent.jsp");
                     dispatcher.forward(request, response);
+                    return;
                 }
             } catch (SQLException e) {
                 getServletContext().log("Database error while fetching event", e);
@@ -131,28 +132,6 @@ public class updateEvent extends HttpServlet {
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(updateEvent.class.getName()).log(Level.SEVERE, "Database driver not found", ex);
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database driver error. Please contact support.");
-            } finally {
-                try {
-                    if (rs != null) {
-                        rs.close();
-                    }
-                } catch (SQLException e) {
-                    getServletContext().log("Error closing result set", e);
-                }
-                if (stmt != null) {
-                    try {
-                        stmt.close();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(updateEvent.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                try {
-                    if (conn != null) {
-                        conn.close();
-                    }
-                } catch (SQLException e) {
-                    getServletContext().log("Error closing connection", e);
-                }
             }
 
         } else if (eventdeleteId != null && !eventdeleteId.isEmpty()) {
@@ -326,101 +305,155 @@ public class updateEvent extends HttpServlet {
 
         try (Connection conn = dbconnection.getConnection()) {
 
-            // Update the event with the image
-            String sql = "UPDATE events e "
-                    + "JOIN address a ON e.addressID = a.addressID "
-                    + "SET e.name = ?, e.date = ?, e.time = ?, e.duration = ?, e.description = ?, "
-                    + "e.image = ?, e.donationLimit = ?, a.city = ?, a.country = ?, a.state = ?, a.postalCode = ?, a.street = ? "
-                    + "WHERE e.eventID = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, eventName);
-                stmt.setDate(2, Date.valueOf(eventDate));
-                stmt.setTime(3, Time.valueOf(eventTime));
-                stmt.setTime(4, duration);
-                stmt.setString(5, desc);
+            String findAddressSQL = "SELECT addressID FROM address WHERE UPPER(street) = UPPER(?) AND UPPER(city) = UPPER(?) AND state = ? AND postalCode = ? AND country = ?";
+            int addressID = -1;
 
-                stmt.setBlob(6, imageInputStream);
+            try (PreparedStatement findStmt = conn.prepareStatement(findAddressSQL)) {
+                findStmt.setString(1, street);
+                findStmt.setString(2, city);
+                findStmt.setString(3, state);
+                findStmt.setInt(4, Integer.parseInt(postalCode));
+                findStmt.setString(5, country);
 
-                stmt.setDouble(7, donationLimit);
-                stmt.setString(8, city);
-                stmt.setString(9, country);
-                stmt.setString(10, state);
-                stmt.setInt(11, Integer.parseInt(postalCode));
-                stmt.setString(12, street);
-                stmt.setInt(13, Integer.parseInt(idValue));
-
-                stmt.executeUpdate();
-                PreparedStatement psTask = null;
-                String sqlTask = null;
-                if (updatedTask != null) {
-
-                    sqlTask = "UPDATE task SET status = ?, description = ?, eventID = ? WHERE taskID = ?";
-                    psTask = conn.prepareStatement(sqlTask);
-
-                    for (int i = 0; i < updatedTask.length; i++) {
-                        String newTask = updatedTask[i];
-                        String taskID = taskIDs[i];
-
-                        psTask.setInt(1, 1);
-                        psTask.setString(2, newTask);
-                        psTask.setInt(3, Integer.parseInt(idValue));
-                        psTask.setInt(4, Integer.parseInt(taskID));
-                        psTask.addBatch();
-                    }
-
-                    if (psTask != null) {
-                        psTask.executeBatch();
+                try (ResultSet rs = findStmt.executeQuery()) {
+                    if (rs.next()) {
+                        // Address already exists, reuse its ID
+                        addressID = rs.getInt("addressID");
                     }
                 }
+            }
 
-                if (!(newTasks == null)) {
-                    sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
-                    psTask = conn.prepareStatement(sqlTask);
+            if (addressID == -1) {
+                // Address does not exist, create a new one
+                String insertAddressSQL = "INSERT INTO address (country, postalCode, street, city, state) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement insertStmt = conn.prepareStatement(insertAddressSQL, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                    insertStmt.setString(1, country);
+                    insertStmt.setInt(2, Integer.parseInt(postalCode));
+                    insertStmt.setString(3, street);
+                    insertStmt.setString(4, city);
+                    insertStmt.setString(5, state);
+                    insertStmt.executeUpdate();
 
-                    for (int i = 0; i < newTasks.length; i++) {
-                        String taskName = newTasks[i];
-
-                        System.out.println("TaskName: " + taskName);
-
-                        if (taskName == null || taskName.trim().isEmpty()) {
-                            break;
-                        }
-
-                        psTask.setInt(1, 1);
-                        psTask.setString(2, taskName);
-                        psTask.setInt(3, Integer.parseInt(idValue));
-                        psTask.setNull(4, java.sql.Types.NULL);
-                        psTask.addBatch();
-                    }
-
-                    // Execute batch task insertions
-                    if (psTask != null) {
-                        psTask.executeBatch();
-                    }
-                }
-
-                if (deleteTasks != null && !deleteTasks.isEmpty()) {
-                    String[] taskIdsArray = deleteTasks.split(",");
-                    String sqlDeleteTask = "DELETE FROM task WHERE taskID = ?";
-                    PreparedStatement psDeleteTask = conn.prepareStatement(sqlDeleteTask);
-                    for (String taskIdStr : taskIdsArray) {
-                        taskIdStr = taskIdStr.trim();
-                        if (!taskIdStr.isEmpty()) {
-
-                            int taskId = Integer.parseInt(taskIdStr);
-                            psDeleteTask.setInt(1, taskId);
-                            psDeleteTask.addBatch();
-
+                    // Retrieve the new addressID
+                    try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            addressID = generatedKeys.getInt(1);
                         }
                     }
-                    psDeleteTask.executeBatch();
-                    psDeleteTask.close();
+                }
+            }
+
+            // Check if the original address is shared with other events
+            String checkSharedAddressSQL = "SELECT COUNT(*) FROM events WHERE addressID = ?";
+            boolean isAddressShared = false;
+
+            try (PreparedStatement stmt = conn.prepareStatement(checkSharedAddressSQL)) {
+                stmt.setInt(1, Integer.parseInt(request.getParameter("addressID"))); // Original addressID
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int eventCount = rs.getInt(1);
+                        if (eventCount > 1) {
+                            isAddressShared = true; // Address is shared with other events
+                        }
+                    }
+                }
+            }
+
+            // Update the event with the new or existing addressID
+            String updateEventSQL = "UPDATE events SET name = ?, date = ?, time = ?, duration = ?, description = ?, "
+                    + "image = ?, donationLimit = ?, addressID = ? WHERE eventID = ?";
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateEventSQL)) {
+                updateStmt.setString(1, eventName);
+                updateStmt.setDate(2, Date.valueOf(eventDate));
+                updateStmt.setTime(3, Time.valueOf(eventTime));
+                updateStmt.setTime(4, duration);
+                updateStmt.setString(5, desc);
+                updateStmt.setBlob(6, imageInputStream);
+                updateStmt.setDouble(7, donationLimit);
+                updateStmt.setInt(8, addressID); // Use the new or existing addressID
+                updateStmt.setInt(9, Integer.parseInt(idValue));
+                updateStmt.executeUpdate();
+            }
+
+            // If the original address is not shared, delete it
+            if (!isAddressShared) {
+                String deleteAddressSQL = "DELETE FROM address WHERE addressID = ?";
+                try (PreparedStatement deleteStmt = conn.prepareStatement(deleteAddressSQL)) {
+                    deleteStmt.setInt(1, Integer.parseInt(request.getParameter("addressID"))); // Original addressID
+                    deleteStmt.executeUpdate();
+                }
+            }
+
+            PreparedStatement psTask = null;
+            String sqlTask = null;
+            if (updatedTask != null) {
+
+                sqlTask = "UPDATE task SET status = ?, description = ?, eventID = ? WHERE taskID = ?";
+                psTask = conn.prepareStatement(sqlTask);
+
+                for (int i = 0; i < updatedTask.length; i++) {
+                    String newTask = updatedTask[i];
+                    String taskID = taskIDs[i];
+
+                    psTask.setInt(1, 1);
+                    psTask.setString(2, newTask);
+                    psTask.setInt(3, Integer.parseInt(idValue));
+                    psTask.setInt(4, Integer.parseInt(taskID));
+                    psTask.addBatch();
                 }
 
+                if (psTask != null) {
+                    psTask.executeBatch();
+                }
+            }
+
+            if (!(newTasks == null)) {
+                sqlTask = "INSERT INTO task (status, description, eventID, volunteerID) VALUES (?, ?, ?, ?)";
+                psTask = conn.prepareStatement(sqlTask);
+
+                for (int i = 0; i < newTasks.length; i++) {
+                    String taskName = newTasks[i];
+
+                    System.out.println("TaskName: " + taskName);
+
+                    if (taskName == null || taskName.trim().isEmpty()) {
+                        break;
+                    }
+
+                    psTask.setInt(1, 1);
+                    psTask.setString(2, taskName);
+                    psTask.setInt(3, Integer.parseInt(idValue));
+                    psTask.setNull(4, java.sql.Types.NULL);
+                    psTask.addBatch();
+                }
+
+                // Execute batch task insertions
+                if (psTask != null) {
+                    psTask.executeBatch();
+                }
+            }
+
+            if (deleteTasks != null && !deleteTasks.isEmpty()) {
+                String[] taskIdsArray = deleteTasks.split(",");
+                String sqlDeleteTask = "DELETE FROM task WHERE taskID = ?";
+                PreparedStatement psDeleteTask = conn.prepareStatement(sqlDeleteTask);
+                for (String taskIdStr : taskIdsArray) {
+                    taskIdStr = taskIdStr.trim();
+                    if (!taskIdStr.isEmpty()) {
+
+                        int taskId = Integer.parseInt(taskIdStr);
+                        psDeleteTask.setInt(1, taskId);
+                        psDeleteTask.addBatch();
+
+                    }
+                }
+                psDeleteTask.executeBatch();
+                psDeleteTask.close();
             }
 
             String message = "The Event Name: " + eventName + " Successfully Updated";
             response.sendRedirect("/CommunityHub/success.jsp?msg=" + URLEncoder.encode(message, "UTF-8"));
+            return;
 
         } catch (SQLException | ClassNotFoundException ex) {
             ex.printStackTrace();
