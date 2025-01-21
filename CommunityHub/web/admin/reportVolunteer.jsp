@@ -66,7 +66,7 @@
                                 <th class="text-center">NO</th>
                                 <th class="">Event List</th>
                                 <th class="text-center">Date</th>
-                                <th class="text-center">Time</th>
+                                <th class="text-center">Duration</th>
                                 <th class="text-center col-3">Role</th>
                                 <th class="text-center">Hours</th>
                             </tr>
@@ -78,7 +78,7 @@
                                 <td class="text-center"><%= ++count%></td>
                                 <td><%= event.getName()%></td>
                                 <td class="text-center"><%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(event.getDate())%></td>
-                                <td class="text-center"><%= new java.text.SimpleDateFormat("HH:mm").format(event.getTime())%></td>
+                                <td class="text-center"><%= new java.text.SimpleDateFormat("HH:mm").format(event.getDuration())%></td>
                                 <td class="text-center"><%= tasks.size() > count - 1 ? tasks.get(count - 1) : "Crew"%></td>
                                 <td class="text-center"><%= event.getDuration().toLocalTime().getHour()%></td>
                             </tr>
