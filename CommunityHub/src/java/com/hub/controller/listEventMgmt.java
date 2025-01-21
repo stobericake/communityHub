@@ -83,17 +83,101 @@ public class listEventMgmt extends HttpServlet {
             return;
         } else {
         }
+        ResultSet rs;
+        PreparedStatement stmt;
+        
+        try (Connection conn = dbconnection.getConnection()) {
 
-        try (Connection conn = dbconnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "SELECT e.eventID, e.name, e.date, e.time, e.duration, e.image, e.donationLimit, "
-                        + "e.description, e.volunteerNeeded, e.status, e.addressID, "
-                        + "a.city, a.state, a.country, a.street, a.postalCode, a.addressID "
-                        + "FROM events e JOIN address a ON e.addressID = a.addressID "
-                        + "WHERE e.beneficiaryID = ?  AND  CURDATE() < e.date")) {
+            String sortBy = request.getParameter("sortBy") != null ? request.getParameter("sortBy") : "eventID";
+            String monthFilter = request.getParameter("month");
+            String yearFilter = request.getParameter("year"); // New year filter
 
-            stmt.setInt(1, Integer.parseInt(beneficiaryID));
-            try (ResultSet rs = stmt.executeQuery()) {
+            // Base SQL for counting total events
+            StringBuilder countSql = new StringBuilder(
+                    "SELECT COUNT(*) as total FROM events WHERE status = 1 AND (date > CURDATE() OR (date = CURDATE() AND time > CURTIME()))"
+            );
+
+            // Add month filter if selected
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                countSql.append(" AND MONTH(date) = ?");
+            }
+
+            // Add year filter if selected
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                countSql.append(" AND YEAR(date) = ?");
+            }
+
+            stmt = conn.prepareStatement(countSql.toString());
+            int paramIndex = 1;
+
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
+            }
+
+            rs = stmt.executeQuery();
+            rs.next();
+            int totalEvents = rs.getInt("total");
+
+            int eventsPerPage = 3;
+            int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+            int offset = (currentPage - 1) * eventsPerPage;
+            int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
+
+            // Base SQL for fetching events
+            StringBuilder sql = new StringBuilder(
+                    "SELECT e.*, a.* FROM events e "
+                    + "JOIN address a ON e.addressID = a.addressID "
+                    + "WHERE e.status = 1 OR e.status = 2 AND (e.date > CURDATE() OR (e.date = CURDATE() AND e.time > CURTIME()))"
+            );
+
+            // Add month filter if selected
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                sql.append(" AND MONTH(e.date) = ?");
+            }
+
+            // Add year filter if selected
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                sql.append(" AND YEAR(e.date) = ?");
+            }
+
+            // Add sorting
+            sql.append(" ORDER BY ");
+            switch (sortBy) {
+                case "eventID":
+                    sql.append("e.eventID ASC"); // Earlier created events first
+                    break;
+                case "date":
+                    sql.append("e.date ASC, e.time ASC");
+                    break;
+                case "donationLimit":
+                    sql.append("e.donationLimit DESC");
+                    break;
+                case "volunteerNeeded":
+                    sql.append("e.volunteerNeeded DESC");
+                    break;
+                default:
+                    sql.append("e.eventID ASC");
+            }
+
+            sql.append(" LIMIT ? OFFSET ?");
+
+            stmt = conn.prepareStatement(sql.toString());
+            paramIndex = 1;
+
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
+            }
+            stmt.setInt(paramIndex++, eventsPerPage);
+            stmt.setInt(paramIndex, offset);
+
+            rs = stmt.executeQuery();
+
                 while (rs.next()) {
                     events event = new events(
                             rs.getInt("eventID"),
@@ -121,16 +205,8 @@ public class listEventMgmt extends HttpServlet {
                     eventList.add(event);
                     addressList.add(addr);
                 }
-            }
-        } catch (SQLException | ClassNotFoundException ex) {
-            Logger.getLogger(listEventMgmt.class.getName()).log(Level.SEVERE, null, ex);
-            request.setAttribute("error", "An error occurred while fetching event data.");
-            request.getRequestDispatcher("error.jsp").forward(request, response);
-            return;
-        }
-
-        // Set the pagination parameters
-        int pageSize = 6;  // Limit of data per page
+                
+                 int pageSize = 6;  // Limit of data per page
         int page = 1; // Default to first page
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
@@ -146,14 +222,28 @@ public class listEventMgmt extends HttpServlet {
         List<address> paginatedAddressList = addressList.subList(startIndex, endIndex);
 
         // Get the total number of events for pagination controls
-        int totalEvents = eventList.size();
-        int totalPages = (int) Math.ceil((double) totalEvents / pageSize);
+        totalEvents = eventList.size();
+        totalPages = (int) Math.ceil((double) totalEvents / pageSize);
 
         request.setAttribute("event", paginatedEventList);
         request.setAttribute("address", paginatedAddressList);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", page);
+         request.setAttribute("sortBy", sortBy);
+            request.setAttribute("monthFilter", monthFilter);
+            request.setAttribute("yearFilter", yearFilter); // Pass year filter to JSP
+            
         request.getRequestDispatcher("beneficiary/eventManagement.jsp").forward(request, response);
+            
+        } catch (SQLException | ClassNotFoundException ex) {
+            Logger.getLogger(listEventMgmt.class.getName()).log(Level.SEVERE, null, ex);
+            request.setAttribute("error", "An error occurred while fetching event data.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
+        }
+
+        // Set the pagination parameters
+       
     }
 
     /**

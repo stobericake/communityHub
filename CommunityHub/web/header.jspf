@@ -176,7 +176,7 @@
                         <!-- Admin Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Menu
+                                Event Approval
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                                 <!--                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>-->
@@ -189,7 +189,7 @@
                         <!-- Volunteer Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Menu
+                               Home
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="volunteerDropdown">
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/vEventList.do" onclick="updateDropdownText('Home')">Home</a></li>
@@ -201,10 +201,11 @@
                         <!-- Beneficiary Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Menu
+                                Event Management
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="beneficiaryDropdown">
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/listEventMgmt.do" onclick="updateDropdownText('Event Management')">Event Management</a></li>
+                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/listHistoryEventMgmt" onclick="updateDropdownText('Event History')">Event History</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/donorList.do" onclick="updateDropdownText('Donor List')">Donor List</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/volunteerList.do" onclick="updateDropdownText('Volunteer List')">Volunteer List</a></li>
                             </ul>

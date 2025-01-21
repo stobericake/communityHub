@@ -162,10 +162,9 @@ public class updateEvent extends HttpServlet {
             try {
                 conn = dbconnection.getConnection(); // Get DB connection
 
-                // SQL query to delete the event from the database
-                // Fetch the addressID before deleting the event
-                String deleteSQL = "SELECT addressID FROM events WHERE eventID = ?";
-                stmt = conn.prepareStatement(deleteSQL);
+                // Fetch the addressID for the event being deleted
+                String fetchAddressSQL = "SELECT addressID FROM events WHERE eventID = ?";
+                stmt = conn.prepareStatement(fetchAddressSQL);
                 stmt.setInt(1, Integer.parseInt(eventdeleteId));
 
                 ResultSet rs = stmt.executeQuery();
@@ -176,47 +175,28 @@ public class updateEvent extends HttpServlet {
                 rs.close();
                 stmt.close();
 
+                // Check if the addressID is shared with other events
+                String checkSharedAddressSQL = "SELECT COUNT(*) FROM events WHERE addressID = ?";
+                stmt = conn.prepareStatement(checkSharedAddressSQL);
+                stmt.setInt(1, addressID);
+                rs = stmt.executeQuery();
+
+                boolean isAddressShared = false;
+                if (rs.next()) {
+                    int eventCount = rs.getInt(1);
+                    if (eventCount > 1) {
+                        isAddressShared = true; // Address is shared with other events
+                    }
+                }
+                rs.close();
+                stmt.close();
+
                 // Delete tasks associated with the event
-                deleteSQL = "DELETE FROM task WHERE eventID = ?";
+                String deleteSQL = "DELETE FROM task WHERE eventID = ?";
                 stmt = conn.prepareStatement(deleteSQL);
                 stmt.setInt(1, Integer.parseInt(eventdeleteId));
                 stmt.executeUpdate();
                 stmt.close();
-
-                String checkBeneficiarySQL = "SELECT COUNT(*) FROM beneficiary WHERE addressID = ?";
-                String checkVolunteerSQL = "SELECT COUNT(*) FROM volunteer WHERE addressID = ?";
-                boolean addressExists = false;
-
-                try (PreparedStatement checkBeneficiaryStmt = conn.prepareStatement(checkBeneficiarySQL);
-                        PreparedStatement checkVolunteerStmt = conn.prepareStatement(checkVolunteerSQL)) {
-
-                    // Check in beneficiary table
-                    checkBeneficiaryStmt.setInt(1, addressID);
-                    try (ResultSet rsBeneficiary = checkBeneficiaryStmt.executeQuery()) {
-                        if (rsBeneficiary.next() && rsBeneficiary.getInt(1) > 0) {
-                            addressExists = true;
-                        }
-                    }
-
-                    // Check in volunteer table
-                    if (!addressExists) { // Only check if it hasn't been found yet
-                        checkVolunteerStmt.setInt(1, addressID);
-                        try (ResultSet rsVolunteer = checkVolunteerStmt.executeQuery()) {
-                            if (rsVolunteer.next() && rsVolunteer.getInt(1) > 0) {
-                                addressExists = true;
-                            }
-                        }
-                    }
-                }
-
-                // Delete the address
-                if (!addressExists) {
-                    String deleteAddressSQL = "DELETE FROM address WHERE addressID = ?";
-                    try (PreparedStatement deleteAddressStmt = conn.prepareStatement(deleteAddressSQL)) {
-                        deleteAddressStmt.setInt(1, addressID);
-                        deleteAddressStmt.executeUpdate();
-                    }
-                }
 
                 // Delete the event
                 deleteSQL = "DELETE FROM donation WHERE eventID = ?";
@@ -243,7 +223,16 @@ public class updateEvent extends HttpServlet {
                 stmt.executeUpdate();
                 stmt.close();
 
-                response.sendRedirect("listEventMgmt.do"); // You may need to adjust the redirect
+                // Delete the address only if it is not shared with other events
+                if (!isAddressShared) {
+                    String deleteAddressSQL = "DELETE FROM address WHERE addressID = ?";
+                    stmt = conn.prepareStatement(deleteAddressSQL);
+                    stmt.setInt(1, addressID);
+                    stmt.executeUpdate();
+                    stmt.close();
+                }
+
+                response.sendRedirect("listEventMgmt.do"); // Redirect after deletion
 
             } catch (SQLException e) {
                 e.printStackTrace();

@@ -112,6 +112,14 @@
         <servlet-name>profileDetail</servlet-name>
         <servlet-class>com.hub.controller.profileDetail</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>eventDetailMgmt</servlet-name>
+        <servlet-class>com.hub.controller.eventDetailMgmt</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>listHistoryEventMgmt</servlet-name>
+        <servlet-class>com.hub.controller.listHistoryEventMgmt</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -247,6 +255,14 @@
     <servlet-mapping>
         <servlet-name>profileDetail</servlet-name>
         <url-pattern>/ProfileDetail</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>eventDetailMgmt</servlet-name>
+        <url-pattern>/eventDetailMgmt</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>listHistoryEventMgmt</servlet-name>
+        <url-pattern>/listHistoryEventMgmt</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
