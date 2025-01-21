@@ -12,6 +12,16 @@ public class beneficiary {
     private String password;
     private int addressID;
     private Blob image;
+
+    public beneficiary(int beneficiaryID, String name, int contactInfo, String username, String password, int addressID, Blob image) {
+        this.beneficiaryID = beneficiaryID;
+        this.name = name;
+        this.contactInfo = contactInfo;
+        this.username = username;
+        this.password = password;
+        this.addressID = addressID;
+        this.image = image;
+    }
     
         // Constructor
     public beneficiary(int beneficiaryID, String name) {

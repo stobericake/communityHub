@@ -108,6 +108,10 @@
         <servlet-name>guestEventDetail</servlet-name>
         <servlet-class>com.hub.controller.guestEventDetail</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>profileDetail</servlet-name>
+        <servlet-class>com.hub.controller.profileDetail</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -239,6 +243,10 @@
     <servlet-mapping>
         <servlet-name>guestEventDetail</servlet-name>
         <url-pattern>/eventDetailGuest</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>profileDetail</servlet-name>
+        <url-pattern>/ProfileDetail</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

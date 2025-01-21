@@ -233,7 +233,7 @@
                                      alt="Profile" class="profile-img">
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/profile.jsp">
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/ProfileDetail">
                                         <i class="bi bi-person me-2"></i>My Profile
                                     </a></li>
                                 <li><hr class="dropdown-divider"></li>
