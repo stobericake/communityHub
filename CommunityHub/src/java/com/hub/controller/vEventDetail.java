@@ -105,6 +105,17 @@ public class vEventDetail extends HttpServlet {
         if (eventID != 0) {
             try {
                 conn = dbconnection.getConnection();
+                
+                String taskSql = "SELECT * FROM task WHERE eventID = ? AND status = 0";
+                    PreparedStatement taskStmt = conn.prepareStatement(taskSql);
+                    taskStmt.setInt(1, eventID);
+                    ResultSet taskRs = taskStmt.executeQuery();
+                    while (taskRs.next()) {
+                        int taskId = taskRs.getInt("taskID");
+                        String taskDescription = taskRs.getString("description");
+                        taskList.add(new task(taskId, taskDescription));
+                    }
+                    
                 String sql = "SELECT * FROM events e "
                         + "INNER JOIN address a ON e.addressID = a.addressID "
                         + "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
@@ -139,16 +150,6 @@ public class vEventDetail extends HttpServlet {
                             rs.getInt("beneficiaryID"),
                             rs.getString("b.name")
                     );
-
-                    String taskSql = "SELECT * FROM task WHERE eventID = ? AND status = 1";
-                    PreparedStatement taskStmt = conn.prepareStatement(taskSql);
-                    taskStmt.setInt(1, eventID);
-                    ResultSet taskRs = taskStmt.executeQuery();
-                    while (taskRs.next()) {
-                        int taskId = taskRs.getInt("taskID");
-                        String taskDescription = taskRs.getString("description");
-                        taskList.add(new task(taskId, taskDescription));
-                    }
 
                     SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mma");
                     SimpleDateFormat inputDateFormat = new SimpleDateFormat("MM/dd/yyyy - ");

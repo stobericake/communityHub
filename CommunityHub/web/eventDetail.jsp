@@ -30,8 +30,9 @@
             }
 
             .event-image {
-                width: 350px;
-                height: auto;
+                width: 300px; /* Fixed width */
+                height: 150px; /* Fixed height */
+                object-fit: cover; /* Ensures the image is resized to fit the dimensions without distortion */
                 margin: 10px;
             }
 
@@ -161,21 +162,35 @@
                             </div>
                         </div>
                 <div class="mb-4">
-                            <h5>Tasks Required:</h5>
-                <form action="volunteerServlet1" method="POST">
-                <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
-                <% int i = 0; %>
-                <% for (task task : tasks) { %>
-                    <div class="form-check form-check-inline mb-3">
-                        <input type="hidden" name="taskID" value="<%= task.getTaskID() %>">
-                        <input type="radio" class="form-check-input" name="task" id="task<%= i %>" 
-                               value="<%= task.getDescription() %>" <%= i == 0 ? "checked" : "" %>>
-                        <label class="form-check-label" for="task<%= i %>"><%= task.getDescription() %></label>
-                    </div>
-                    <% i++; %>
-                <% } %>
+                <h5>Tasks Required:</h5>
+        <form action="volunteerServlet1" method="POST">
+            <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
+            <% 
+                if (tasks == null || tasks.isEmpty()) { 
+            %>
+                <div class="form-check form-check-inline mb-3">
+                    <input type="hidden" name="taskID" value="null">
+                    <input type="radio" class="form-check-input" name="task" id="defaultTask" value="Crew" checked>
+                    <label class="form-check-label" for="defaultTask">Crew</label>
+                </div>
+            <% 
+                } else { 
+                    int i = 0; 
+                    for (task task : tasks) { 
+            %>
+                <div class="form-check form-check-inline mb-3">
+                    <input type="hidden" name="taskID" value="<%= task.getTaskID() %>">
+                    <input type="radio" class="form-check-input" name="task" id="task<%= i %>" 
+                           value="<%= task.getDescription() %>" <%= i == 0 ? "checked" : "" %>>
+                    <label class="form-check-label" for="task<%= i %>"><%= task.getDescription() %></label>
+                </div>
+                <% 
+                            i++;
+                        } 
+                    } 
+                %>
                 <%
-                   if (user == null) {
+                    if (user == null) {
                 %>
                 <p class="text-danger">Please log in to volunteer for this event.</p>
                 <a href="../login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
@@ -191,6 +206,7 @@
                     }
                 %>
             </form>
+
             </div>
         </div>
             </div> 

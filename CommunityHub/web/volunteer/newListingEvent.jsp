@@ -117,7 +117,7 @@
         <div class="row g-4">
         <%
             if (events != null && !events.isEmpty()) {
-                                        int num = (currentPage - 1) * 4 + 1; // Start number for pagination
+                                        int num = (currentPage - 1) * 5 + 1;// Start number for pagination
                                         for (events event : events) {
                                             int eventID = event.getEventID();
                                             String name = event.getName();
@@ -187,7 +187,7 @@
                             </a>
                         </li>
                         
-                        <% for(int i = 1; i <= totalPages; i++) { %>
+                        <% for(int i = 1; i < totalPages; i++) { %>
                             <li class="page-item <%= currentPage == i ? "active" : "" %>">
                                 <a class="page-link" href="?page=<%= i %>"><%= i %></a>
                             </li>
@@ -216,9 +216,9 @@
                 var location = card.getAttribute('data-location').toLowerCase();
 
                 if (title.includes(input)  description.includes(input)  location.includes(input)) {
-                    card.closest('.col-md-3').style.display = '';
+                    card.closest('.col-md-4').style.display = '';
                 } else {
-                    card.closest('.col-md-3').style.display = 'none';
+                    card.closest('.col-md-4').style.display = 'none';
                 }
             });
         }

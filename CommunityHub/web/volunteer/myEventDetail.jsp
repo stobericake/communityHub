@@ -35,11 +35,12 @@
             .container {
                 margin: 15px;
             }
-
+            
             .event-image {
-                width: 350px; /* Set the width */
-                height: auto; /* Keep the aspect ratio */
-                margin: 10px
+                width: 300px; /* Fixed width */
+                height: 150px; /* Fixed height */
+                object-fit: cover; /* Ensures the image is resized to fit the dimensions without distortion */
+                margin: 10px;
             }
 
             .divider {
@@ -276,9 +277,15 @@
                             <p class="card-text text-muted">
                                 Tell us about your experience and suggestions to improve our service and enhance our system.
                             </p>
+                            <% if ( isEventEnded  && ev.getAttendance() == 1) { %>
                             <a href="serviceForm?eventID=<%= eventID %>" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
                                 FILL IN FORM? <i class="bi bi-pencil-square"></i>
                             </a>
+                            <% } else { %>
+                                <button class="btn w-100 py-2" style="background-color: #ccc; color: #666; border-radius: 30px;" disabled>
+                                    Report Unavailable
+                                </button>
+                            <% } %>
                         </div>
                     </div>
                 </div>

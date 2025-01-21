@@ -304,7 +304,7 @@
             </nav>
         </div>
     </div>
-      <script>
+    <script>
     function filterTable() {
                 const input = document.getElementById('searchInput').value.toLowerCase();
                 const rows = document.querySelectorAll('#eventTable tbody tr');

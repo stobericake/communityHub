@@ -107,16 +107,18 @@ public class vEventList extends HttpServlet {
                 countRs.close();
                 countStmt.close();
 
-                int eventsPerPage = 4;
+                int eventsPerPage = 3;
                 int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
                 int offset = (currentPage - 1) * eventsPerPage;
                 int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
 
-                // Fetch events for the current page
-                String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? AND status = 2 AND e.eventID NOT IN (SELECT eventID FROM eventsVolunteer WHERE volunteerID = ?)";
+                String sql = "SELECT * FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? AND status = 2 AND e.eventID NOT IN (SELECT eventID FROM eventsVolunteer WHERE volunteerID = ?) LIMIT ? OFFSET ?";
                 stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, postalCode);
                 stmt.setInt(2, volunteerId);
+                stmt.setInt(3, eventsPerPage);  // Limit to 3 events per page
+                stmt.setInt(4, offset);         // Skip previous pages' events
+
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
