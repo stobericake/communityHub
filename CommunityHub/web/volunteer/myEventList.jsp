@@ -85,7 +85,7 @@
                 <div class="col-md-4">
                     <h1 class="page-header">MY EVENT</h1>
                     <h6 class="page-subheader">The tables below show all of the events that you joined</h6>
-            </div>
+                </div>
 
                 <div class="col-md-4 offset-md-4">
                     <input type="text" id="searchInput" class="form-control rounded"
@@ -95,49 +95,50 @@
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-striped" id="eventTable" >
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col" width="25%">Events</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Task</th>
-                        <th scope="col" width="10%" class="text-center">View Detail</th>
-                    </tr>
-                </thead>
-                <tbody>
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" width="25%">Events</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Task</th>
+                            <th scope="col" width="10%" class="text-center">View Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                 <%
-                if (events != null && !events.isEmpty()) {
-                    int index = 1;
-                    int num = (currentPage - 1) * 4 + 1; // Start number for pagination
-                        if (events != null && !events.isEmpty()) {
                     for (int i = 0; i < events.size(); i++) {
                         events event = events.get(i);
                         task task = tasks.get(i); // Assuming tasks and events are aligned
-            
-                String formattedDate = new SimpleDateFormat("MM/dd/yyyy -").format(event.getDate());
-                String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
-                %>         
-               <tr>
-                   <td class="fw-medium"><%= event.getName() %></td>
-                   <td><%= formattedDate %></td>
-                   <td><%= formattedTime %></td>
-                   <td><%= task.getDescription() %></td>
-                   <td class="text-center">
-                       <a href="myDetail.do?eventID=<%= event.getEventID() %>">
-                           <i class="bi bi-arrow-right-circle"></i>
-                       </a>
-                   </td>
-               </tr>                                       
+                        address add = addresses.get(i);
+                        String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(event.getDate());
+                        String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
 
-               </table>
-                    
-                 <% }
-                        } else {
+                        // Check if the task is null or if the task description is empty
+                        String taskDescription = (task == null || task.getDescription() == null || task.getDescription().isEmpty()) 
+                                                ? "Crew" 
+                                                : task.getDescription();
+                %>         
+                <tr>
+                    <td class="fw-medium"><%= event.getName() %></td>
+                    <td><%= add.getState() %></td>
+                    <td><%= formattedDate %></td>
+                    <td><%= formattedTime %></td>
+                    <td><%= taskDescription %></td> <!-- Display "Crew" if no task is assigned -->
+                    <td class="text-center">
+                        <a href="myDetail.do?eventID=<%= event.getEventID() %>">
+                            <i class="bi bi-arrow-right-circle"></i>
+                        </a>
+                    </td>
+                </tr>                                       
+                <%
+                    }
                 %>
-            <div> No events found.</div>
-                               
-                <% }
-                }%>
+            </tbody>
+                </table>
+               </div>
+        </div>
+
         <!-- Pagination -->
         <div class="container  mb-3">
             <nav aria-label="Page navigation">
@@ -165,16 +166,16 @@
     </div>
 
     <script>
-    function filterTable() {
-                const input = document.getElementById('searchInput').value.toLowerCase();
-                const rows = document.querySelectorAll('#eventTable tbody tr');
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#eventTable tbody tr');
 
-                rows.forEach(row => {
-                    const cells = Array.from(row.querySelectorAll('td'));
-                    const match = cells.some(cell => cell.textContent.toLowerCase().includes(input));
-                    row.style.display = match ? '' : 'none';
-                });
-            }
-</script>
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                const match = cells.some(cell => cell.textContent.toLowerCase().includes(input));
+                row.style.display = match ? '' : 'none';
+            });
+        }
+    </script>
 </body>
 </html>

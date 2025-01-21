@@ -107,30 +107,61 @@
                 <h2>Featured Events</h2>
             </div>
             <div class="col-md-4 offset-md-4">
-                <div class="input-group">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search events...">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search events...">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    </div>
                 </div>
-            </div>
-        </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="sortBy" onchange="updateFilters()">
+                        <option value="eventID" <%= "eventID".equals(request.getAttribute("sortBy")) ? "selected" : ""%>>Sort by Creation Order</option>
+                        <option value="date" <%= "date".equals(request.getAttribute("sortBy")) ? "selected" : ""%>>Sort by Event Date</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="monthFilter" onchange="updateFilters()">
+                        <option value="">All Months</option>
+                        <%
+                            String[] months = {"January", "February", "March", "April", "May", "June",
+                                "July", "August", "September", "October", "November", "December"};
+                            for (int i = 0; i < months.length; i++) {
+                                String selected = String.valueOf(i + 1).equals(request.getAttribute("monthFilter")) ? "selected" : "";
+                        %>
+                        <option value="<%= i + 1%>" <%= selected%>><%= months[i]%></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="yearFilter" onchange="updateFilters()">
+                        <option value="">All Years</option>
+                        <%
+                            int currentYear = java.time.Year.now().getValue();
+                            for (int year = currentYear - 5; year <= currentYear + 5; year++) {
+                                String selected = String.valueOf(year).equals(request.getAttribute("yearFilter")) ? "selected" : "";
+                        %>
+                        <option value="<%= year%>" <%= selected%>><%= year%></option>
+                        <% } %>
+                    </select>
+                </div>
+       
         <!-- Events Grid -->
         <div class="row g-4">
         <%
             if (events != null && !events.isEmpty()) {
-                                        int num = (currentPage - 1) * 5 + 1;// Start number for pagination
-                                        for (events event : events) {
-                                            int eventID = event.getEventID();
-                                            String name = event.getName();
-                                            String desc = event.getDescription();
-                                            String city = "";
-                                            for (address addr : addresses) {
-                                                if (addr.getAddressID() == event.getAddressID()) {
-                                                    city = addr.getCity();
-                                                    break; // Exit the loop once the match is found
-                                                }
-                                            }
-                                            String formattedDate = new SimpleDateFormat("dd/MM:").format(event.getDate());
-                                            String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
+                int num = (currentPage - 1) * 5 + 1;// Start number for pagination
+                for (events event : events) {
+                int eventID = event.getEventID();
+                String name = event.getName();
+                String desc = event.getDescription();
+                String city = "";
+                for (address addr : addresses) {
+                    if (addr.getAddressID() == event.getAddressID()) {
+                        city = addr.getCity();
+                        break; // Exit the loop once the match is found
+                    }
+                }
+                String formattedDate = new SimpleDateFormat("dd/MM:").format(event.getDate());
+                String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
             %>            
             <div class="col-md-4">
                  <div class="card h-100 event-card shadow" data-title="<%= name%>" data-description="<%= desc%>" data-location="<%= city%>">
@@ -156,12 +187,7 @@
                             <i class="bi bi-coin me-2"></i>
                             Donate
                         </button>
-                        <button 
-                            class="btn btn-primary" 
-                            onclick="location.href='vEvent.do?eventID=<%= eventID %>'">
-                            <i class="bi bi-arrow-up-right-circle me-2"></i>
-                            View Details
-                        </button>      
+                            
                     </div>
 
                     </div>
@@ -178,50 +204,70 @@
           
             <!-- Updated Pagination -->
             <div class="row mt-4">
-            <div class="col-12">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
-                            <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        
-                        <% for(int i = 1; i < totalPages; i++) { %>
-                            <li class="page-item <%= currentPage == i ? "active" : "" %>">
-                                <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                <div class="col-12">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item <%= currentPage == 1 ? "disabled" : ""%>">
+                                <a class="page-link" href="?page=<%= currentPage - 1%>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
                             </li>
-                        <% } %>
-                        
-                        <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
-                            <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div> 
+                            <% for (int i = 1; i <= totalPages; i++) {%>
+                            <li class="page-item <%= currentPage == i ? "active" : ""%>">
+                                <a class="page-link" href="?page=<%= i%>"><%= i%></a>
+                            </li>
+                            <% }%>
+                            <li class="page-item <%= currentPage == totalPages ? "disabled" : ""%>">
+                                <a class="page-link" href="?page=<%= currentPage + 1%>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
-   </div>
-    <!-- Keep your existing filterEvents() function -->
+    </div>
     <script>
-        function filterEvents() {
-            var input = document.getElementById('searchInput').value.toLowerCase();
-            var eventCards = document.querySelectorAll('.event-card');
-            
-            eventCards.forEach(function(card) {
-                var title = card.getAttribute('data-title').toLowerCase();
-                var description = card.getAttribute('data-description').toLowerCase();
-                var location = card.getAttribute('data-location').toLowerCase();
+            function filterEvents() {
+                var input = document.getElementById('searchInput').value.toLowerCase();
+                var eventCards = document.querySelectorAll('.event-card');
 
-                if (title.includes(input)  description.includes(input)  location.includes(input)) {
-                    card.closest('.col-md-4').style.display = '';
+                eventCards.forEach(function (card) {
+                    var title = card.getAttribute('data-title').toLowerCase();
+                    var description = card.getAttribute('data-description').toLowerCase();
+                    var location = card.getAttribute('data-location').toLowerCase();
+
+                    if (title.includes(input) || description.includes(input) || location.includes(input)) {
+                        card.closest('.col-md-4').style.display = '';
+                    } else {
+                        card.closest('.col-md-4').style.display = 'none';
+                    }
+                });
+            }
+
+            function updateFilters() {
+                const sortBy = document.getElementById('sortBy').value;
+                const monthFilter = document.getElementById('monthFilter').value;
+                const yearFilter = document.getElementById('yearFilter').value; // New year filter
+
+                let url = new URL(window.location.href);
+                url.searchParams.set('sortBy', sortBy);
+                if (monthFilter) {
+                    url.searchParams.set('month', monthFilter);
                 } else {
-                    card.closest('.col-md-4').style.display = 'none';
+                    url.searchParams.delete('month');
                 }
-            });
-        }
+                if (yearFilter) {
+                    url.searchParams.set('year', yearFilter); // Add year filter to URL
+                } else {
+                    url.searchParams.delete('year');
+                }
+                url.searchParams.set('page', '1'); // Reset to first page when filters change
+                window.location.href = url.toString();
+            }
+
+            document.getElementById('searchInput').addEventListener('input', filterEvents);
     </script>
 </body>
 </html>

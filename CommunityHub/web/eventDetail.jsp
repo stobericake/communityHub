@@ -38,7 +38,7 @@
 
             .divider {
                 height: 1px;
-                width: 95%;
+                width: 100%;
                 background-color: black;
                 margin: 0 auto;
             }
@@ -53,26 +53,6 @@
                 border-radius: 30px; /* Rounded edges */
             }
                         
-            .dropdown-menu {
-                list-style: none; /* Removes bullet points */
-                padding: 0; /* Optional: Adjust spacing */
-                margin: 0; /* Optional: Adjust spacing */
-            }
-
-            .dropdown-toggle::before {
-                content: none; /* Removes any unintended dots or symbols */
-            }
-            .dropdown-item {
-                color: #495057; /* Dark gray text */
-                font-size: 16px; /* Font size */
-                padding: 12px 20px; /* Increase padding for better spacing */
-            }
-
-            /* Change the color of the item on hover */
-            .dropdown-item:hover {
-                background-color: #F56476; /* Blue background on hover */
-                color: white; /* White text on hover */
-            }
         </style>
     </head>
     <body>
@@ -161,54 +141,49 @@
                                 </div>
                             </div>
                         </div>
-                <div class="mb-4">
-                <h5>Tasks Required:</h5>
-        <form action="volunteerServlet1" method="POST">
-            <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
+<div class="mb-4">
+    <!-- "Tasks Required" and Dropdown in One Line -->
+    <div class="d-flex align-items-center mb-4">
+        <h5 class="mb-0 me-4">Tasks Required:</h5>
+
+        <!-- Dropdown for Tasks -->
+        <select name="taskID" class="form-select w-auto" required>
+            <!-- Always include "Crew" as the first option with a special value (e.g., -1) -->
+            <option value="-1">Crew</option>
             <% 
-                if (tasks == null || tasks.isEmpty()) { 
-            %>
-                <div class="form-check form-check-inline mb-3">
-                    <input type="hidden" name="taskID" value="null">
-                    <input type="radio" class="form-check-input" name="task" id="defaultTask" value="Crew" checked>
-                    <label class="form-check-label" for="defaultTask">Crew</label>
-                </div>
-            <% 
-                } else { 
-                    int i = 0; 
+                if (tasks != null && !tasks.isEmpty()) { 
                     for (task task : tasks) { 
             %>
-                <div class="form-check form-check-inline mb-3">
-                    <input type="hidden" name="taskID" value="<%= task.getTaskID() %>">
-                    <input type="radio" class="form-check-input" name="task" id="task<%= i %>" 
-                           value="<%= task.getDescription() %>" <%= i == 0 ? "checked" : "" %>>
-                    <label class="form-check-label" for="task<%= i %>"><%= task.getDescription() %></label>
-                </div>
-                <% 
-                            i++;
-                        } 
+                <option value="<%= task.getTaskID() %>"><%= task.getDescription() %></option>
+            <% 
                     } 
-                %>
-                <%
-                    if (user == null) {
-                %>
-                <p class="text-danger">Please log in to volunteer for this event.</p>
-                <a href="../login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
-                    LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
-                </a>
-                <%
-                    } else {
-                %>
-                <button type="submit" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
-                    VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
-                </button>
-                <%
-                    }
-                %>
-            </form>
+                } 
+            %>
+        </select>
+    </div>
 
-            </div>
-        </div>
-            </div> 
+    <!-- Volunteer Button or Login Prompt Below -->
+    <form action="volunteerServlet1" method="POST">
+        <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
+
+        <% 
+            if (user == null) { 
+        %>
+            <p class="text-danger mt-2">Please log in to volunteer for this event.</p>
+            <a href="../login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
+            </a>
+        <% 
+            } else { 
+        %>
+            <button type="submit" class="btn w-100 py-2 mt-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
+            </button>
+        <% 
+            } 
+        %>
+    </form>
+</div>
+        </div> 
     </body>
 </html>

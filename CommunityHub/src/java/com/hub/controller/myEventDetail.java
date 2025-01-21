@@ -70,139 +70,136 @@ public class myEventDetail extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
-            int eventID = Integer.parseInt(request.getParameter("eventID"));
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-            PreparedStatement taskStmt = null;
-            ResultSet taskRs = null;
-            PreparedStatement donationStmt = null;
-            ResultSet donationRs = null;
-            events event = null;
-            address address = null;
-            beneficiary beneficiary = null;
-            task tasks = null;
-            eventsVolunteer ev = null;
+        int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
+        int eventID = Integer.parseInt(request.getParameter("eventID"));
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        PreparedStatement taskStmt = null;
+        ResultSet taskRs = null;
+        PreparedStatement donationStmt = null;
+        ResultSet donationRs = null;
+        events event = null;
+        address address = null;
+        beneficiary beneficiary = null;
+        task tasks = null;
+        eventsVolunteer ev = null;
 
-            if (eventID != 0) {
-                try {
-                    conn = dbconnection.getConnection();
-                    String sql = "SELECT* FROM events e "
-                            + "INNER JOIN address a ON e.addressID = a.addressID "
-                            + "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID "
-                            + "INNER JOIN task t ON ev.volunteerID = t.volunteerID AND e.eventID = t.eventID "
-                            + "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID WHERE e.eventID = ?";
-                    stmt = conn.prepareStatement(sql);
-                    stmt.setInt(1, eventID);
-                    rs = stmt.executeQuery();
+        if (eventID != 0) {
+            try {
+                conn = dbconnection.getConnection();
 
-                    if (rs.next()) {
-                        event = new events(
-                                rs.getInt("e.eventID"),
-                                rs.getString("e.name"),
-                                rs.getDate("date"),
-                                rs.getTime("time"),
-                                rs.getTime("duration"),
-                                rs.getString("description"),
-                                rs.getInt("volunteerNeeded"),
-                                rs.getString("status"),
-                                rs.getBlob("image"),
-                                rs.getDouble("donationLimit"),
-                                rs.getInt("addressID")
-                        );
-                        eventsVolunteer eventsVolunteer = new eventsVolunteer(
-                                rs.getInt("eventsVolunteerID"),
-                                rs.getInt("eventID"),
-                                rs.getInt("volunteerID"),
-                                rs.getInt("attendance")
-                        );
-                        
-                        address = new address(
-                                rs.getInt("addressID"),
-                                rs.getString("country"),
-                                rs.getInt("postalCode"),
-                                rs.getString("street"),
-                                rs.getString("city"),
-                                rs.getString("state")
-                        );
+                // Fetch event details with LEFT JOIN for task to handle null tasks
+                String sql = "SELECT e.*, a.*, ev.*, b.*, t.taskID, t.description AS taskDescription " +
+                             "FROM events e " +
+                             "INNER JOIN address a ON e.addressID = a.addressID " +
+                             "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
+                             "INNER JOIN beneficiary b ON e.beneficiaryID = b.beneficiaryID " +
+                             "LEFT JOIN task t ON ev.volunteerID = t.volunteerID AND e.eventID = t.eventID " +
+                             "WHERE e.eventID = ? AND ev.volunteerID = ?";
+                stmt = conn.prepareStatement(sql);
+                stmt.setInt(1, eventID);
+                stmt.setInt(2, volunteerId);
+                rs = stmt.executeQuery();
 
-                        beneficiary = new beneficiary(
-                                rs.getInt("beneficiaryID"), 
-                                rs.getString("b.name")
-                        );
-                        tasks = new task(
-                             rs.getInt("taskID"),
-                             rs.getString("t.description"),
-                             rs.getInt("t.volunteerID")
-                        );
+                if (rs.next()) {
+                    event = new events(
+                            rs.getInt("e.eventID"),
+                            rs.getString("e.name"),
+                            rs.getDate("date"),
+                            rs.getTime("time"),
+                            rs.getTime("duration"),
+                            rs.getString("description"),
+                            rs.getInt("volunteerNeeded"),
+                            rs.getString("status"),
+                            rs.getBlob("image"),
+                            rs.getDouble("donationLimit"),
+                            rs.getInt("addressID")
+                    );
 
-                        SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mma");
-                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                    ev = new eventsVolunteer(
+                            rs.getInt("eventsVolunteerID"),
+                            rs.getInt("eventID"),
+                            rs.getInt("volunteerID"),
+                            rs.getInt("attendance")
+                    );
 
-                        // Convert `eventDate` to LocalDate (compatible approach)
-                        LocalDate eventLocalDate = new java.util.Date(rs.getDate("date").getTime())
-                                .toInstant()
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate();
+                    address = new address(
+                            rs.getInt("addressID"),
+                            rs.getString("country"),
+                            rs.getInt("postalCode"),
+                            rs.getString("street"),
+                            rs.getString("city"),
+                            rs.getString("state")
+                    );
 
-                        // Convert SQL Time to LocalTime
-                        LocalTime startTime = rs.getTime("time").toLocalTime();
-                        LocalTime duration = rs.getTime("duration").toLocalTime();
+                    beneficiary = new beneficiary(
+                            rs.getInt("beneficiaryID"),
+                            rs.getString("b.name")
+                    );
 
-                        // Calculate the event's end time
-                        LocalTime endTime = startTime.plusHours(duration.getHour()).plusMinutes(duration.getMinute());
+                    // Handle null task (Crew)
+                    int taskID = rs.getInt("taskID");
+                    String taskDescription = rs.getString("taskDescription");
+                    if (rs.wasNull()) { // Check if taskID or taskDescription is null
+                        taskDescription = "Crew"; // Default to "Crew" if no task is assigned
+                    }
 
-                        // Format the date and time for display
-                        String formattedDate = inputDateFormat.format(rs.getDate("date"));
-                        String formattedStartTime = outputFormat.format(rs.getDate("time"));
-                        String formattedEndTime = outputFormat.format(Time.valueOf(endTime));
-                        
-                        request.setAttribute("formattedDate", formattedDate);
-                        request.setAttribute("formattedStartTime", formattedStartTime);
-                        request.setAttribute("formattedEndTime", formattedEndTime);
-                        request.setAttribute("event", event);
-                        request.setAttribute("address", address);
-                        request.setAttribute("beneficiary", beneficiary);
-                        request.setAttribute("task", tasks);
-                        request.setAttribute("eventsVolunteer", eventsVolunteer);
-                        
-                        request.getRequestDispatcher("/volunteer/myEventDetail.jsp").forward(request, response);
-                        } 
+                    tasks = new task(
+                            taskID,
+                            taskDescription,
+                            volunteerId
+                    );
+
+                    // Format date and time
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mma");
+                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+                    LocalDate eventLocalDate = new java.util.Date(rs.getDate("date").getTime())
+                            .toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate();
+
+                    LocalTime startTime = rs.getTime("time").toLocalTime();
+                    LocalTime duration = rs.getTime("duration").toLocalTime();
+                    LocalTime endTime = startTime.plusHours(duration.getHour()).plusMinutes(duration.getMinute());
+
+                    String formattedDate = inputDateFormat.format(rs.getDate("date"));
+                    String formattedStartTime = outputFormat.format(rs.getDate("time"));
+                    String formattedEndTime = outputFormat.format(Time.valueOf(endTime));
+
+                    request.setAttribute("formattedDate", formattedDate);
+                    request.setAttribute("formattedStartTime", formattedStartTime);
+                    request.setAttribute("formattedEndTime", formattedEndTime);
+                    request.setAttribute("event", event);
+                    request.setAttribute("address", address);
+                    request.setAttribute("beneficiary", beneficiary);
+                    request.setAttribute("task", tasks);
+                    request.setAttribute("eventsVolunteer", ev);
+
+                    request.getRequestDispatcher("/volunteer/myEventDetail.jsp").forward(request, response);
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
-            }   catch (ClassNotFoundException ex) {
-                    Logger.getLogger(myEventDetail.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(myEventDetail.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
                 // Close resources manually
                 try {
-                    if (taskRs != null) {
-                        taskRs.close();
-                    }
-                    if (taskStmt != null) {
-                        taskStmt.close();
-                    }
-                    if (donationRs != null) {
-                        donationRs.close();
-                    }
-                    if (donationStmt != null) {
-                        donationStmt.close();
-                    }
-                    if (rs != null) {
-                        rs.close();
-                    }
-                    if (stmt != null) {
-                        stmt.close();
-                    }
-                    if (conn != null) {
-                        conn.close();
-                    }
+                    if (taskRs != null) taskRs.close();
+                    if (taskStmt != null) taskStmt.close();
+                    if (donationRs != null) donationRs.close();
+                    if (donationStmt != null) donationStmt.close();
+                    if (rs != null) rs.close();
+                    if (stmt != null) stmt.close();
+                    if (conn != null) conn.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-                } else { }
-                        
+        } else {
+            // Handle case where eventID is 0
+        }
     }
 
     /**

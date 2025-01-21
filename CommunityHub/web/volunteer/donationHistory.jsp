@@ -183,7 +183,6 @@
                     placeholder="Search by any field..." onkeyup="filterTable()"><br>
             </div>
          </div>
-        <div class="container">
         <div class="center-card">
             <div class="donation-card mb-3">
                 <%
@@ -222,7 +221,6 @@
                     </div>
                 </div>
             </div>
-        </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">

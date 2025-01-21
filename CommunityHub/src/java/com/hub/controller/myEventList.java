@@ -64,112 +64,118 @@ public class myEventList extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-                int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
+        int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
 
-                int pageSize = 5; // Number of events per page
-                int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-                int totalRecords = 0;
-                int totalPages = 0;
-                List<events> eventList = new ArrayList<>();
-                List<eventsVolunteer> eventsVolList = new ArrayList<>();
-                List<address> addressList = new ArrayList<>();
-                List<task> taskList = new ArrayList<>();
+        int pageSize = 5; // Number of events per page
+        int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+        int totalRecords = 0;
+        int totalPages = 0;
+        List<events> eventList = new ArrayList<>();
+        List<eventsVolunteer> eventsVolList = new ArrayList<>();
+        List<address> addressList = new ArrayList<>();
+        List<task> taskList = new ArrayList<>();
 
-                Connection conn = null;
-                PreparedStatement stmt = null;
-                ResultSet rs = null;
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
 
-                try {
-                    conn = dbconnection.getConnection(); // Get DB connection
+        try {
+            conn = dbconnection.getConnection(); // Get DB connection
 
-                    // Count total records
-                    String countQuery = "SELECT COUNT(*) AS total FROM events e " +
-                                        "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
-                                        "WHERE ev.volunteerID = ?";
-                    stmt = conn.prepareStatement(countQuery);
-                    stmt.setInt(1, volunteerId);
-                    rs = stmt.executeQuery();
-                    if (rs.next()) {
-                        totalRecords = rs.getInt("total");
-                        totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
-                    }
-                    rs.close();
-                    stmt.close();
-
-                     // Fetch paginated data
-                    String sql ="SELECT * FROM events e " +
-                                "INNER JOIN address a ON e.addressID = a.addressID " +
+            // Count total records
+            String countQuery = "SELECT COUNT(*) AS total FROM events e " +
                                 "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
-                                "INNER JOIN task t ON ev.volunteerID = t.volunteerID AND e.eventID = t.eventID " +
-                                "WHERE ev.volunteerID = ? "+
-                                "LIMIT ? OFFSET ?";
+                                "WHERE ev.volunteerID = ?";
+            stmt = conn.prepareStatement(countQuery);
+            stmt.setInt(1, volunteerId);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                totalRecords = rs.getInt("total");
+                totalPages = (int) Math.ceil(totalRecords / (double) pageSize);
+            }
+            rs.close();
+            stmt.close();
 
-                    stmt = conn.prepareStatement(sql);
-                    stmt.setInt(1, volunteerId);
-                    stmt.setInt(2, pageSize);
-                    stmt.setInt(3, (currentPage - 1) * pageSize);
-                    rs = stmt.executeQuery();
-                   while (rs.next()) {
-                    address address = new address(
-                            rs.getInt("addressID"),
-                            rs.getString("country"),
-                            rs.getInt("postalCode"),
-                            rs.getString("street"),
-                            rs.getString("city"),
-                            rs.getString("state")
-                    );
+            // Fetch paginated data
+            String sql = "SELECT e.*, a.*, ev.*, t.taskID, t.description AS taskDescription " +
+                         "FROM events e " +
+                         "INNER JOIN address a ON e.addressID = a.addressID " +
+                         "INNER JOIN eventsVolunteer ev ON e.eventID = ev.eventID " +
+                         "LEFT JOIN task t ON ev.volunteerID = t.volunteerID AND e.eventID = t.eventID " +
+                         "WHERE ev.volunteerID = ? " +
+                         "LIMIT ? OFFSET ?";
 
-                    addressList.add(address);
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, volunteerId);
+            stmt.setInt(2, pageSize);
+            stmt.setInt(3, (currentPage - 1) * pageSize);
+            rs = stmt.executeQuery();
 
-                    eventsVolunteer eventsv = new eventsVolunteer(
-                            rs.getInt("eventsVolunteerID"), 
-                            rs.getInt("eventID"), 
-                            rs.getInt("volunteerID"),
-                            rs.getInt("attendance")
-                    );
-                    
-                    eventsVolList.add(eventsv);
-                    
-                    events event = new events(
-                            rs.getInt("eventID"),
-                            rs.getString("name"),
-                            rs.getDate("date"),
-                            rs.getTime("time"),
-                            rs.getTime("duration"),
-                            rs.getString("description"),
-                            rs.getInt("volunteerNeeded"),
-                            rs.getString("status"),
-                            rs.getBlob("image"),
-                            rs.getDouble("donationLimit"),
-                            rs.getInt("addressID")
-                    );
-                    eventList.add(event);
-                    
-                     task tasks = new task(
-                             rs.getInt("taskID"),
-                             rs.getString("t.description"),
-                             rs.getInt("t.volunteerID")
-                     ); 
-                     taskList.add(tasks);
+            while (rs.next()) {
+                address address = new address(
+                        rs.getInt("addressID"),
+                        rs.getString("country"),
+                        rs.getInt("postalCode"),
+                        rs.getString("street"),
+                        rs.getString("city"),
+                        rs.getString("state")
+                );
+                addressList.add(address);
+
+                eventsVolunteer eventsv = new eventsVolunteer(
+                        rs.getInt("eventsVolunteerID"),
+                        rs.getInt("eventID"),
+                        rs.getInt("volunteerID"),
+                        rs.getInt("attendance")
+                );
+                eventsVolList.add(eventsv);
+
+                events event = new events(
+                        rs.getInt("eventID"),
+                        rs.getString("name"),
+                        rs.getDate("date"),
+                        rs.getTime("time"),
+                        rs.getTime("duration"),
+                        rs.getString("description"),
+                        rs.getInt("volunteerNeeded"),
+                        rs.getString("status"),
+                        rs.getBlob("image"),
+                        rs.getDouble("donationLimit"),
+                        rs.getInt("addressID")
+                );
+                eventList.add(event);
+
+                // Handle null task (Crew)
+                int taskID = rs.getInt("taskID");
+                String taskDescription = rs.getString("taskDescription");
+                if (rs.wasNull()) { // Check if taskID or taskDescription is null
+                    taskDescription = "Crew"; // Default to "Crew" if no task is assigned
                 }
 
-                request.setAttribute("events", eventList);
-                request.setAttribute("address", addressList);
-                request.setAttribute("tasks", taskList);
-                request.setAttribute("eventsV", eventsVolList);
-                request.setAttribute("totalPages", totalPages);
-                request.setAttribute("currentPage", currentPage);
-                
-                request.getRequestDispatcher("/volunteer/myEventList.jsp").forward(request, response);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
-                    try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-                }
+                task tasks = new task(
+                        taskID,
+                        taskDescription,
+                        volunteerId
+                );
+                taskList.add(tasks);
+            }
+
+            request.setAttribute("events", eventList);
+            request.setAttribute("address", addressList);
+            request.setAttribute("tasks", taskList);
+            request.setAttribute("eventsV", eventsVolList);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("currentPage", currentPage);
+
+            request.getRequestDispatcher("/volunteer/myEventList.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try { if (rs != null) rs.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (stmt != null) stmt.close(); } catch (SQLException e) { e.printStackTrace(); }
+            try { if (conn != null) conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+        }
     }
-
     /**
      * Handles the HTTP <code>POST</code> method.
      *
