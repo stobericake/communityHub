@@ -85,7 +85,7 @@
         <%
             List<events> events = (List) request.getAttribute("events");
             List<address> addresses = (List) request.getAttribute("address");
-           
+
             Integer currentPage = (Integer) request.getAttribute("currentPage");
             Integer totalPages = (Integer) request.getAttribute("totalPages");
         %>
@@ -148,10 +148,10 @@
                                 </button>
                                 <button 
                                     class="btn btn-primary" 
-                                    onclick="location.href = 'vEvent.do?eventID=<%= eventID%>'">
+                                    onclick="location.href = '${pageContext.request.contextPath}/eventDetailGuest?eventID=<%= eventID%>'">
                                     <i class="bi bi-arrow-up-right-circle me-2"></i>
                                     View Details
-                                </button>      
+                                </button>
                             </div>
 
                         </div>
@@ -169,7 +169,7 @@
                 <!-- Updated Pagination -->
                 <div class="row mt-4">
                     <div class="col-12">
-                      
+
 
                         <div class="pagination-container">
                             <nav aria-label="Page navigation">

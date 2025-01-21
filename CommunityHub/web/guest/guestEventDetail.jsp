@@ -17,9 +17,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Event Detail</title>
-     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
         <style>
-    
+
 
             .container {
                 margin: 15px;
@@ -47,7 +47,7 @@
                 color: #fff; /* White text */
                 border-radius: 30px; /* Rounded edges */
             }
-                        
+
             .dropdown-menu {
                 list-style: none; /* Removes bullet points */
                 padding: 0; /* Optional: Adjust spacing */
@@ -73,13 +73,12 @@
     <body>
         <%@ include file="../header.jspf" %>
         <%
-            
             // Access the attributes set by the servlet
             events event = (events) request.getAttribute("event");
             address addressObj = (address) request.getAttribute("address");
             beneficiary beneficiaryObj = (beneficiary) request.getAttribute("beneficiary");
             List<task> tasks = (List) request.getAttribute("tasks");
-            
+
             String formattedDate = request.getAttribute("formattedDate").toString();
             String formattedStartTime = request.getAttribute("formattedStartTime").toString();
             String formattedEndTime = request.getAttribute("formattedEndTime").toString();
@@ -88,90 +87,90 @@
             double remainingAmount = Double.parseDouble(request.getAttribute("remainingAmount").toString());
             double progress = Double.parseDouble(request.getAttribute("progress").toString());
         %>
-            <img src="getImage.do?type=events&id=<%= event.getEventID() %>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
-            <figure class="text-center">
-                <blockquote class="blockquote">
-                    <p class="h6"><%= event.getName() %></p>
-                </blockquote>
-                <figcaption class="blockquote-footer">
-                    BY <cite title="Beneficiary Name">@<%= beneficiaryObj.getName() %></cite>
-                </figcaption>
-            </figure>
-            <div class="divider"></div>
-            <div class="container">
+        <img src="getImage.do?type=events&id=<%= event.getEventID()%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
+        <figure class="text-center">
+            <blockquote class="blockquote">
+                <p class="h6"><%= event.getName()%></p>
+            </blockquote>
+            <figcaption class="blockquote-footer">
+                BY <cite title="Beneficiary Name">@<%= beneficiaryObj.getName()%></cite>
+            </figcaption>
+        </figure>
+        <div class="divider"></div>
+        <div class="container">
             <div class="clearfix">
                 <div class="card col-md-3 float-md-end mb-4 ms-md-3" style="border-radius: 10px;">
                     <div class="card-body text-start">
-                        <h2 class="fw-bold">RM<%= totalDonation %></h2>
+                        <h2 class="fw-bold">RM<%= totalDonation%></h2>
                         <div class="progress mb-3" style="height: 8px; border-radius: 5px;">
-                            <div class="progress-bar" role="progressbar" style="width: <%= progress %>%;" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar" role="progressbar" style="width: <%= progress%>%;" aria-valuenow="<%= progress%>" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between mb-3">
-                            <small class="text-muted text-start">Goal<br>RM<%= event.getDonationLimit() %></small>
-                            <small class="text-muted text-end">Remaining<br>RM<%= remainingAmount %></small>
+                            <small class="text-muted text-start">Goal<br>RM<%= event.getDonationLimit()%></small>
+                            <small class="text-muted text-end">Remaining<br>RM<%= remainingAmount%></small>
                         </div>
                         <div class="d-flex align-items-start justify-content-start">
-                        <i class="bi bi-clock me-2"></i>
-                        <small class="text-muted"> 123 days </small>
+                            <i class="bi bi-clock me-2"></i>
+                            <small class="text-muted"> 123 days </small>
+                        </div>
+                        <div class="d-flex align-items-start justify-content-start">
+                            <i class="bi bi-heart-fill text-danger me-2"></i>
+                            <small class="text-muted"><%= totalContributors%> Contributors</small>
+                        </div>
+                        <hr>
+                        <button class="btn w-100 py-2" onclick="location.href = 'addDonor.do?eventID=<%= event.getEventID()%>'" style="background-color: #000; color: #fff; border-radius: 30px;">
+                            DONATE <i class="bi bi-heart"></i>
+                        </button>
                     </div>
-                    <div class="d-flex align-items-start justify-content-start">
-                        <i class="bi bi-heart-fill text-danger me-2"></i>
-                        <small class="text-muted"><%= totalContributors %> Contributors</small>
-                    </div>
-                    <hr>
-                    <button class="btn w-100 py-2" onclick="location.href='addDonor.do?eventID=<%= event.getEventID() %>'" style="background-color: #000; color: #fff; border-radius: 30px;">
-                        DONATE <i class="bi bi-heart"></i>
-                    </button>
                 </div>
-                    </div>
-       
-            <p><strong>About.</strong></p>
-            <p><%= event.getDescription() %></p>
-            <p><strong>Location.</strong></p>
-            <div class="d-flex align-items-start justify-content-start">
-                <i class="bi bi-geo-alt me-2"></i>
-                <p class="text-muted"><%= addressObj.getState() %></p>
-            </div>
-            <p><strong>Event Date.</strong></p>
-            <div class="d-flex justify-content-between md-3">
-            <small>Start Date
-            
-                <br><div class="d-flex align-items-start justify-content-start">
-                <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"><%=formattedDate%> <%=formattedStartTime%></p>
-            </div>
-            </small>
-            <small>End Date
-            
-                <br><div class="d-flex align-items-start justify-content-start">
-                <i class="bi bi-calendar-event me-2"></i>
-                <p class="text-muted"><%=formattedDate%> <%=formattedEndTime%></p>
-            </div>
-            </small>
-            </div>
+
+                <p><strong>About.</strong></p>
+                <p><%= event.getDescription()%></p>
+                <p><strong>Location.</strong></p>
+                <div class="d-flex align-items-start justify-content-start">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    <p class="text-muted"><%= addressObj.getState()%></p>
+                </div>
+                <p><strong>Event Date.</strong></p>
+                <div class="d-flex justify-content-between md-3">
+                    <small>Start Date
+
+                        <br><div class="d-flex align-items-start justify-content-start">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            <p class="text-muted"><%=formattedDate%> <%=formattedStartTime%></p>
+                        </div>
+                    </small>
+                    <small>End Date
+
+                        <br><div class="d-flex align-items-start justify-content-start">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            <p class="text-muted"><%=formattedDate%> <%=formattedEndTime%></p>
+                        </div>
+                    </small>
+                </div>
                 <p><strong>Tasks Required:</strong></p>
                 <form action="volunteerServlet1" method="POST">
-                <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
-                <% int i = 0; %>
-                <% for (task task : tasks) { %>
+                    <input type="hidden" name="eventID" value="<%= event.getEventID()%>">
+                    <% int i = 0; %>
+                    <% for (task task : tasks) {%>
                     <div class="form-check form-check-inline mb-3">
-                        <input type="hidden" name="taskID" value="<%= task.getTaskID() %>">
-                        <input type="radio" class="form-check-input" name="task" id="task<%= i %>" 
-                               value="<%= task.getDescription() %>" <%= i == 0 ? "checked" : "" %>>
-                        <label class="form-check-label" for="task<%= i %>"><%= task.getDescription() %></label>
+                        <input type="hidden" name="taskID" value="<%= task.getTaskID()%>">
+                        <input type="radio" class="form-check-input" name="task" id="task<%= i%>" 
+                               value="<%= task.getDescription()%>" <%= i == 0 ? "checked" : ""%>>
+                        <label class="form-check-label" for="task<%= i%>"><%= task.getDescription()%></label>
                     </div>
                     <% i++; %>
-                <% } %>
+                    <% }%>
                 </form>
-                
+
                 <p class="text-danger">Please log in to volunteer for this event.</p>
-<a href="${pageContext.request.contextPath}/login.jsp" 
-   class="btn w-100 py-2" 
-   style="background-color: #000; color: #fff; border-radius: 30px;">
-    LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
-</a>
-               
-        
+                <a href="${pageContext.request.contextPath}/login.jsp" 
+                   class="btn w-100 py-2" 
+                   style="background-color: #000; color: #fff; border-radius: 30px;">
+                    LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
+                </a>
+
+
             </div>
         </div>
     </body>
