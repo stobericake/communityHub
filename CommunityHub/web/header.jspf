@@ -153,7 +153,7 @@
 
         <nav class="header navbar navbar-expand-lg navbar-dark fixed-top">
             <div class="container-fluid">
-                <a href="<%=userRole.equals("admin") ? request.getContextPath() + "/adminList.do"
+                <a href="<%=userRole.equals("admin") ? request.getContextPath() + "/AdminDashboard"
                         : userRole.equals("volunteer") ? request.getContextPath() + "/vEventList.do"
                         : userRole.equals("beneficiary") ? request.getContextPath() + "/listEventMgmt.do"
                         : request.getContextPath() + "/listGuestEvent.do"%>" class="text-decoration-none">
@@ -179,7 +179,7 @@
                                 Event Approval
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                                <!--                                <li><a class="dropdown-item" href="#" onclick="updateDropdownText('Home')">Home</a></li>-->
+                                <li><a class="dropdown-item" href="<%=request.getContextPath()%>/AdminDashboard" onclick="updateDropdownText('Home')">Home</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/adminList.do" onclick="updateDropdownText('Event Approval')">Event Approval</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/reportList" onclick="updateDropdownText('Generate Report')">Generate Report</a></li>
                             </ul>
