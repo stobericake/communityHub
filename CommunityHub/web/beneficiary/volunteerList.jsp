@@ -149,7 +149,7 @@
                     %>
                     <tr>
                         <td><%= vol.getName() %></td>
-                        <td><%= vol.getContactInfo() %></td>
+                        <td>0<%= vol.getContactInfo() %></td>
                         <td><%= vol.getUsername() %></td>
                         <td><%= event.getName() %></td>
                         <td><%= dateFormat.format(event.getDate()) %></td>

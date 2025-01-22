@@ -124,7 +124,7 @@
                 %>            
                 <div class="col-md-4">
                     <div class="card h-100 event-card shadow" data-title="<%= name%>" data-description="<%= desc%>" data-location="<%= city%>">
-                        <a href="vEvent.do?eventID=<%= eventID%>">
+                        <a href="${pageContext.request.contextPath}/eventDetailGuest?eventID=<%= eventID%>">
                             <img src="getImage.do?type=events&id=<%= eventID%>"   class="card-img-top" alt="Event Image">
                         </a>
                         <div class="card-body d-flex flex-column">
@@ -142,7 +142,7 @@
                             <div class="action-buttons mt-auto">
                                 <button 
                                     class="btn btn-dark" 
-                                    onclick="location.href = 'guest/donationForm.jsp?eventID=<%= eventID%>'">
+                                    onclick="location.href = 'addDonor.do?eventID=<%= eventID%>'">
                                     <i class="bi bi-coin me-2"></i>
                                     Donate
                                 </button>

@@ -152,7 +152,7 @@ public class vEventDetail extends HttpServlet {
                     );
 
                     SimpleDateFormat outputFormat = new SimpleDateFormat("hh:mma");
-                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("MM/dd/yyyy - ");
+                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd-MM-yyyy - ");
 
                     // Convert eventDate to LocalDate
                     LocalDate eventLocalDate = new java.util.Date(rs.getDate("date").getTime())

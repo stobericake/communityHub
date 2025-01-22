@@ -242,7 +242,7 @@
                 for (int i = 0; i < events.size(); i++) {
                     events event = events.get(i);
                     donation donation = donations.get(i);  
-                    String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(donation.getDate());
+                    String formattedDate = new SimpleDateFormat("dd-MM-yyyy").format(donation.getDate());
                     String amount = df.format(donation.getAmount());
             %>
                 <tr>

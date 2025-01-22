@@ -98,9 +98,13 @@ public class vEventList extends HttpServlet {
 
             if (postalCode != 0) {
                 // Count total events for pagination
-                String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ?";
+                String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? "
+                        + "AND status = 2 AND e.eventID NOT IN "
+                        + "(SELECT eventID FROM eventsVolunteer "
+                        + "WHERE volunteerID = ?) ";
                 PreparedStatement countStmt = conn.prepareStatement(countSql);
                 countStmt.setInt(1, postalCode);
+                countStmt.setInt(2, volunteerId);
                 ResultSet countRs = countStmt.executeQuery();
                 countRs.next();
                 int totalEvents = countRs.getInt("total");
@@ -163,7 +167,7 @@ public class vEventList extends HttpServlet {
                 request.getRequestDispatcher("/volunteer/newListingEvent.jsp").forward(request, response);
             } else {
                 request.setAttribute("msg", "No postal code found for the volunteer.");
-                request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
+                request.getRequestDispatcher("/error.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();
