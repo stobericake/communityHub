@@ -3,6 +3,7 @@
     Created on : Dec 25, 2024, 1:43:16 AM
     Author     : Rina
 --%>
+<%@page import="java.time.LocalDate"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="com.cm.model.address"%>
 <%@ page import="java.util.ArrayList" %>
@@ -132,6 +133,7 @@
                 }
                 String formattedDate = new SimpleDateFormat("dd/MM:").format(event.getDate());
                 String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
+                
             %>            
             <div class="col-md-4">
                  <div class="card h-100 event-card shadow" data-title="<%= name%>" data-description="<%= desc%>" data-location="<%= city%>">

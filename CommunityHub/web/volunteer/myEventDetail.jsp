@@ -157,9 +157,7 @@
             LocalTime eventStartTime = LocalTime.parse(formattedStartTime, timeFormatter);
             LocalTime eventEndTime = LocalTime.parse(formattedEndTime, timeFormatter);
 
-            boolean isEventOngoing = currentDate.isEqual(eventDate) &&
-                                     currentTime.isAfter(eventStartTime) &&
-                                     currentTime.isBefore(eventEndTime);
+            boolean isEventOngoing = currentDate.isEqual(eventDate) && currentTime.isAfter(eventStartTime) && currentTime.isBefore(eventEndTime);
 
             boolean isEventEnded = currentDate.isAfter(eventDate) ||
                                (currentDate.isEqual(eventDate) && currentTime.isAfter(eventEndTime));
@@ -195,7 +193,7 @@
                             <br>
                             <div class="d-flex align-items-start justify-content-start">
                                 <i class="bi bi-calendar-event me-2"></i>
-                                <p class="text-muted"><%=formattedDate%> <%= event.getTime()%></p>
+                                <p class="text-muted"><%=formattedDate%> <%= formattedStartTime %></p>
                             </div>
                         </small>
 

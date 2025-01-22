@@ -98,10 +98,11 @@ public class vEventList extends HttpServlet {
 
             if (postalCode != 0) {
                 // Count total events for pagination
-                String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? "
-                        + "AND status = 2 AND e.eventID NOT IN "
-                        + "(SELECT eventID FROM eventsVolunteer "
-                        + "WHERE volunteerID = ?) ";
+                String countSql =  "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? "
+                    + "AND status = 2 AND e.eventID NOT IN "
+                    + "(SELECT eventID FROM eventsVolunteer "
+                    + "WHERE volunteerID = ?) "
+                    + "AND e.date >= CURDATE()";  // Add this condition to filter out past events
                 PreparedStatement countStmt = conn.prepareStatement(countSql);
                 countStmt.setInt(1, postalCode);
                 countStmt.setInt(2, volunteerId);
@@ -117,11 +118,12 @@ public class vEventList extends HttpServlet {
                 int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
 
                 String sql = "SELECT * FROM events e "
-                        + "JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? "
-                        + "AND status = 2 AND e.eventID NOT IN "
-                        + "(SELECT eventID FROM eventsVolunteer "
-                        + "WHERE volunteerID = ?) "
-                        + "LIMIT ? OFFSET ?";
+                    + "JOIN address a ON e.addressID = a.addressID WHERE a.postalCode = ? "
+                    + "AND status = 2 AND e.eventID NOT IN "
+                    + "(SELECT eventID FROM eventsVolunteer "
+                    + "WHERE volunteerID = ?) "
+                    + "AND e.date >= CURDATE() "  // Add this condition to filter out past events
+                    + "LIMIT ? OFFSET ?";
                 
                 stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, postalCode);

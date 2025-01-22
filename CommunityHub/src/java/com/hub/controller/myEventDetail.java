@@ -165,7 +165,7 @@ public class myEventDetail extends HttpServlet {
                     LocalTime endTime = startTime.plusHours(duration.getHour()).plusMinutes(duration.getMinute());
 
                     String formattedDate = inputDateFormat.format(rs.getDate("date"));
-                    String formattedStartTime = outputFormat.format(rs.getDate("time"));
+                    String formattedStartTime = outputFormat.format(rs.getTime("time"));
                     String formattedEndTime = outputFormat.format(Time.valueOf(endTime));
 
                     request.setAttribute("formattedDate", formattedDate);
