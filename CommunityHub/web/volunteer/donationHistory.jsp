@@ -21,7 +21,7 @@
         }
                 
         .donation-card {
-            width: 1000px;
+            width: 100%;
             border: 1px solid #e6e6f2;
             border-radius: 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -175,14 +175,17 @@
     <div class="container my-4">
         <div class="row align-items-center mb-4">
             <div class="col-md-4">
-                <h1 class="page-header">Donation History</h1>    
-            </div>
+                    <h1 class="page-header">DONATION HISTORY</h1>
+                    <h6 class="page-subheader">The tables below show all the donation you have made</h6>
+
+                </div>
 
             <div class="col-md-4 offset-md-4">
                 <input type="text" id="searchInput" class="form-control rounded"
                     placeholder="Search by any field..." onkeyup="filterTable()"><br>
             </div>
          </div>
+        <div class="container">
         <div class="center-card">
             <div class="donation-card mb-3">
                 <%
@@ -221,6 +224,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
