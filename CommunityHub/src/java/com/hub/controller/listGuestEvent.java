@@ -42,7 +42,7 @@ public class listGuestEvent extends HttpServlet {
             conn = dbconnection.getConnection();
 
             // Get the total number of events for pagination
-            String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID where e.status=2 ";
+            String countSql = "SELECT COUNT(*) as total FROM events e JOIN address a ON e.addressID = a.addressID where e.status=2 AND (date > CURDATE() OR (date = CURDATE() AND time > CURTIME())) ";
             PreparedStatement countStmt = conn.prepareStatement(countSql);
             ResultSet countRs = countStmt.executeQuery();
             countRs.next();
@@ -61,7 +61,7 @@ public class listGuestEvent extends HttpServlet {
             String sql = "SELECT e.eventID, e.name, e.date, e.time, e.duration, e.image, e.donationLimit, "
                     + "e.description, e.volunteerNeeded, e.status, e.addressID, "
                     + "a.city, a.state, a.country, a.street, a.postalCode "
-                    + "FROM events e JOIN address a ON e.addressID = a.addressID where e.status = 2 "
+                    + "FROM events e JOIN address a ON e.addressID = a.addressID where e.status = 2  AND (e.date > CURDATE() OR (e.date = CURDATE() AND e.time > CURTIME())) "
                     + "LIMIT ? OFFSET ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, eventsPerPage);
