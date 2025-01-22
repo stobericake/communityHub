@@ -64,22 +64,22 @@
                 volunteerObj = (volunteer) request.getAttribute("volunteerObj");
                 name = volunteerObj.getName();
                 contact = volunteerObj.getContactInfo();
-                street = addressObj.getStreet();
+                country = addressObj.getCountry();
                 postcode = addressObj.getPostalCode();
+                street = addressObj.getStreet();
                 city = addressObj.getCity();
                 state = addressObj.getState();
-                country = addressObj.getCountry();
                 username = volunteerObj.getUsername();
                 password = volunteerObj.getPassword();
             } else {
                 beneficiaryObj = (beneficiary) request.getAttribute("beneficiaryObj");
                 name = beneficiaryObj.getName();
                 contact = beneficiaryObj.getContactInfo();
-                street = addressObj.getStreet();
+                country = addressObj.getCountry();
                 postcode = addressObj.getPostalCode();
+                street = addressObj.getStreet();
                 city = addressObj.getCity();
                 state = addressObj.getState();
-                country = addressObj.getCountry();
                 username = beneficiaryObj.getUsername();
                 password = beneficiaryObj.getPassword();
             }
@@ -115,7 +115,9 @@
                     </div>
                     <div class="col">
                         <h5 class="mt-3"><%=name%></h5>
-                        <p><%=email%></p>
+                        <% if (userRole1.equals("admin")) { %>
+                            <p><%=email%></p>
+                        <% } %>
                     </div>
                 </div>
 
@@ -157,10 +159,12 @@
                                     <input type="text" name="username" class="form-control" id="Username" value="<%=username%>">
                                 </div>
                             </div>
+                            <% if (userRole1.equals("admin")) { %>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email Address</label>
                                 <input type="email" name="email" class="form-control" id="email" value="<%=email%>">
                             </div>
+                            <% } %>
                             <div class="mb-3">
                                 <label for="contactNumber" class="form-label">Contact Number</label>
                                 <input type="text" name="phone_number" class="form-control" id="contactNumber" value="<%=contact%>">

@@ -73,85 +73,100 @@ public class UpdateProfile extends HttpServlet {
     }
 
     // Method to update user info (name, email, contact, username, profile picture)
-    private void updateUserInfo(HttpServletRequest request, Connection conn, String userId, String userRole)
-            throws SQLException, IOException, ServletException {
-        // Retrieve form parameters
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String contact = request.getParameter("phone_number");
-        String username = request.getParameter("username");
+   private void updateUserInfo(HttpServletRequest request, Connection conn, String userId, String userRole)
+        throws SQLException, IOException, ServletException {
+    // Retrieve form parameters
+    String name = request.getParameter("name");
+    String email = request.getParameter("email");
+    String contact = request.getParameter("phone_number");
+    String username = request.getParameter("username");
 
-        // Retrieve the uploaded image file
-        Part filePart = request.getPart("profilePicture");
-        InputStream imageInputStream = null;
+    // Retrieve the uploaded image file
+    Part filePart = request.getPart("profilePicture");
+    InputStream imageInputStream = null;
 
-        // Check if a new image was uploaded
-        if (filePart != null && filePart.getSize() > 0) {
-            imageInputStream = filePart.getInputStream();
-        }
+    // Check if a new image was uploaded
+    boolean hasNewImage = false;
+    if (filePart != null && filePart.getSize() > 0) {
+        imageInputStream = filePart.getInputStream();
+        hasNewImage = true; // Flag to indicate a new image was uploaded
+    }
 
-        // Prepare the SQL query based on the user role
-        String updateUserSQL;
-        if (userRole.equals("admin")) {
+    // Prepare the SQL query based on the user role
+    String updateUserSQL;
+    if (userRole.equals("admin")) {
+        if (hasNewImage) {
             updateUserSQL = "UPDATE admin SET name = ?, email = ?, contactInfo = ?, username = ?, image = ? WHERE adminID = ?";
-        } else if (userRole.equals("volunteer")) {
+        } else {
+            updateUserSQL = "UPDATE admin SET name = ?, email = ?, contactInfo = ?, username = ? WHERE adminID = ?";
+        }
+    } else if (userRole.equals("volunteer")) {
+        if (hasNewImage) {
             updateUserSQL = "UPDATE volunteer SET name = ?, contactInfo = ?, username = ?, image = ? WHERE volunteerID = ?";
         } else {
-            updateUserSQL = "UPDATE beneficiary SET name = ?, contactInfo = ?, username = ?, image = ? WHERE beneficiaryID = ?";
+            updateUserSQL = "UPDATE volunteer SET name = ?, contactInfo = ?, username = ? WHERE volunteerID = ?";
         }
-
-        try (PreparedStatement userStmt = conn.prepareStatement(updateUserSQL)) {
-            // Set common parameters for all roles
-            if (userRole.equals("admin")) {
-                userStmt.setString(1, name);
-                userStmt.setString(2, email);
-                userStmt.setInt(3, Integer.parseInt(contact));
-                userStmt.setString(4, username);
-                if (imageInputStream != null) {
-                    userStmt.setBlob(5, imageInputStream); // Set the new image
-                } else {
-                    userStmt.setNull(5, java.sql.Types.BLOB); // Keep the existing image
-                }
-                userStmt.setInt(6, Integer.parseInt(userId));
-            } else {
-                userStmt.setString(1, name);
-                userStmt.setInt(2, Integer.parseInt(contact));
-                userStmt.setString(3, username);
-                if (imageInputStream != null) {
-                    userStmt.setBlob(4, imageInputStream); // Set the new image
-                } else {
-                    userStmt.setNull(4, java.sql.Types.BLOB); // Keep the existing image
-                }
-                userStmt.setInt(5, Integer.parseInt(userId));
-            }
-
-            // Execute the update
-            int rowsUpdated = userStmt.executeUpdate();
-            if (rowsUpdated <= 0) {
-                throw new SQLException("Failed to update user info.");
-            }
+    } else {
+        if (hasNewImage) {
+            updateUserSQL = "UPDATE beneficiary SET name = ?, contactInfo = ?, username = ?, image = ? WHERE beneficiaryID = ?";
+        } else {
+            updateUserSQL = "UPDATE beneficiary SET name = ?, contactInfo = ?, username = ? WHERE beneficiaryID = ?";
         }
     }
+
+    try (PreparedStatement userStmt = conn.prepareStatement(updateUserSQL)) {
+        // Set parameters based on the user role
+        if (userRole.equals("admin")) {
+            userStmt.setString(1, name);
+            userStmt.setString(2, email);
+            userStmt.setInt(3, Integer.parseInt(contact));
+            userStmt.setString(4, username);
+            if (hasNewImage) {
+                userStmt.setBlob(5, imageInputStream); // Set the new image
+                userStmt.setInt(6, Integer.parseInt(userId));
+            } else {
+                userStmt.setInt(5, Integer.parseInt(userId));
+            }
+        } else {
+            userStmt.setString(1, name);
+            userStmt.setInt(2, Integer.parseInt(contact));
+            userStmt.setString(3, username);
+            if (hasNewImage) {
+                userStmt.setBlob(4, imageInputStream); // Set the new image
+                userStmt.setInt(5, Integer.parseInt(userId));
+            } else {
+                userStmt.setInt(4, Integer.parseInt(userId));
+            }
+        }
+
+        // Execute the update
+        int rowsUpdated = userStmt.executeUpdate();
+        if (rowsUpdated <= 0) {
+            throw new SQLException("Failed to update user info.");
+        }
+    }
+}
 
     // Method to update address (only for volunteers and beneficiaries)
     private void updateAddress(HttpServletRequest request, Connection conn, String userId)
             throws SQLException {
-        String street = request.getParameter("street");
+        String country = request.getParameter("country");
         String postcode = request.getParameter("postcode");
+        String street = request.getParameter("street");
         String city = request.getParameter("city");
         String state = request.getParameter("state");
-        String country = request.getParameter("country");
+        
 
-        String updateAddressSQL = "UPDATE address SET street = ?, postalCode = ?, city = ?, state = ?, country = ? "
-                + "WHERE addressID = (SELECT addressID FROM volunteer WHERE volunteerID = ? "
-                + "UNION SELECT addressID FROM beneficiary WHERE beneficiaryID = ?)";
+        String updateAddressSQL = "UPDATE address SET country = ?, postalCode = ?, street = ?, city = ?, state = ? "
+        + "WHERE addressID = (SELECT addressID FROM volunteer WHERE volunteerID = ? "
+        + "UNION SELECT addressID FROM beneficiary WHERE beneficiaryID = ?)";
 
         try (PreparedStatement addressStmt = conn.prepareStatement(updateAddressSQL)) {
-            addressStmt.setString(1, street);
+            addressStmt.setString(1, country);
             addressStmt.setInt(2, Integer.parseInt(postcode));
-            addressStmt.setString(3, city);
-            addressStmt.setString(4, state);
-            addressStmt.setString(5, country);
+            addressStmt.setString(3, street);
+            addressStmt.setString(4, city);
+            addressStmt.setString(5, state);
             addressStmt.setInt(6, Integer.parseInt(userId));
             addressStmt.setInt(7, Integer.parseInt(userId));
 
