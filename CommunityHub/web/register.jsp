@@ -93,7 +93,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <input type="text" name="country" class="form-control" placeholder="Country" required>
+                    <input type="text" name="country" class="form-control" placeholder="Country" value ="Malaysia" required>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
