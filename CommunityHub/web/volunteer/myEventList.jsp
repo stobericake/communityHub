@@ -111,7 +111,7 @@
                         events event = events.get(i);
                         task task = tasks.get(i); // Assuming tasks and events are aligned
                         address add = addresses.get(i);
-                        String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(event.getDate());
+                        String formattedDate = new SimpleDateFormat("dd-MM-yyyy").format(event.getDate());
                         String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
 
                         // Check if the task is null or if the task description is empty
