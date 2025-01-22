@@ -141,31 +141,32 @@
                                 </div>
                             </div>
                         </div>
-<div class="mb-4">
-    <!-- "Tasks Required" and Dropdown in One Line -->
-    <div class="d-flex align-items-center mb-4">
-        <h5 class="mb-0 me-4">Tasks Required:</h5>
+        <div class="mb-4">
+        <!-- "Tasks Required" and Dropdown in One Line -->
+        <div class="d-flex align-items-center mb-4">
+            <h5 class="mb-0 me-4">Tasks Required:</h5>
 
-        <!-- Dropdown for Tasks -->
-        <select name="taskID" class="form-select w-auto" required>
-            <!-- Always include "Crew" as the first option with a special value (e.g., -1) -->
-            <option value="-1">Crew</option>
-            <% 
-                if (tasks != null && !tasks.isEmpty()) { 
-                    for (task task : tasks) { 
-            %>
-                <option value="<%= task.getTaskID() %>"><%= task.getDescription() %></option>
-            <% 
+            <!-- Dropdown for Tasks -->
+            <select name="taskID" id="taskID" class="form-select w-auto" required>
+                <!-- Always include "Crew" as the first option with a special value (e.g., -1) -->
+                <option value="-1">Crew</option>
+                <% 
+                    if (tasks != null && !tasks.isEmpty()) { 
+                        for (task task : tasks) { 
+                %>
+                    <option value="<%= task.getTaskID() %>"><%= task.getDescription() %></option>
+                <% 
+                        } 
                     } 
-                } 
-            %>
-        </select>
-    </div>
+                %>
+            </select>
+        </div>
 
-    <!-- Volunteer Button or Login Prompt Below -->
-    <form action="volunteerServlet1" method="POST">
-        <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
-
+        <!-- Volunteer Button or Login Prompt Below -->
+        <form action="volunteerServlet1" method="POST">
+            <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
+            <input type="hidden" name="taskID" id="selectedTaskID" value=""> <!-- Hidden field for taskID -->
+        
         <% 
             if (user == null) { 
         %>
