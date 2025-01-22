@@ -62,7 +62,7 @@
                 <h2>Welcome to</h2>
                 <h1 style="color: #2F6690;">CommUNITYHub</h1>
             </div>
-            <form action="register" method="post">
+            <form action="register" method="post" onsubmit="return validateForm()">
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
@@ -73,7 +73,8 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <input type="text" name="phone_number" class="form-control" placeholder="Phone Number" required>
+                        <input type="number" name="phone_number" class="form-control" placeholder="Phone Number" 
+                               oninput="enforceMaxLength(this, 13)" required>
                     </div>
                     <div class="col-md-6">
                         <input type="text" name="street" class="form-control" placeholder="Street" required>
@@ -81,7 +82,8 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-4">
-                        <input type="text" name="postcode" class="form-control" placeholder="Postcode" required>
+                        <input type="number" name="postcode" class="form-control" placeholder="Postcode" 
+                               oninput="enforceMaxLength(this, 5)" required>
                     </div>
                     <div class="col-md-4">
                         <input type="text" name="city" class="form-control" placeholder="City" required>
@@ -91,7 +93,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <input type="text" name="country" class="form-control" placeholder="Country" required>
+                    <input type="text" name="country" class="form-control" placeholder="Country" value ="Malaysia" required>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -115,10 +117,35 @@
                     <button type="submit" class="btn btn-lg w-100" id="register" style="background-color: #2F6690; color: #ffffff;">REGISTER</button>
                 </div>
             </form>
-            <!--            <div class="text-center">
-                            <button type="submit" class="btn btn-lg w-100 text-info">LOGIN</button>
-                        </div>-->
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Function to enforce maximum length for number inputs
+            function enforceMaxLength(input, maxLength) {
+                if (input.value.length > maxLength) {
+                    input.value = input.value.slice(0, maxLength); // Truncate the input
+                }
+            }
+
+            // Function to validate the form
+            function validateForm() {
+                const phoneNumber = document.querySelector('input[name="phone_number"]').value;
+                const postcode = document.querySelector('input[name="postcode"]').value;
+
+                // Validate phone number length (10 to 13 digits)
+                if (phoneNumber.length < 10 || phoneNumber.length > 13) {
+                    alert("Phone number must be between 10 to 13 digits.");
+                    return false;
+                }
+
+                // Validate postcode length (exactly 5 digits)
+                if (postcode.length !== 5) {
+                    alert("Postcode must be exactly 5 digits.");
+                    return false;
+                }
+
+                return true;
+            }
+        </script>
     </body>
 </html>
