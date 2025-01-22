@@ -182,7 +182,7 @@
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                            <% for (int i = 1; i < totalPages; i++) {%>
+                            <% for (int i = 1; i <= totalPages; i++) {%>
                             <li class="page-item <%= currentPage == i ? "active" : ""%>">
                                 <a class="page-link" href="?page=<%= i%>"><%= i%></a>
                             </li>
