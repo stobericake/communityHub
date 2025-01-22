@@ -153,7 +153,7 @@
                         <div class="action-buttons mt-auto">
                         <button 
                             class="btn btn-dark" 
-                            onclick="location.href='guest/donationForm.jsp?eventID=<%= eventID %>'">
+                            onclick="location.href='addDonor.do?eventID=<%= eventID %>'">
                             <i class="bi bi-coin me-2"></i>
                             Donate
                         </button>
@@ -182,7 +182,7 @@
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
-                            <% for (int i = 1; i <= totalPages; i++) {%>
+                            <% for (int i = 1; i < totalPages; i++) {%>
                             <li class="page-item <%= currentPage == i ? "active" : ""%>">
                                 <a class="page-link" href="?page=<%= i%>"><%= i%></a>
                             </li>
