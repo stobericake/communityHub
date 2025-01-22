@@ -1,7 +1,7 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.cm.model.events"%>
 <!DOCTYPE html>
-<html lang="en">
+<html>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,10 +82,7 @@
                     </div>
                 </div>
             </div>
-
-
-
-            <!-- Additional Information Section -->
+                    
             <!-- Additional Information Section -->
             <div class="mt-5">
                 <h4 class="section-title text-center fw-bold mb-4">Additional Insights</h4>
@@ -106,8 +103,8 @@
                                 <li class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <div>
                                         <strong class="text-dark"><%= event.getName()%></strong>
-                                        <p class="mb-0 text-muted">Date: <%= formattedDate%></p>
-                                        <p class="mb-0 text-muted">Time: <%= formattedTime%></p>
+                                        <p class="mb-0 text-muted">Date: <%= event.getDate()%></p>
+                                        <p class="mb-0 text-muted">Time: <%= event.getTime()%></p>
                                     </div>
                                     <span class="badge bg-primary rounded-pill">Event ID: <%= event.getEventID()%></span>
                                 </li>
@@ -142,6 +139,5 @@
 
 
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>

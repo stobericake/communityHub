@@ -176,7 +176,7 @@
                         <!-- Admin Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Event Approval
+                                Home
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/AdminDashboard" onclick="updateDropdownText('Home')">Home</a></li>

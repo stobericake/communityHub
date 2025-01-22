@@ -71,7 +71,6 @@ public class AdminDashboard extends HttpServlet {
                     "SELECT COUNT(*) FROM events WHERE MONTH(date) = MONTH(CURDATE()) AND YEAR(date) = YEAR(CURDATE())");
             int pendingApprovals = getCount(conn, "SELECT COUNT(*) FROM events WHERE status = 1");
             double totalDonations = getTotalDonations(conn);
-            
 
             // Fetch recent events
             ArrayList<events> recentEvents = getRecentEvents(conn);
@@ -86,7 +85,8 @@ public class AdminDashboard extends HttpServlet {
             request.setAttribute("totalDonations", totalDonations);
             request.setAttribute("recentEvents", recentEvents);
 
-            request.getRequestDispatcher("admin/adminDashboard.jsp").forward(request, response);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("admin/adminDashboard.jsp");
+            dispatcher.forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
         }
