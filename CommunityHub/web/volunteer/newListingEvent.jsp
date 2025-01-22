@@ -153,7 +153,7 @@
                         <div class="action-buttons mt-auto">
                         <button 
                             class="btn btn-dark" 
-                            onclick="location.href='guest/donationForm.jsp?eventID=<%= eventID %>'">
+                            onclick="location.href='addDonor.do?eventID=<%= eventID %>'">
                             <i class="bi bi-coin me-2"></i>
                             Donate
                         </button>
