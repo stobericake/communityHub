@@ -146,7 +146,7 @@
                     %>
                         <tr>
                             <td><%= donor.getName() %></td>
-                            <td><%= donor.getContactInfo() %></td>
+                            <td>0<%= donor.getContactInfo() %></td>
                             <td><%= amountFormat.format(donation.getAmount()) %></td>
                             <td><%= event.getName() %></td>
                             <td><%= dateFormat.format(donation.getDate()) %></td>

@@ -47,8 +47,8 @@
                     </div>
                     <div class="col-12">
                         <label for="contactInfo" class="form-label">Contact Number (without '-')</label>
-                        <input type="tel" class="form-control" id="contactInfo" name="contactInfo" pattern="^[0-9]{10}$" required>
-                        <div class="invalid-feedback">Please insert a valid 10-digit contact number.</div>
+                        <input type="tel" class="form-control" id="contactInfo" name="contactInfo" pattern="^[0-9]{9,11}$" required>
+                        <div class="invalid-feedback">Please insert a valid contact number.</div>
                     </div>
 
                     <div class="col-12">
