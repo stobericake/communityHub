@@ -124,6 +124,10 @@
         <servlet-name>AdminDashboard</servlet-name>
         <servlet-class>com.hub.controller.AdminDashboard</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>beneficiaryDashboard</servlet-name>
+        <servlet-class>com.hub.controller.beneficiaryDashboard</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>volunteerServlet</servlet-name>
         <url-pattern>/volunteer_servlet.do</url-pattern>
@@ -271,6 +275,10 @@
     <servlet-mapping>
         <servlet-name>AdminDashboard</servlet-name>
         <url-pattern>/AdminDashboard</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>beneficiaryDashboard</servlet-name>
+        <url-pattern>/beneficiaryDashboard</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

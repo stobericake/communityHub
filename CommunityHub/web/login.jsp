@@ -14,7 +14,7 @@
                 response.sendRedirect(request.getContextPath() + "/admin/adminListing.jsp"); // Redirect to admin page
                 return;
             } else if (userRole.equals("beneficiary")) {
-                response.sendRedirect(request.getContextPath() + "/beneficiary/eventmanagement.jsp"); // Redirect to beneficiary page
+                response.sendRedirect(request.getContextPath() + "/beneficiaryDashboard"); // Redirect to beneficiary page
                 return;
             }
         }

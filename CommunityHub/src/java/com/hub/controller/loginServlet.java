@@ -135,7 +135,7 @@ public class loginServlet extends HttpServlet {
                 HttpSession session = request.getSession();
                 session.setAttribute("userRole", "beneficiary");
                 session.setAttribute("beneficiary", beneficiaryID);
-                response.sendRedirect(request.getContextPath() + "/listEventMgmt.do");
+                response.sendRedirect(request.getContextPath() + "/beneficiaryDashboard");
 //                RequestDispatcher view = request.getRequestDispatcher(request.getContextPath() + "/beneficiary/eventManagement.jsp");
 //                view.forward(request, response);
                 return;

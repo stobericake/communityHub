@@ -204,6 +204,7 @@
                                 Event Management
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="beneficiaryDropdown">
+                                   <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiaryDashboard" onclick="updateDropdownText('Home')">Home</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/listEventMgmt.do" onclick="updateDropdownText('Event Management')">Event Management</a></li>
                                  <li><a class="dropdown-item" href="<%=request.getContextPath()%>/listHistoryEventMgmt" onclick="updateDropdownText('Event History')">Event History</a></li>
                                 <li><a class="dropdown-item" href="<%=request.getContextPath()%>/donorList.do" onclick="updateDropdownText('Donor List')">Donor List</a></li>
