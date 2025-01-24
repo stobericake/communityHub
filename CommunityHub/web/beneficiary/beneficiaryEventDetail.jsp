@@ -178,7 +178,7 @@
                                         ${requestScope.totalVol}
                                     </c:when>
                                     <c:otherwise>
-                                          No one has volunteered yet
+                                        No one has volunteered yet
                                     </c:otherwise>
                                 </c:choose>
                             </span>
@@ -206,7 +206,43 @@
                                 <div class="d-flex justify-content-between mb-3">
                                     <div>
                                         <i class="bi bi-clock me-2"></i>
-                                        <small class="text-muted"><%= request.getAttribute("daysLeft")%> days left</small>
+                                        <small class="text-muted">
+                                            <%
+                                                Long daysLeft = (Long) request.getAttribute("daysLeft");
+                                                if (daysLeft != null) {
+                                                    long daysAgo = Math.abs(daysLeft);
+
+                                                    // Convert days to years and months
+                                                    long years = daysAgo / 365;
+                                                    long months = (daysAgo % 365) / 30;
+
+                                                    if (years > 0) {
+                                                        if (months > 0) {
+                                            %>
+                                            This event ended <%= years%> <%= (years == 1) ? "year" : "years"%> <br>
+                                            and <%= months%> <%= (months == 1) ? "month" : "months"%> ago
+                                            <%
+                                            } else {
+                                            %>
+                                            This event ended <%= years%> <%= (years == 1) ? "year" : "years"%> ago
+                                            <%
+                                                }
+                                            } else if (months > 0) {
+                                            %>
+                                            This event ended <%= months%> <%= (months == 1) ? "month" : "months"%> ago
+                                            <%
+                                            } else {
+                                            %>
+                                            This event ended <%= daysAgo%> <%= (daysAgo == 1) ? "day" : "days"%> ago
+                                            <%
+                                                }
+                                            } else {
+                                            %>
+                                            Event date not available
+                                            <%
+                                                }
+                                            %>
+                                        </small>
                                     </div>
                                     <div>
                                         <i class="bi bi-heart-fill text-danger me-2"></i>
