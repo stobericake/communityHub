@@ -176,6 +176,35 @@ public class myEventDetail extends HttpServlet {
                     request.setAttribute("beneficiary", beneficiary);
                     request.setAttribute("task", tasks);
                     request.setAttribute("eventsVolunteer", ev);
+                    
+                    // Fetch donation details
+                double donationLimit = rs.getDouble("donationLimit");
+
+                double totalDonation = 0;
+                String donationSql = "SELECT SUM(amount) AS totalDonation FROM donation WHERE eventID = ?";
+                donationStmt = conn.prepareStatement(donationSql);
+                donationStmt.setInt(1, eventID);
+                donationRs = donationStmt.executeQuery();
+                if (donationRs.next()) {
+                    totalDonation = donationRs.getDouble("totalDonation");
+                }
+
+                // Fetch the total number of contributors (donors)
+                String contributorsQuery = "SELECT COUNT(DISTINCT donorID) AS totalContributors FROM donation WHERE eventID = ?";
+                PreparedStatement contributorsStmt = conn.prepareStatement(contributorsQuery);
+                contributorsStmt.setInt(1, eventID);
+                ResultSet contributorsRs = contributorsStmt.executeQuery();
+                int totalContributors = 0;
+                if (contributorsRs.next()) {
+                    totalContributors = contributorsRs.getInt("totalContributors");
+                }
+                double remainingAmount = donationLimit - totalDonation;
+                double progress = (totalDonation / donationLimit) * 100;
+
+                request.setAttribute("totalDonation", totalDonation);
+                request.setAttribute("totalContributors", totalContributors);
+                request.setAttribute("remainingAmount", remainingAmount);
+                request.setAttribute("progress", progress);
 
                     request.getRequestDispatcher("/volunteer/myEventDetail.jsp").forward(request, response);
                 }

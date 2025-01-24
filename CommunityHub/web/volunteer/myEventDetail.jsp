@@ -45,7 +45,7 @@
 
             .divider {
                 height: 1px; 
-                width: 95%; /* Set width to 80% of the screen size */
+                width: 100%; /* Set width to 80% of the screen size */
                 background-color: black; 
                 margin: 0 auto; /* Center the divider horizontally */
             }
@@ -145,6 +145,10 @@
             String formattedDate = request.getAttribute("formattedDate").toString();
             String formattedStartTime = request.getAttribute("formattedStartTime").toString();
             String formattedEndTime = request.getAttribute("formattedEndTime").toString();
+            int totalContributors = Integer.parseInt(request.getAttribute("totalContributors").toString());
+            double totalDonation = Double.parseDouble(request.getAttribute("totalDonation").toString());
+            double remainingAmount = Double.parseDouble(request.getAttribute("remainingAmount").toString());
+            double progress = Double.parseDouble(request.getAttribute("progress").toString());
 
             int eventID = event.getEventID();
 
@@ -193,9 +197,11 @@
             }
 
             // Check if the event has ended
-            boolean isEventEnded = currentDate.isAfter(eventDate)
-                    || (currentDate.isEqual(eventDate) && currentTime.isAfter(eventEndTime) && !eventEndTime.isBefore(eventStartTime))
-                    || (currentDate.isEqual(eventDate.plusDays(1)) && currentTime.isAfter(eventEndTime));
+            boolean isEventEnded = currentDate.isAfter(eventDate) // Event date is in the past
+                || (currentDate.isEqual(eventDate) && currentTime.isAfter(eventEndTime)) // Event date is today, and current time is after end time
+                || (eventEndTime.isBefore(eventStartTime) // Event spans midnight
+                    && currentDate.isEqual(eventDate.plusDays(1)) // Current date is the next day
+                    && currentTime.isAfter(eventEndTime)); // Current time is after end time
 
 // Debugging: Print results
             System.out.println("Is Event Ongoing: " + isEventOngoing);
@@ -258,72 +264,78 @@
                     </div>
 
 
-                    <!-- Right Column: Cards -->
                     <div class="col-md-4">
-                        <div class="card mb-4" style="border-radius: 10px;">
-                            <div class="card-body text-center">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <img src="assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
-                                    <p><strong>DOWNLOAD CERTIFICATE</strong></p>
-                                </div>
-                                <% if (isEventEnded && ev.getAttendance() == 1) {%>
-                                <a href="javascript:void(0)" onclick="showCertificateModal(<%= eventID%>)" 
-                                   class="btn w-100 py-2" 
-                                   style="background-color: #000; color: #fff; border-radius: 30px;">
-                                    DOWNLOAD <i class="bi bi-download"></i>
-                                </a>
-                                <% } else { %>
-                                <button class="btn w-100 py-2" style="background-color: #ccc; color: #666; border-radius: 30px;" disabled>
-                                    Certificate Unavailable
-                                </button>
-                                <% } %>
-                            </div>
-                        </div>
-
-                        <!-- Fullscreen Overlay -->
-                        <div class="modal fade" id="certificateOverlay" tabindex="-1" aria-labelledby="certificateOverlayLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-fullscreen">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="certificateOverlayLabel">Certificate</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <% if (isEventEnded == true) { %>
+                            <!-- Donation Card (Before and During Event) -->
+                            <div class="card mb-4" style="border-radius: 10px;">
+                                <div class="card-body text-start">
+                                    <h2 class="fw-bold">RM<%= String.format("%.2f", totalDonation) %></h2>
+                                    <div class="progress mb-3" style="height: 8px; border-radius: 5px;">
+                                        <div class="progress-bar" role="progressbar" style="width: <%= progress %>%;" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
-                                    <div class="modal-body">
-                                        <!--                                    Wrap the certificate content with a specific class -->
-                                        <div class="certificate-content">
-                                            <iframe id="certificatePreview" style="width: 100%; height: 100%; border: none;"></iframe>
-                                        </div>
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <small class="text-muted text-start">Goal<br>RM<%= String.format("%.2f", event.getDonationLimit()) %></small>
+                                        <small class="text-muted text-end">Remaining<br>RM<%= String.format("%.2f", remainingAmount) %></small>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-primary print-button" onclick="window.print();">Download</button>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <div class="d-flex align-items-start justify-content-start">
+                                        <i class="bi bi-clock me-2"></i>
+                                        <small class="text-muted"> 123 days </small>
                                     </div>
+                                    <div class="d-flex align-items-start justify-content-start">
+                                        <i class="bi bi-heart-fill text-danger me-2"></i>
+                                        <small class="text-muted"><%= totalContributors %> Contributors</small>
+                                    </div>
+                                    <hr>
+                                    <button class="btn w-100 py-2" onclick="location.href='addDonor.do?eventID=<%= event.getEventID() %>'" style="background-color: #000; color: #fff; border-radius: 30px;">
+                                        DONATE <i class="bi bi-heart"></i>
+                                    </button>
                                 </div>
                             </div>
-                        </div>
+                        <% } %>
 
-
-                        <!-- Second Card -->
-                        <div class="card mb-4" style="border-radius: 10px;">
-                            <div class="card-body text-center">
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <img src="assets/medal.svg" alt="Icon" style="width: 50px; height: 50px;">
-                                    <p><strong>SERVICE REPORT</strong></p>
+                        <% if (isEventEnded == false) { %>
+                            <!-- Certificate and Service Report (After Event) -->
+                            <div class="card mb-4" style="border-radius: 10px;">
+                                <div class="card-body text-center">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <img src="assets/Medallions.svg" alt="Icon" style="width: 50px; height: 50px;">
+                                        <p><strong>DOWNLOAD CERTIFICATE</strong></p>
+                                    </div>
+                                    <% if (ev.getAttendance() == 1) { %>
+                                        <a href="javascript:void(0)" onclick="showCertificateModal(<%= eventID%>)" 
+                                           class="btn w-100 py-2" 
+                                           style="background-color: #000; color: #fff; border-radius: 30px;">
+                                            DOWNLOAD <i class="bi bi-download"></i>
+                                        </a>
+                                    <% } else { %>
+                                        <button class="btn w-100 py-2" style="background-color: #ccc; color: #666; border-radius: 30px;" disabled>
+                                            Certificate Unavailable
+                                        </button>
+                                    <% } %>
                                 </div>
-                                <p class="card-text text-muted">
-                                    Tell us about your experience and suggestions to improve our service and enhance our system.
-                                </p>
-                                <% if (isEventEnded && ev.getAttendance() == 1) {%>
-                                <a href="serviceForm?eventID=<%= eventID%>" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
-                                    FILL IN FORM? <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <% } else { %>
-                                <button class="btn w-100 py-2" style="background-color: #ccc; color: #666; border-radius: 30px;" disabled>
-                                    Report Unavailable
-                                </button>
-                                <% }%>
                             </div>
-                        </div>
+
+                            <div class="card mb-4" style="border-radius: 10px;">
+                                <div class="card-body text-center">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <img src="assets/medal.svg" alt="Icon" style="width: 50px; height: 50px;">
+                                        <p><strong>SERVICE REPORT</strong></p>
+                                    </div>
+                                    <p class="card-text text-muted">
+                                        Tell us about your experience and suggestions to improve our service and enhance our system.
+                                    </p>
+                                    <% if (ev.getAttendance() == 1) { %>
+                                        <a href="serviceForm?eventID=<%= eventID%>" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                                            FILL IN FORM? <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    <% } else { %>
+                                        <button class="btn w-100 py-2" style="background-color: #ccc; color: #666; border-radius: 30px;" disabled>
+                                            Report Unavailable
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% } %>
                     </div>
                 </div>
             </div>
