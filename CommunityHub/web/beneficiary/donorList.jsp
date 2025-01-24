@@ -72,6 +72,12 @@
         .header-spacing {
             margin-bottom: 15px;
         }
+
+        .no-donors-message {
+            font-size: 1.1rem;
+            color: #6c757d; /* Gray color */
+            padding: 10px;
+        }
     </style>
     <script>
         function filterTable() {
@@ -98,6 +104,31 @@
                 }
             });
         }
+
+        function updateFilters() {
+            const eventFilter = document.getElementById('eventFilter').value;
+            const monthFilter = document.getElementById('monthFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+
+            let url = new URL(window.location.href);
+            if (eventFilter) {
+                url.searchParams.set('eventFilter', eventFilter);
+            } else {
+                url.searchParams.delete('eventFilter');
+            }
+            if (monthFilter) {
+                url.searchParams.set('month', monthFilter);
+            } else {
+                url.searchParams.delete('month');
+            }
+            if (yearFilter) {
+                url.searchParams.set('year', yearFilter);
+            } else {
+                url.searchParams.delete('year');
+            }
+            url.searchParams.set('page', '1'); // Reset to first page when filters change
+            window.location.href = url.toString();
+        }
     </script>
 </head>
 <body>
@@ -112,6 +143,55 @@
             <div class="col-md-4 offset-md-4">
                 <input type="text" id="searchInput" class="form-control rounded" 
                        placeholder="Search by any field..." onkeyup="filterTable()">
+            </div>
+        </div>
+
+        <!-- Add sorting and filtering dropdowns here -->
+        <div class="row mb-4 align-items-center">
+            <!-- Event Filter (Wider) -->
+            <div class="col-md-6">
+                <select class="form-select" id="eventFilter" onchange="updateFilters()">
+                    <option value="">All Events</option>
+                    <%
+                        List<events> beneficiaryEvents = (List<events>) request.getAttribute("beneficiaryEvents");
+                        String eventFilter = (String) request.getAttribute("eventFilter");
+                        if (beneficiaryEvents != null) {
+                            for (events event : beneficiaryEvents) {
+                                String selected = event.getName().equals(eventFilter) ? "selected" : "";
+                    %>
+                    <option value="<%= event.getName() %>" <%= selected %>><%= event.getName() %></option>
+                    <% 
+                            }
+                        }
+                    %>
+                </select>
+            </div>
+            <!-- Month Filter (Smaller) -->
+            <div class="col-md-3">
+                <select class="form-select" id="monthFilter" onchange="updateFilters()">
+                    <option value="">All Months</option>
+                    <%
+                        String[] months = {"January", "February", "March", "April", "May", "June",
+                            "July", "August", "September", "October", "November", "December"};
+                        for (int i = 0; i < months.length; i++) {
+                            String selected = String.valueOf(i + 1).equals(request.getAttribute("monthFilter")) ? "selected" : "";
+                    %>
+                    <option value="<%= i + 1 %>" <%= selected %>><%= months[i] %></option>
+                    <% } %>
+                </select>
+            </div>
+            <!-- Year Filter (Smaller) -->
+            <div class="col-md-3">
+                <select class="form-select" id="yearFilter" onchange="updateFilters()">
+                    <option value="">All Years</option>
+                    <%
+                        int currentYear = java.time.Year.now().getValue();
+                        for (int year = currentYear - 5; year <= currentYear + 5; year++) {
+                            String selected = String.valueOf(year).equals(request.getAttribute("yearFilter")) ? "selected" : "";
+                    %>
+                    <option value="<%= year %>" <%= selected %>><%= year %></option>
+                    <% } %>
+                </select>
             </div>
         </div>
 
@@ -139,20 +219,34 @@
                 </thead>
                 <tbody>
                     <% 
-                        for (int i = 0; i < donorList.size(); i++) {
-                            donor donor = donorList.get(i);
-                            donation donation = donationList.get(i);
-                            events event = eventList.get(i);
+                        if (donorList.isEmpty()) {
                     %>
-                        <tr>
-                            <td><%= donor.getName() %></td>
-                            <td>0<%= donor.getContactInfo() %></td>
-                            <td><%= amountFormat.format(donation.getAmount()) %></td>
-                            <td><%= event.getName() %></td>
-                            <td><%= dateFormat.format(donation.getDate()) %></td>
-                        </tr>
-                    <% } %>
-                    </tbody>
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <div class="no-donors-message" role="alert">
+                                No donors found for the selected filters.
+                            </div>
+                        </td>
+                    </tr>
+                    <% 
+                        } else {
+                            for (int i = 0; i < donorList.size(); i++) {
+                                donor donor = donorList.get(i);
+                                donation donation = donationList.get(i);
+                                events event = eventList.get(i);
+                    %>
+                    <tr>
+                        <td><%= donor.getName() %></td>
+                        <td>0<%= donor.getContactInfo() %></td>
+                        <td><%= amountFormat.format(donation.getAmount()) %></td>
+                        <td><%= event.getName() %></td>
+                        <td><%= dateFormat.format(donation.getDate()) %></td>
+                    </tr>
+                    <% 
+                            }
+                        }
+                    %>
+                </tbody>
             </table>
         </div>
 

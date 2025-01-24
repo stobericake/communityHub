@@ -30,30 +30,64 @@ public class volunteerListServlet extends HttpServlet {
             conn = dbconnection.getConnection();
 
             String searchName = request.getParameter("searchName");
+            String eventFilter = request.getParameter("eventFilter"); // Event filter
+            String monthFilter = request.getParameter("month"); // Month filter
+            String yearFilter = request.getParameter("year"); // Year filter
+            String sortBy = request.getParameter("sortBy"); // Sort by parameter
+
             int volunteerPerPage = 8;
             int currentPage = request.getParameter("page") != null
                     ? Integer.parseInt(request.getParameter("page")) : 1;
             int offset = (currentPage - 1) * volunteerPerPage;
 
             // Count total volunteers for pagination
-            String countSql = "SELECT COUNT(*) AS total FROM volunteer v " +
-                    "INNER JOIN eventsVolunteer ev ON v.volunteerID = ev.volunteerID " +
-                    "INNER JOIN events e ON ev.eventID = e.eventID WHERE 1=1";
+            StringBuilder countSql = new StringBuilder(
+                "SELECT COUNT(*) AS total FROM volunteer v " +
+                "INNER JOIN eventsVolunteer ev ON v.volunteerID = ev.volunteerID " +
+                "INNER JOIN events e ON ev.eventID = e.eventID WHERE e.beneficiaryID = ?"
+            );
 
             if (searchName != null && !searchName.isEmpty()) {
-                countSql += " AND (v.volunteerID LIKE ? OR v.name LIKE ? OR v.contactInfo LIKE ? " +
-                        "OR v.username LIKE ? OR e.name LIKE ? OR e.date LIKE ?)";
+                countSql.append(" AND (v.volunteerID LIKE ? OR v.name LIKE ? OR v.contactInfo LIKE ? " +
+                        "OR v.username LIKE ? OR e.name LIKE ? OR e.date LIKE ?)");
             }
 
-            stmt = conn.prepareStatement(countSql);
+            if (eventFilter != null && !eventFilter.isEmpty()) {
+                countSql.append(" AND e.name = ?");
+            }
+
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                countSql.append(" AND MONTH(e.date) = ?");
+            }
+
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                countSql.append(" AND YEAR(e.date) = ?");
+            }
+
+            stmt = conn.prepareStatement(countSql.toString());
+            stmt.setInt(1, beneficiaryID);
+            int paramIndex = 2;
+
             if (searchName != null && !searchName.isEmpty()) {
                 String likePattern = "%" + searchName + "%";
-                stmt.setString(1, likePattern);
-                stmt.setString(2, likePattern);
-                stmt.setString(3, likePattern);
-                stmt.setString(4, likePattern);
-                stmt.setString(5, likePattern);
-                stmt.setString(6, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+                stmt.setString(paramIndex++, likePattern);
+            }
+
+            if (eventFilter != null && !eventFilter.isEmpty()) {
+                stmt.setString(paramIndex++, eventFilter);
+            }
+
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
             }
 
             rs = stmt.executeQuery();
@@ -61,21 +95,58 @@ public class volunteerListServlet extends HttpServlet {
             int totalVolunteer = rs.getInt("total");
             int totalPages = (int) Math.ceil((double) totalVolunteer / volunteerPerPage);
 
-           // Fetch volunteer data with pagination
-            String sql = "SELECT * " +
-                    "FROM volunteer v " +
-                    "INNER JOIN eventsVolunteer ev ON v.volunteerID = ev.volunteerID " +
-                    "INNER JOIN events e ON ev.eventID = e.eventID WHERE 1=1 AND e.beneficiaryID =" + beneficiaryID;
+            // Fetch volunteer data with pagination
+            StringBuilder sql = new StringBuilder(
+                "SELECT v.volunteerID, v.name AS volunteerName, v.contactInfo, v.username, " +
+                "e.eventID, e.name AS eventName, e.date, e.time, e.duration, e.description, " +
+                "e.volunteerNeeded, e.status, e.image, e.donationLimit, e.addressID, " +
+                "ev.eventsVolunteerID, ev.attendance " +
+                "FROM volunteer v " +
+                "INNER JOIN eventsVolunteer ev ON v.volunteerID = ev.volunteerID " +
+                "INNER JOIN events e ON ev.eventID = e.eventID WHERE e.beneficiaryID = ?"
+            );
 
             if (searchName != null && !searchName.isEmpty()) {
-                sql += " AND (v.volunteerID LIKE ? OR v.name LIKE ? OR v.contactInfo LIKE ? " +
-                        "OR v.username LIKE ? OR e.name LIKE ? OR e.date LIKE ?)";
+                sql.append(" AND (v.volunteerID LIKE ? OR v.name LIKE ? OR v.contactInfo LIKE ? " +
+                        "OR v.username LIKE ? OR e.name LIKE ? OR e.date LIKE ?)");
             }
 
-            sql += " LIMIT ? OFFSET ?";
-            stmt = conn.prepareStatement(sql);
+            if (eventFilter != null && !eventFilter.isEmpty()) {
+                sql.append(" AND e.name = ?");
+            }
 
-            int paramIndex = 1;
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                sql.append(" AND MONTH(e.date) = ?");
+            }
+
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                sql.append(" AND YEAR(e.date) = ?");
+            }
+
+            // Add sorting logic
+            if (sortBy != null && !sortBy.isEmpty()) {
+                switch (sortBy) {
+                    case "name":
+                        sql.append(" ORDER BY v.name");
+                        break;
+                    case "date":
+                        sql.append(" ORDER BY e.date");
+                        break;
+                    case "event":
+                        sql.append(" ORDER BY e.name");
+                        break;
+                    default:
+                        sql.append(" ORDER BY e.date DESC"); // Default sorting by event date
+                        break;
+                }
+            }
+
+            sql.append(" LIMIT ? OFFSET ?");
+            stmt = conn.prepareStatement(sql.toString());
+
+            stmt.setInt(1, beneficiaryID);
+            paramIndex = 2;
+
             if (searchName != null && !searchName.isEmpty()) {
                 String likePattern = "%" + searchName + "%";
                 stmt.setString(paramIndex++, likePattern);
@@ -85,49 +156,86 @@ public class volunteerListServlet extends HttpServlet {
                 stmt.setString(paramIndex++, likePattern);
                 stmt.setString(paramIndex++, likePattern);
             }
+
+            if (eventFilter != null && !eventFilter.isEmpty()) {
+                stmt.setString(paramIndex++, eventFilter);
+            }
+
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
+            }
+
             stmt.setInt(paramIndex++, volunteerPerPage);
-            stmt.setInt(paramIndex++, offset);
+            stmt.setInt(paramIndex, offset);
 
             rs = stmt.executeQuery();
 
             List<volunteer> volunteers = new ArrayList<>();
             List<eventsVolunteer> eventsVolunteers = new ArrayList<>();
             List<events> events = new ArrayList<>();
-         
+
             while (rs.next()) {
                 volunteer volunteer = new volunteer(
-                        rs.getInt("volunteerID"),
-                        rs.getString("name"),
-                        rs.getInt("contactInfo"),
-                        rs.getString("username"),
-                        null, // Password is not retrieved
-                        0,    // AddressID is not retrieved
-                        null  // Image is not retrieved
+                    rs.getInt("volunteerID"),
+                    rs.getString("volunteerName"), // Use the alias here
+                    rs.getInt("contactInfo"),
+                    rs.getString("username"),
+                    null, // Password is not retrieved
+                    0,    // AddressID is not retrieved
+                    null  // Image is not retrieved
                 );
                 volunteers.add(volunteer);
 
                 eventsVolunteer eventsVolunteer = new eventsVolunteer(
-                        rs.getInt("eventsVolunteerID"),
-                        rs.getInt("eventID"),
-                        rs.getInt("volunteerID"),
-                        rs.getInt("attendance")
+                    rs.getInt("eventsVolunteerID"),
+                    rs.getInt("eventID"),
+                    rs.getInt("volunteerID"),
+                    rs.getInt("attendance")
                 );
                 eventsVolunteers.add(eventsVolunteer);
 
                 events event = new events(
-                        rs.getInt("e.eventID"),
-                        rs.getString("e.name"),
-                        rs.getDate("date"),
-                        rs.getTime("time"),
-                        rs.getTime("duration"),
-                        rs.getString("description"),
-                        rs.getInt("volunteerNeeded"),
-                        rs.getString("status"),
-                        rs.getBlob("image"),
-                        rs.getDouble("donationLimit"),
-                        rs.getInt("addressID")
+                    rs.getInt("eventID"),
+                    rs.getString("eventName"), // Use the alias here
+                    rs.getDate("date"),
+                    rs.getTime("time"),
+                    rs.getTime("duration"),
+                    rs.getString("description"),
+                    rs.getInt("volunteerNeeded"),
+                    rs.getString("status"),
+                    rs.getBlob("image"),
+                    rs.getDouble("donationLimit"),
+                    rs.getInt("addressID")
                 );
                 events.add(event);
+            }
+
+            // Fetch events created by the logged-in beneficiary for the event filter dropdown
+            String eventSql = "SELECT * FROM events WHERE beneficiaryID = ?";
+            stmt = conn.prepareStatement(eventSql);
+            stmt.setInt(1, beneficiaryID);
+            rs = stmt.executeQuery();
+
+            List<events> beneficiaryEvents = new ArrayList<>();
+            while (rs.next()) {
+                events event = new events(
+                    rs.getInt("eventID"),
+                    rs.getString("name"),
+                    rs.getDate("date"),
+                    rs.getTime("time"),
+                    rs.getTime("duration"),
+                    rs.getString("description"),
+                    rs.getInt("volunteerNeeded"),
+                    rs.getString("status"),
+                    rs.getBlob("image"),
+                    rs.getDouble("donationLimit"),
+                    rs.getInt("addressID")
+                );
+                beneficiaryEvents.add(event);
             }
 
             // Set attributes for JSP
@@ -137,6 +245,11 @@ public class volunteerListServlet extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("currentPage", currentPage);
             request.setAttribute("searchName", searchName);
+            request.setAttribute("beneficiaryEvents", beneficiaryEvents); // For event filter dropdown
+            request.setAttribute("eventFilter", eventFilter); // For selected event filter
+            request.setAttribute("monthFilter", monthFilter); // For selected month filter
+            request.setAttribute("yearFilter", yearFilter); // For selected year filter
+            request.setAttribute("sortBy", sortBy); // For selected sort option
 
             // Forward to JSP
             request.getRequestDispatcher("/beneficiary/volunteerList.jsp").forward(request, response);
