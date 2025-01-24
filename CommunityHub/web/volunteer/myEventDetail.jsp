@@ -274,7 +274,7 @@
 
 
                     <div class="col-md-4">
-                        <% if (isEventEnded == true) { %>
+                        <% if (!isEventEnded) { %>
                             <!-- Donation Card (Before and During Event) -->
                             <div class="card mb-4" style="border-radius: 10px;">
                                 <div class="card-body text-start">
@@ -302,7 +302,7 @@
                             </div>
                         <% } %>
 
-                        <% if (isEventEnded == false) { %>
+                        <% if (isEventEnded) { %>
                             <!-- Certificate and Service Report (After Event) -->
                             <div class="card mb-4" style="border-radius: 10px;">
                                 <div class="card-body text-center">
