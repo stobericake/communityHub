@@ -172,20 +172,18 @@
 </head>
 <body>
     <%@ include file="../header.jspf" %>
-    <div class="container my-4">
-        <div class="row align-items-center mb-4">
-            <div class="col-md-4">
-                    <h1 class="page-header">DONATION HISTORY</h1>
-                    <h6 class="page-subheader">The tables below show all the donation you have made</h6>
-
-                </div>
-
-            <div class="col-md-4 offset-md-4">
-                <input type="text" id="searchInput" class="form-control rounded"
-                    placeholder="Search by any field..." onkeyup="filterTable()"><br>
-            </div>
-         </div>
-        <div class="container">
+<div class="container my-4">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-4">
+            <h1 class="page-header">DONATION HISTORY</h1>
+            <h6 class="page-subheader">The tables below show all the donation you have made</h6>
+        </div>
+        <div class="col-md-4 offset-md-4">
+            <input type="text" id="searchInput" class="form-control rounded"
+                placeholder="Search by any field..." onkeyup="filterTable()"><br>
+        </div>
+    </div>
+    <div class="container">
         <div class="center-card">
             <div class="donation-card mb-3">
                 <%
@@ -198,7 +196,7 @@
                     int currentPage = Integer.parseInt(request.getAttribute("currentPage").toString());
 
                     int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
-                    DecimalFormat df = new DecimalFormat("#.00");
+                    DecimalFormat df = new DecimalFormat("0.00");
                     String totalDon = df.format(totalDonation);
                     String latestDon = df.format(latestDonation);
                 %>
@@ -225,87 +223,79 @@
                 </div>
             </div>
         </div>
-        </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped" id="eventTable" >
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col" width="25%">Events</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th scope="col" width="15%" class="text-center">View Receipt</th>
-                  </tr>
-                </thead>
-                <tbody>
-            <%
-                for (int i = 0; i < events.size(); i++) {
-                    events event = events.get(i);
-                    donation donation = donations.get(i);  
-                    String formattedDate = new SimpleDateFormat("dd-MM-yyyy").format(donation.getDate());
-                    String amount = df.format(donation.getAmount());
-            %>
-                <tr>
-                    <td class="fw-medium"><%= event.getName() %></td>
-                    <td><%= formattedDate %></td>
-                    <td>RM<%=  amount %></td>
-                    <td class="text-center">
-                        <button class="view-details-button" data-bs-toggle="modal" data-bs-target="#receiptOverlay">
-                        <i class="bi bi-receipt-cutoff"></i>
-                        </button>
-                    </td>
-                </tr>
-            </table>
-                
-                
-                <!-- Fullscreen Overlay -->
-               <div class="modal fade" id="receiptOverlay" tabindex="-1" aria-labelledby="receiptOverlayLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="receiptOverlayLabel">Receipt</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Wrap the certificate content with a specific class -->
-                            <div class="receipt-content">
-                                <img src="getImage.do?type=donation&id=<%= donation.getDonationID() %>" class="modal-img">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
+                <table class="table table-bordered table-striped" id="eventTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th scope="col" width="25%">Events</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th scope="col" width="15%" class="text-center">View Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%
+                            if (events != null && !events.isEmpty()) {
+                                for (int i = 0; i < events.size(); i++) {
+                                    events event = events.get(i);
+                                    donation donation = donations.get(i);
+                                    String formattedDate = new SimpleDateFormat("dd-MM-yyyy").format(donation.getDate());
+                                    String amount = df.format(donation.getAmount());
+                        %>
+                        <tr>
+                            <td class="fw-medium"><%= event.getName() %></td>
+                            <td><%= formattedDate %></td>
+                            <td>RM<%= amount %></td>
+                            <td class="text-center">
+                                <button class="view-details-button" data-bs-toggle="modal" data-bs-target="#receiptOverlay">
+                                    <i class="bi bi-receipt-cutoff"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <%
+                                }
+                            } else {
+                        %>
+                        <tr>
+                            <td colspan="4" class="text-center">No donations found.</td>
+                        </tr>
+                        <%
+                            }
+                        %>
+                    </tbody>
+                </table>
             </div>
-            <% } %>
-        </ul>
-       </div>
-        <!-- Pagination -->
-        <div class="col-12">
-            <nav aria-label="Page navigation">
-                <ul class="pagination">
-                    <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
-                        <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-
-                    <% for (int i = 1; i <= totalPages; i++) { %>
-                        <li class="page-item <%= currentPage == i ? "active" : "" %>">
-                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
-                        </li>
-                    <% } %>
-
-                    <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
-                        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
         </div>
     </div>
+
+    <!-- Pagination -->
+    <div class="col-12">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item <%= currentPage == 1 ? "disabled" : "" %>">
+                    <a class="page-link" href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <%
+                    for (int i = 1; i <= totalPages; i++) {
+                %>
+                <li class="page-item <%= currentPage == i ? "active" : "" %>">
+                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                </li>
+                <%
+                    }
+                %>
+                <li class="page-item <%= currentPage == totalPages ? "disabled" : "" %>">
+                    <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
     <script>
     function filterTable() {
                 const input = document.getElementById('searchInput').value.toLowerCase();

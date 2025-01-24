@@ -107,6 +107,7 @@
                     </thead>
                     <tbody>
                 <%
+                     if (events != null && !events.isEmpty()) {
                     for (int i = 0; i < events.size(); i++) {
                         events event = events.get(i);
                         task task = tasks.get(i); // Assuming tasks and events are aligned
@@ -131,9 +132,15 @@
                         </a>
                     </td>
                 </tr>                                       
-                <%
-                    }
+                <% } 
+                    }  else {
                 %>
+                        <tr>
+                            <td colspan="6" class="text-center">No events found.</td>
+                        </tr>
+                        <%
+                            }
+                        %>
             </tbody>
                 </table>
                </div>
