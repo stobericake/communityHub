@@ -150,7 +150,7 @@
                                     class="btn btn-primary" 
                                     onclick="location.href = '${pageContext.request.contextPath}/eventDetailGuest?eventID=<%= eventID%>'">
                                     <i class="bi bi-arrow-up-right-circle me-2"></i>
-                                    View Details
+                                    Learn More..
                                 </button>
                             </div>
 
