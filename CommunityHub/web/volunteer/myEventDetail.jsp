@@ -82,6 +82,15 @@
             .start-date-gap {
                 margin-right: 20px; /* Adjust the value as needed */
             }
+            .progress-bar {
+                background-color: pink;
+            }
+
+            .donate-btn {
+                background-color: #000; /* Black button */
+                color: #fff; /* White text */
+                border-radius: 30px; /* Rounded edges */
+            }
             @media print {
                 body * {
                     visibility: hidden;

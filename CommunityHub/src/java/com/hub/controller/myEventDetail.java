@@ -190,7 +190,7 @@ public class myEventDetail extends HttpServlet {
                 }
 
                 // Fetch the total number of contributors (donors)
-                String contributorsQuery = "SELECT COUNT(DISTINCT donorID) AS totalContributors FROM donation WHERE eventID = ?";
+                String contributorsQuery = "SELECT COUNT(DISTINCT donationID) AS totalContributors FROM donation WHERE eventID = ?";
                 PreparedStatement contributorsStmt = conn.prepareStatement(contributorsQuery);
                 contributorsStmt.setInt(1, eventID);
                 ResultSet contributorsRs = contributorsStmt.executeQuery();
