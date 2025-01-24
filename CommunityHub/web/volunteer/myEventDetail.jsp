@@ -212,7 +212,7 @@
                     && currentDate.isEqual(eventDate.plusDays(1)) // Current date is the next day
                     && currentTime.isAfter(eventEndTime)); // Current time is after end time
 
-// Debugging: Print results
+            // Debugging: Print results
             System.out.println("Is Event Ongoing: " + isEventOngoing);
             System.out.println("Is Event Ended: " + isEventEnded);
         %>

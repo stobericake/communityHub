@@ -91,6 +91,14 @@
                     <input type="text" id="searchInput" class="form-control rounded"
                            placeholder="Search by any field..." onkeyup="filterTable()"><br>
                 </div>
+                <!-- Dropdown for Event Filter -->
+                <div class="col-md-4">
+                    <select id="eventFilter" class="form-select" onchange="filterEvents()">
+                        <option value="all">All Events</option>
+                        <option value="upcoming">Upcoming Events</option>
+                        <option value="ended">Past Events</option>
+                    </select>
+                </div>
             </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -106,41 +114,46 @@
                         </tr>
                     </thead>
                     <tbody>
-                <%
-                     if (events != null && !events.isEmpty()) {
-                    for (int i = 0; i < events.size(); i++) {
-                        events event = events.get(i);
-                        task task = tasks.get(i); // Assuming tasks and events are aligned
-                        address add = addresses.get(i);
-                        String formattedDate = new SimpleDateFormat("dd-MM-yyyy").format(event.getDate());
-                        String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
+                    <%
+                        if (events != null && !events.isEmpty()) {
+                            for (int i = 0; i < events.size(); i++) {
+                                events event = events.get(i);
+                                task task = tasks.get(i); // Assuming tasks and events are aligned
+                                address add = addresses.get(i);
+                                String formattedDate = new SimpleDateFormat("dd-MM-yyyy").format(event.getDate());
+                                String formattedTime = new SimpleDateFormat("hh:mm a").format(event.getTime());
 
-                        // Check if the task is null or if the task description is empty
-                        String taskDescription = (task == null || task.getDescription() == null || task.getDescription().isEmpty()) 
-                                                ? "Crew" 
-                                                : task.getDescription();
-                %>         
-                <tr>
-                    <td class="fw-medium"><%= event.getName() %></td>
-                    <td><%= add.getState() %></td>
-                    <td><%= formattedDate %></td>
-                    <td><%= formattedTime %></td>
-                    <td><%= taskDescription %></td> <!-- Display "Crew" if no task is assigned -->
-                    <td class="text-center">
-                        <a href="myDetail.do?eventID=<%= event.getEventID() %>">
-                            <i class="bi bi-arrow-right-circle"></i>
-                        </a>
-                    </td>
-                </tr>                                       
-                <% } 
-                    }  else {
-                %>
-                        <tr>
-                            <td colspan="6" class="text-center">No events found.</td>
-                        </tr>
-                        <%
-                            }
-                        %>
+                                // Check if the task is null or if the task description is empty
+                                String taskDescription = (task == null || task.getDescription() == null || task.getDescription().isEmpty()) 
+                                                        ? "Crew" 
+                                                        : task.getDescription();
+
+                                // Determine if the event has ended or is upcoming
+                                Date eventDateTime = new Date(event.getDate().getTime() + event.getTime().getTime());
+                                Date currentDateTime = new Date();
+                                String eventStatus = eventDateTime.before(currentDateTime) ? "ended" : "upcoming";
+                    %>         
+                    <tr data-event-status="<%= eventStatus %>">
+                        <td class="fw-medium"><%= event.getName() %></td>
+                        <td><%= add.getCity() %></td>
+                        <td><%= formattedDate %></td>
+                        <td><%= formattedTime %></td>
+                        <td><%= taskDescription %></td> <!-- Display "Crew" if no task is assigned -->
+                        <td class="text-center">
+                            <a href="myDetail.do?eventID=<%= event.getEventID() %>">
+                                <i class="bi bi-arrow-right-circle"></i>
+                            </a>
+                        </td>
+                    </tr>                                       
+                    <% } 
+                        }  else {
+                    %>
+                    <tr>
+                        <td colspan="6" class="text-center">No events found.</td>
+                    </tr>
+                    <%
+                        }
+                    %>
             </tbody>
                 </table>
                </div>
@@ -171,7 +184,40 @@
             </nav>
         </div>
     </div>
+    <script>
+      function filterEvents() {
+            const filterValue = document.getElementById('eventFilter').value;
+            const rows = document.querySelectorAll('#eventTable tbody tr');
 
+            rows.forEach(row => {
+                const eventStatus = row.getAttribute('data-event-status');
+                switch (filterValue) {
+                    case 'all':
+                        row.style.display = '';
+                        break;
+                    case 'upcoming':
+                        row.style.display = eventStatus === 'upcoming' ? '' : 'none';
+                        break;
+                    case 'ended':
+                        row.style.display = eventStatus === 'ended' ? '' : 'none';
+                        break;
+                    default:
+                        row.style.display = '';
+                }
+            });
+        }
+
+        function filterTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#eventTable tbody tr');
+
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                const match = cells.some(cell => cell.textContent.toLowerCase().includes(input));
+                row.style.display = match ? '' : 'none';
+            });
+        }
+    </script>
     <script>
         function filterTable() {
             const input = document.getElementById('searchInput').value.toLowerCase();

@@ -30,8 +30,8 @@ public class donationFormServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String eventID = request.getParameter("eventID"); // Example: Replace with dynamic ID if needed.
-        HttpSession session = request.getSession();
-        Integer volunteerID = (Integer) session.getAttribute("volunteer");
+        HttpSession session = request.getSession(false); // Get existing session, do not create a new one
+        Integer volunteerID = (session != null) ? (Integer) session.getAttribute("volunteer") : null;
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -45,35 +45,12 @@ public class donationFormServlet extends HttpServlet {
                 System.out.println("DB Connection: " + (conn != null));
                 return;
             }
-            
-            // Query to retrieve volunteer details
-            String nameSQL = "SELECT volunteerID, name FROM volunteer WHERE volunteerID = ?";
-            stmt2 = conn.prepareStatement(nameSQL);
-            stmt2.setInt(1, volunteerID);
-            rs2 = stmt2.executeQuery();
 
-            // Check if the ResultSet has data
-            if (rs2.next()) {
-                // Retrieve volunteer name and ID
-                int volunteerId = rs2.getInt("volunteerID");
-                String volunteerName = rs2.getString("name");
-
-                // Set volunteer details as request attributes
-                request.setAttribute("volunteerName", volunteerName);
-                request.setAttribute("volunteerID", volunteerId);
-            } else {
-                // Handle case where no volunteer is found
-                request.setAttribute("errorMessage", "Volunteer not found.");
-                request.getRequestDispatcher("/error.jsp").forward(request, response);
-                return;
-            }
-            
             // Query to retrieve event details
             String sql = "SELECT * FROM events WHERE eventID = ?";
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, Integer.parseInt(eventID));
             rs = stmt.executeQuery();
-
 
             if (rs.next()) {
                 event = new events(
@@ -91,7 +68,22 @@ public class donationFormServlet extends HttpServlet {
                 );
             }
             request.setAttribute("event", event);
-            
+
+            // If the user is a volunteer, retrieve their details
+            if (volunteerID != null) {
+                String nameSQL = "SELECT volunteerID, name, contactInfo FROM volunteer WHERE volunteerID = ?";
+                stmt2 = conn.prepareStatement(nameSQL);
+                stmt2.setInt(1, volunteerID);
+                rs2 = stmt2.executeQuery();
+
+                if (rs2.next()) {
+                    String volunteerName = rs2.getString("name");
+                    int contactInfo = rs2.getInt("contactInfo");
+                    request.setAttribute("volunteerName", volunteerName);
+                    request.setAttribute("contactInfo", contactInfo);
+                }
+            }
+
             request.getRequestDispatcher("/guest/donationForm.jsp").forward(request, response);
         } catch (SQLException e) {
             e.printStackTrace();

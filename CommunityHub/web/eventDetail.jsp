@@ -141,50 +141,53 @@
                                 </div>
                             </div>
                         </div>
-        <div class="mb-4">
-        <!-- "Tasks Required" and Dropdown in One Line -->
-        <div class="d-flex align-items-center mb-4">
-            <h5 class="mb-0 me-4">Tasks Required:</h5>
+                    <div class="mb-4">
+                    <!-- Task Selection Dropdown -->
+                    <div class="d-flex align-items-center mb-4">
+                        <h5 class="mb-0 me-4">Tasks Required:</h5>
+                        <select name="taskID" id="taskID" class="form-select w-auto" required>
+                            <!-- "Crew" option with value -1 -->
+                            <option value="-1">Crew</option>
+                            <% 
+                                if (tasks != null && !tasks.isEmpty()) { 
+                                    for (task task : tasks) { 
+                            %>
+                                <option value="<%= task.getTaskID() %>"><%= task.getDescription() %></option>
+                            <% 
+                                    } 
+                                } 
+                            %>
+                        </select>
+                    </div>
 
-            <!-- Dropdown for Tasks -->
-            <select name="taskID" id="taskID" class="form-select w-auto" required>
-                <!-- Always include "Crew" as the first option with a special value (e.g., -1) -->
-                <option value="-1">Crew</option>
-                <% 
-                    if (tasks != null && !tasks.isEmpty()) { 
-                        for (task task : tasks) { 
-                %>
-                    <option value="<%= task.getTaskID() %>"><%= task.getDescription() %></option>
-                <% 
-                        } 
-                    } 
-                %>
-            </select>
-        </div>
+                    <!-- Form Submission -->
+                    <form action="volunteerServlet1" method="POST">
+                        <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
+                        <input type="hidden" name="taskID" id="selectedTaskID" value=""> <!-- Hidden field for taskID -->
 
-        <!-- Volunteer Button or Login Prompt Below -->
-        <form action="volunteerServlet1" method="POST">
-            <input type="hidden" name="eventID" value="<%= event.getEventID() %>">
-            <input type="hidden" name="taskID" id="selectedTaskID" value=""> <!-- Hidden field for taskID -->
-        
-        <% 
-            if (user == null) { 
-        %>
-            <p class="text-danger mt-2">Please log in to volunteer for this event.</p>
-            <a href="../login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
-                LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
-            </a>
-        <% 
-            } else { 
-        %>
-            <button type="submit" class="btn w-100 py-2 mt-2" style="background-color: #000; color: #fff; border-radius: 30px;">
-                VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
-            </button>
-        <% 
-            } 
-        %>
-    </form>
-</div>
-        </div> 
+                        <% 
+                            if (user == null) { 
+                        %>
+                            <p class="text-danger mt-2">Please log in to volunteer for this event.</p>
+                            <a href="../login.jsp" class="btn w-100 py-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                                LOGIN TO VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
+                            </a>
+                        <% 
+                            } else { 
+                        %>
+                            <button type="submit" class="btn w-100 py-2 mt-2" style="background-color: #000; color: #fff; border-radius: 30px;">
+                                VOLUNTEER <i class="bi bi-box2-heart-fill"></i>
+                            </button>
+                        <% 
+                            } 
+                        %>
+                    </form>
+
+                    <!-- JavaScript to set the selected taskID in the hidden field -->
+                    <script>
+                        document.getElementById('taskID').addEventListener('change', function() {
+                            document.getElementById('selectedTaskID').value = this.value;
+                        });
+                    </script>
     </body>
 </html>

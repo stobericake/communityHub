@@ -70,80 +70,80 @@ public class volunteerServlet1 extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    @Override
+   @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
 
-    HttpSession session = request.getSession();
-    int volunteerID = (Integer) session.getAttribute("volunteer");
-    String eventID = request.getParameter("eventID");
-    String taskIDParam = request.getParameter("taskID"); // Get taskID as a String
-    int status = 1;
+        HttpSession session = request.getSession();
+        int volunteerID = (Integer) session.getAttribute("volunteer");
+        String eventID = request.getParameter("eventID");
+        String taskIDParam = request.getParameter("taskID"); // Get taskID as a String
+        int status = 1; // Status for assigned tasks
 
-    Connection conn = null;
-    PreparedStatement insertStmt = null;
-    PreparedStatement updateStmt = null;
+        Connection conn = null;
+        PreparedStatement insertStmt = null;
+        PreparedStatement updateStmt = null;
 
-    try {
-        // Database connection
-        conn = dbconnection.getConnection();
+        try {
+            // Database connection
+            conn = dbconnection.getConnection();
 
-        if (volunteerID == 0) {
-            // Redirect to login page if not logged in
-            response.sendRedirect("login.jsp?message=Please login to volunteer for this event.");
-            return;
-        }
+            if (volunteerID == 0) {
+                // Redirect to login page if not logged in
+                response.sendRedirect("login.jsp?message=Please login to volunteer for this event.");
+                return;
+            }
 
-        // Insert into eventsVolunteer table
-        String sql = "INSERT INTO eventsVolunteer (eventID, volunteerID) VALUES (?, ?)";
-        insertStmt = conn.prepareStatement(sql);
-        insertStmt.setInt(1, Integer.parseInt(eventID));
-        insertStmt.setInt(2, volunteerID);
+            // Insert into eventsVolunteer table
+            String sql = "INSERT INTO eventsVolunteer (eventID, volunteerID) VALUES (?, ?)";
+            insertStmt = conn.prepareStatement(sql);
+            insertStmt.setInt(1, Integer.parseInt(eventID));
+            insertStmt.setInt(2, volunteerID);
 
-        int rowsInserted = insertStmt.executeUpdate();
+            int rowsInserted = insertStmt.executeUpdate();
 
-        // Check if taskID is provided and not the "Crew" option
-        if (taskIDParam != null && !taskIDParam.isEmpty() && !taskIDParam.equals("-1")) {
-            int taskID = Integer.parseInt(taskIDParam);
+            // Check if taskID is provided and not the "Crew" option
+            if (taskIDParam != null && !taskIDParam.isEmpty() && !taskIDParam.equals("-1")) {
+                int taskID = Integer.parseInt(taskIDParam);
 
-            // Update the task table
-            String sqlTask = "UPDATE task SET status = ?, volunteerID = ? WHERE taskID = ?";
-            updateStmt = conn.prepareStatement(sqlTask);
-            updateStmt.setInt(1, status);
-            updateStmt.setInt(2, volunteerID);
-            updateStmt.setInt(3, taskID);
+                // Update the task table to mark the task as assigned
+                String sqlTask = "UPDATE task SET status = ?, volunteerID = ? WHERE taskID = ?";
+                updateStmt = conn.prepareStatement(sqlTask);
+                updateStmt.setInt(1, status); // Set status to 1 (assigned)
+                updateStmt.setInt(2, volunteerID); // Assign the task to the volunteer
+                updateStmt.setInt(3, taskID); // Task ID to update
 
-            updateStmt.executeUpdate();
-        }
+                updateStmt.executeUpdate();
+            }
 
-        // Redirect based on the insertion result
-        if (rowsInserted > 0) {
-            response.sendRedirect(request.getContextPath() + "/success.jsp");
-        } else {
+            // Redirect based on the insertion result
+            if (rowsInserted > 0) {
+                response.sendRedirect(request.getContextPath() + "/success.jsp");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/error.jsp");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/error.jsp");
-        }
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        response.sendRedirect(request.getContextPath() + "/error.jsp");
-    } finally {
-        try {
-            if (insertStmt != null) insertStmt.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            if (updateStmt != null) updateStmt.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            if (conn != null) conn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } finally {
+            try {
+                if (insertStmt != null) insertStmt.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                if (updateStmt != null) updateStmt.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                if (conn != null) conn.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
-}
 
 
     /**
