@@ -155,7 +155,7 @@
             <div class="container-fluid">
                 <a href="<%=userRole.equals("admin") ? request.getContextPath() + "/AdminDashboard"
                         : userRole.equals("volunteer") ? request.getContextPath() + "/vEventList.do"
-                        : userRole.equals("beneficiary") ? request.getContextPath() + "/listEventMgmt.do"
+                        : userRole.equals("beneficiary") ? request.getContextPath() + "/beneficiaryDashboard"
                         : request.getContextPath() + "/listGuestEvent.do"%>" class="text-decoration-none">
                     <div class="d-flex align-items-center">
                         <img src="<%=request.getContextPath()%>/assets/logo.png" alt="Logo" style="height: 60px; vertical-align: middle;" class="me-2 mb-3">
@@ -201,7 +201,7 @@
                         <!-- Beneficiary Specific Navigation -->
                         <li class="nav-item dropdown">
                             <a class="nav-drop dropdown-toggle" href="#" id="DropdownHeader" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Event Management
+                                Home
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="beneficiaryDropdown">
                                    <li><a class="dropdown-item" href="<%=request.getContextPath()%>/beneficiaryDashboard" onclick="updateDropdownText('Home')">Home</a></li>
