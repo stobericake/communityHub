@@ -152,15 +152,20 @@
                                 <small class="text-body-secondary"><%= formattedDate %> <%= formattedTime %></small>
                             </div>
                        
-                        <div class="action-buttons mt-auto">
-                        <button 
-                            class="btn btn-dark" 
-                            onclick="location.href='addDonor.do?eventID=<%= eventID %>'">
-                            <i class="bi bi-coin me-2"></i>
-                            Donate
-                        </button>
-                            
-                    </div>
+                            <div class="action-buttons mt-auto">
+                                <button 
+                                    class="btn btn-dark" 
+                                    onclick="location.href = 'addDonor.do?eventID=<%= eventID%>'">
+                                    <i class="bi bi-coin me-2"></i>
+                                    Donate
+                                </button>
+                                <button 
+                                    class="btn btn-primary" 
+                                    onclick="location.href = '${pageContext.request.contextPath}/eventDetailGuest?eventID=<%= eventID%>'">
+                                    <i class="bi bi-arrow-up-right-circle me-2"></i>
+                                    Learn More..
+                                </button>
+                            </div>
 
                     </div>
                 </div>

@@ -18,7 +18,8 @@
     <%@ include file="../header.jspf" %>
     <%
         events event = (events) request.getAttribute("event");
-
+         String volunteerName = (String) request.getAttribute("volunteerName");
+        
         // Get current date
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -42,7 +43,7 @@
                     </div>
                     <div class="col-12">
                         <label for="name" class="form-label">Donor/Volunteer Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                        <input type="text" class="form-control" id="name" name="name" value="<%= volunteerName %>" required>
                         <div class="invalid-feedback">Please insert your name.</div>
                     </div>
                     <div class="col-12">
