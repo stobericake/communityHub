@@ -71,160 +71,161 @@ public class listEventMgmt extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-   List<events> eventList = new ArrayList<>();
-    List<address> addressList = new ArrayList<>();
-    HttpSession session = request.getSession();
-    String beneficiaryID = session.getAttribute("beneficiary").toString();
+        List<events> eventList = new ArrayList<>();
+        List<address> addressList = new ArrayList<>();
+        HttpSession session = request.getSession();
+        String beneficiaryID = session.getAttribute("beneficiary").toString();
 
-    if (beneficiaryID == null) {
-        request.setAttribute("error", "Beneficiary not found in session.");
-        request.getRequestDispatcher("error.jsp").forward(request, response);
-        return;
-    }
-
-    ResultSet rs;
-    PreparedStatement stmt;
-
-    try (Connection conn = dbconnection.getConnection()) {
-
-        String sortBy = request.getParameter("sortBy") != null ? request.getParameter("sortBy") : "eventID";
-        String monthFilter = request.getParameter("month");
-        String yearFilter = request.getParameter("year");
-
-        // Base SQL for counting total events
-        StringBuilder countSql = new StringBuilder(
-                "SELECT COUNT(*) as total FROM events WHERE (status = 1 OR status = 2) AND (date > CURDATE() OR (date = CURDATE() AND time > CURTIME()))"
-        );
-
-        // Add month filter if selected
-        if (monthFilter != null && !monthFilter.isEmpty()) {
-            countSql.append(" AND MONTH(date) = ?");
+        if (beneficiaryID == null) {
+            request.setAttribute("error", "Beneficiary not found in session.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            return;
         }
 
-        // Add year filter if selected
-        if (yearFilter != null && !yearFilter.isEmpty()) {
-            countSql.append(" AND YEAR(date) = ?");
-        }
+        ResultSet rs;
+        PreparedStatement stmt;
 
-        stmt = conn.prepareStatement(countSql.toString());
-        int paramIndex = 1;
+        try (Connection conn = dbconnection.getConnection()) {
 
-        if (monthFilter != null && !monthFilter.isEmpty()) {
-            stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
-        }
-        if (yearFilter != null && !yearFilter.isEmpty()) {
-            stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
-        }
+            String sortBy = request.getParameter("sortBy") != null ? request.getParameter("sortBy") : "eventID";
+            String monthFilter = request.getParameter("month");
+            String yearFilter = request.getParameter("year");
 
-        rs = stmt.executeQuery();
-        rs.next();
-        int totalEvents = rs.getInt("total");
-
-        int eventsPerPage = 6; // Set the number of events per page
-        int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
-        int offset = (currentPage - 1) * eventsPerPage;
-        int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
-
-        // Base SQL for fetching events
-        StringBuilder sql = new StringBuilder(
-                "SELECT e.*, a.* FROM events e "
-                + "JOIN address a ON e.addressID = a.addressID "
-                + "WHERE (e.status = 1 OR e.status = 2) AND (e.date > CURDATE() OR (e.date = CURDATE() AND e.time > CURTIME()))"
-        );
-
-        // Add month filter if selected
-        if (monthFilter != null && !monthFilter.isEmpty()) {
-            sql.append(" AND MONTH(e.date) = ?");
-        }
-
-        // Add year filter if selected
-        if (yearFilter != null && !yearFilter.isEmpty()) {
-            sql.append(" AND YEAR(e.date) = ?");
-        }
-
-        // Add sorting
-        sql.append(" ORDER BY ");
-        switch (sortBy) {
-            case "eventID":
-                sql.append("e.eventID ASC");
-                break;
-            case "date":
-                sql.append("e.date ASC, e.time ASC");
-                break;
-            case "donationLimit":
-                sql.append("e.donationLimit DESC");
-                break;
-            case "volunteerNeeded":
-                sql.append("e.volunteerNeeded DESC");
-                break;
-            default:
-                sql.append("e.eventID ASC");
-        }
-
-        // Add pagination
-        sql.append(" LIMIT ? OFFSET ?");
-
-        stmt = conn.prepareStatement(sql.toString());
-        paramIndex = 1;
-
-        if (monthFilter != null && !monthFilter.isEmpty()) {
-            stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
-        }
-        if (yearFilter != null && !yearFilter.isEmpty()) {
-            stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
-        }
-        stmt.setInt(paramIndex++, eventsPerPage);
-        stmt.setInt(paramIndex, offset);
-
-        rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            events event = new events(
-                    rs.getInt("eventID"),
-                    rs.getString("name"),
-                    rs.getDate("date"),
-                    rs.getTime("time"),
-                    rs.getTime("duration"),
-                    rs.getString("description"),
-                    rs.getInt("volunteerNeeded"),
-                    rs.getString("status"),
-                    rs.getBlob("image"),
-                    rs.getDouble("donationLimit"),
-                    rs.getInt("addressID")
+            // Base SQL for counting total events
+            StringBuilder countSql = new StringBuilder(
+                    "SELECT COUNT(*) as total FROM events WHERE (status = 1 OR status = 2) AND (date > CURDATE() OR (date = CURDATE() AND time > CURTIME()))"
             );
 
-            address addr = new address(
-                    rs.getInt("addressID"),
-                    rs.getString("country"),
-                    rs.getInt("postalCode"),
-                    rs.getString("street"),
-                    rs.getString("city"),
-                    rs.getString("state")
+            // Add month filter if selected
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                countSql.append(" AND MONTH(date) = ?");
+            }
+
+            // Add year filter if selected
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                countSql.append(" AND YEAR(date) = ?");
+            }
+
+            stmt = conn.prepareStatement(countSql.toString());
+            int paramIndex = 1;
+
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
+            }
+
+            rs = stmt.executeQuery();
+            rs.next();
+            int totalEvents = rs.getInt("total");
+
+            int eventsPerPage = 6; // Set the number of events per page
+            int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
+            int offset = (currentPage - 1) * eventsPerPage;
+            int totalPages = (int) Math.ceil((double) totalEvents / eventsPerPage);
+
+            // Base SQL for fetching events
+            StringBuilder sql = new StringBuilder(
+                    "SELECT e.*, a.* FROM events e "
+                    + "JOIN address a ON e.addressID = a.addressID "
+                    + "WHERE (e.status = 1 OR e.status = 2) AND e.beneficiaryID = ? AND "
+                    + "(e.date > CURDATE() OR (e.date = CURDATE() AND e.time > CURTIME()))"
             );
 
-            eventList.add(event);
-            addressList.add(addr);
+            // Add month filter if selected
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                sql.append(" AND MONTH(e.date) = ?");
+            }
+
+            // Add year filter if selected
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                sql.append(" AND YEAR(e.date) = ?");
+            }
+
+            // Add sorting
+            sql.append(" ORDER BY ");
+            switch (sortBy) {
+                case "eventID":
+                    sql.append("e.eventID ASC");
+                    break;
+                case "date":
+                    sql.append("e.date ASC, e.time ASC");
+                    break;
+                case "donationLimit":
+                    sql.append("e.donationLimit DESC");
+                    break;
+                case "volunteerNeeded":
+                    sql.append("e.volunteerNeeded DESC");
+                    break;
+                default:
+                    sql.append("e.eventID ASC");
+            }
+
+            // Add pagination
+            sql.append(" LIMIT ? OFFSET ?");
+
+            stmt = conn.prepareStatement(sql.toString());
+            paramIndex = 1;
+
+            stmt.setInt(paramIndex++, Integer.parseInt(beneficiaryID));
+            if (monthFilter != null && !monthFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));
+            }
+            if (yearFilter != null && !yearFilter.isEmpty()) {
+                stmt.setInt(paramIndex++, Integer.parseInt(yearFilter));
+            }
+            stmt.setInt(paramIndex++, eventsPerPage);
+            stmt.setInt(paramIndex, offset);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                events event = new events(
+                        rs.getInt("eventID"),
+                        rs.getString("name"),
+                        rs.getDate("date"),
+                        rs.getTime("time"),
+                        rs.getTime("duration"),
+                        rs.getString("description"),
+                        rs.getInt("volunteerNeeded"),
+                        rs.getString("status"),
+                        rs.getBlob("image"),
+                        rs.getDouble("donationLimit"),
+                        rs.getInt("addressID")
+                );
+
+                address addr = new address(
+                        rs.getInt("addressID"),
+                        rs.getString("country"),
+                        rs.getInt("postalCode"),
+                        rs.getString("street"),
+                        rs.getString("city"),
+                        rs.getString("state")
+                );
+
+                eventList.add(event);
+                addressList.add(addr);
+            }
+
+            // Set attributes for the JSP
+            request.setAttribute("event", eventList);
+            request.setAttribute("address", addressList);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("currentPage", currentPage);
+            request.setAttribute("sortBy", sortBy);
+            request.setAttribute("monthFilter", monthFilter);
+            request.setAttribute("yearFilter", yearFilter);
+
+            request.getRequestDispatcher("beneficiary/eventManagement.jsp").forward(request, response);
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            Logger.getLogger(listEventMgmt.class.getName()).log(Level.SEVERE, null, ex);
+            request.setAttribute("error", "An error occurred while fetching event data.");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
         }
-        
-        // Set attributes for the JSP
-        request.setAttribute("event", eventList);
-        request.setAttribute("address", addressList);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("currentPage", currentPage);
-        request.setAttribute("sortBy", sortBy);
-        request.setAttribute("monthFilter", monthFilter);
-        request.setAttribute("yearFilter", yearFilter);
-
-        request.getRequestDispatcher("beneficiary/eventManagement.jsp").forward(request, response);
-
-    } catch (SQLException | ClassNotFoundException ex) {
-        Logger.getLogger(listEventMgmt.class.getName()).log(Level.SEVERE, null, ex);
-        request.setAttribute("error", "An error occurred while fetching event data.");
-        request.getRequestDispatcher("error.jsp").forward(request, response);
-    }
 
         // Set the pagination parameters
-       
     }
 
     /**

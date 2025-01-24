@@ -53,7 +53,11 @@
                 font-size: 1.0rem;
                 color: #6c757d;
             }
-
+            .no-events-message {
+                font-size: 1.1rem;
+                color: #6c757d; /* Gray color */
+                padding: 10px;
+            }
 
         </style>
     </head>
@@ -130,6 +134,18 @@
                                 <%
                                     List<events> eventList = (List) request.getAttribute("event");
                                     List<address> addressList = (List) request.getAttribute("address");
+
+                                    if (eventList.isEmpty()) {
+                                %>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <div class="no-events-message" role="alert">
+                                            No events have finished yet.
+                                        </div>
+                                    </td>
+                                </tr>
+                                <%
+                                } else {
                                     for (int i = 0; i < eventList.size(); i++) {
 
                                         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
@@ -161,6 +177,7 @@
                                     </td>
                                 </tr>
                                 <%
+                                        }
                                     }
                                 %>
                             </tbody>
@@ -199,7 +216,7 @@
                 Integer totalPages = (Integer) request.getAttribute("totalPages");
             %>
 
-           <div class="row mt-4">
+            <div class="row mt-4">
                 <div class="col-12">
                     <nav aria-label="Page navigation">
                         <ul class="pagination">

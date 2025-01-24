@@ -125,7 +125,8 @@ public class listHistoryEventMgmt extends HttpServlet {
             StringBuilder sql = new StringBuilder(
                     "SELECT e.*, a.* FROM events e "
                     + "JOIN address a ON e.addressID = a.addressID "
-                    + "WHERE e.status = 2 AND (e.date < CURDATE() OR (e.date = CURDATE() AND e.time < CURTIME()))"
+                    + "WHERE e.status = 2 AND e.beneficiaryID = ? AND "
+                    + " (e.date < CURDATE() OR (e.date = CURDATE() AND e.time < CURTIME()))"
             );
 
             // Add month filter if selected
@@ -161,6 +162,7 @@ public class listHistoryEventMgmt extends HttpServlet {
 
             stmt = conn.prepareStatement(sql.toString());
             paramIndex = 1;
+            stmt.setInt(paramIndex++, Integer.parseInt(beneficiaryID));
 
             if (monthFilter != null && !monthFilter.isEmpty()) {
                 stmt.setInt(paramIndex++, Integer.parseInt(monthFilter));

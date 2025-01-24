@@ -343,29 +343,72 @@ public class updateEvent extends HttpServlet {
                 }
             }
 
-            // Check if the original address is shared with other events
-            String checkSharedAddressSQL = "SELECT COUNT(*) FROM events WHERE addressID = ?";
+            // Check if the original address is shared with other tables (events, volunteer, beneficiary)
             boolean isAddressShared = false;
 
-            try (PreparedStatement stmt = conn.prepareStatement(checkSharedAddressSQL)) {
+            // Query to check if the address is used in the events table
+            String checkEventsSQL = "SELECT COUNT(*) FROM events WHERE addressID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(checkEventsSQL)) {
                 stmt.setInt(1, Integer.parseInt(request.getParameter("addressID"))); // Original addressID
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         int eventCount = rs.getInt(1);
-                        if (eventCount > 1) {
-                            isAddressShared = true; // Address is shared with other events
+                        if (eventCount > 1) { // If more than one event uses this address
+                            isAddressShared = true;
                         }
                     }
                 }
             }
 
-            // Update the event with the new or existing addressID
+            // Query to check if the address is used in the volunteer table
+            String checkVolunteerSQL = "SELECT COUNT(*) FROM volunteer WHERE addressID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(checkVolunteerSQL)) {
+                stmt.setInt(1, Integer.parseInt(request.getParameter("addressID"))); // Original addressID
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int volunteerCount = rs.getInt(1);
+                        if (volunteerCount > 0) { // If any volunteer uses this address
+                            isAddressShared = true;
+                        }
+                    }
+                }
+            }
+                
+            // Query to check if the address is used in the beneficiary table
+            String checkBeneficiarySQL = "SELECT COUNT(*) FROM beneficiary WHERE addressID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(checkBeneficiarySQL)) {
+                stmt.setInt(1, Integer.parseInt(request.getParameter("addressID"))); // Original addressID
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        int beneficiaryCount = rs.getInt(1);
+                        if (beneficiaryCount > 0) { // If any beneficiary uses this address
+                            isAddressShared = true;
+                        }
+                    }
+                }
+            }
+
+            // Update the event with the new or eisting addressID
             String updateEventSQL = "UPDATE events SET name = ?, date = ?, time = ?, duration = ?, description = ?, "
                     + "image = ?, donationLimit = ?, addressID = ? WHERE eventID = ?";
             try (PreparedStatement updateStmt = conn.prepareStatement(updateEventSQL)) {
                 updateStmt.setString(1, eventName);
                 updateStmt.setDate(2, Date.valueOf(eventDate));
-                updateStmt.setTime(3, Time.valueOf(eventTime));
+                String formattedTime;
+
+                if (eventTime.matches("\\d{2}:\\d{2}")) {
+
+                    formattedTime = eventTime + ":00";
+                } else if (eventTime.matches("\\d{2}:\\d{2}:\\d{2}")) {
+
+                    formattedTime = eventTime;
+                } else {
+
+                    throw new IllegalArgumentException("Invalid time format: " + eventTime);
+                }
+
+                // Set the formatted time in the prepared statement
+                updateStmt.setTime(3, Time.valueOf(formattedTime));
                 updateStmt.setTime(4, duration);
                 updateStmt.setString(5, desc);
                 updateStmt.setBlob(6, imageInputStream);
@@ -375,7 +418,12 @@ public class updateEvent extends HttpServlet {
                 updateStmt.executeUpdate();
             }
 
-            // If the original address is not shared, delete it
+      
+
+            PreparedStatement psTask = null;
+            String sqlTask = null;
+            
+                  // If the original address is not shared, delete it
             if (!isAddressShared) {
                 String deleteAddressSQL = "DELETE FROM address WHERE addressID = ?";
                 try (PreparedStatement deleteStmt = conn.prepareStatement(deleteAddressSQL)) {
@@ -383,22 +431,18 @@ public class updateEvent extends HttpServlet {
                     deleteStmt.executeUpdate();
                 }
             }
-
-            PreparedStatement psTask = null;
-            String sqlTask = null;
             if (updatedTask != null) {
 
-                sqlTask = "UPDATE task SET status = ?, description = ?, eventID = ? WHERE taskID = ?";
+                sqlTask = "UPDATE task SET description = ?, eventID = ? WHERE taskID = ?";
                 psTask = conn.prepareStatement(sqlTask);
 
                 for (int i = 0; i < updatedTask.length; i++) {
                     String newTask = updatedTask[i];
                     String taskID = taskIDs[i];
 
-                    psTask.setInt(1, 1);
-                    psTask.setString(2, newTask);
-                    psTask.setInt(3, Integer.parseInt(idValue));
-                    psTask.setInt(4, Integer.parseInt(taskID));
+                    psTask.setString(1, newTask);
+                    psTask.setInt(2, Integer.parseInt(idValue));
+                    psTask.setInt(3, Integer.parseInt(taskID));
                     psTask.addBatch();
                 }
 
@@ -433,7 +477,7 @@ public class updateEvent extends HttpServlet {
                 }
             }
 
-            if (deleteTasks != null && !deleteTasks.isEmpty()) {
+            if (deleteTasks != null) {
                 String[] taskIdsArray = deleteTasks.split(",");
                 String sqlDeleteTask = "DELETE FROM task WHERE taskID = ?";
                 PreparedStatement psDeleteTask = conn.prepareStatement(sqlDeleteTask);

@@ -4,6 +4,7 @@
 <%@page import="com.cm.model.task"%>
 <%@page import="java.util.List"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html>
@@ -133,8 +134,8 @@
                                         : event.getStatus().equals("2") ? "Approved" : "Rejected"%>
                             </span>
                         </div>
-                            
-                          
+
+
 
                         <div class="mb-4">
                             <h5>About</h5>
@@ -169,13 +170,20 @@
                                 </div>
                             </div>
                         </div>
-                                    
-                                      <div class="mb-4">
+                        <div class="mb-4">
                             <h5>Total Volunteer: </h5>
                             <span class="status-badge">
-                                <%= request.getAttribute("totalVol")%>
+                                <c:choose>
+                                    <c:when test="${not empty requestScope.totalVol and requestScope.totalVol != 0}">
+                                        ${requestScope.totalVol}
+                                    </c:when>
+                                    <c:otherwise>
+                                          No one has volunteered yet
+                                    </c:otherwise>
+                                </c:choose>
                             </span>
                         </div>
+
                     </div>
 
                     <div class="col-md-4">

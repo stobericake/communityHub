@@ -98,20 +98,19 @@
 
 
         </style>
+
+    </head>
+    <body>
         <%
             events event = (events) request.getAttribute("event");
             address address = (address) request.getAttribute("address");
-            
- address addr = (address)request.getAttribute("address");
-    System.out.println("JSP values - Country: " + addr.getCountry() + ", City: " + addr.getCity());
+
         %>
-    </head>
-    <body>
         <%@ include file="../header.jspf" %>
 
         <form action="updateEvent.do" method="POST"  enctype="multipart/form-data">
             <input type="hidden" name="id" class="form-control" value="<%= event.getEventID()%>">
-                    <input type="hidden" name="addressID" class="form-control" value="<%= address.getAddressID()%>">
+            <input type="hidden" name="addressID" class="form-control" value="<%= address.getAddressID()%>">
             <div class="container py-5">
 
 
@@ -162,7 +161,7 @@
                             <div class="mb-3">
                                 <label for="eventName" class="form-label">Event Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="eventName" name="eventName" placeholder="Enter your event name" value="<%= event.getName()%>" required>
-                                
+
 
                             </div>
                             <div class="mb-3">
