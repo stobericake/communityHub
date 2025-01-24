@@ -101,7 +101,7 @@
                             <th>Location</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th>Task</th>
+                            <th scope="col" width="20%">Task</th>
                             <th scope="col" width="10%" class="text-center">View Detail</th>
                         </tr>
                     </thead>
