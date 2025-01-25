@@ -89,7 +89,7 @@ public class listHistoryEventMgmt extends HttpServlet {
 
             // Base SQL for counting total events
             StringBuilder countSql = new StringBuilder(
-                    "SELECT COUNT(*) as total FROM events WHERE status = 2 AND (date > CURDATE() OR (date = CURDATE() AND time > CURTIME()))"
+                    "SELECT COUNT(*) as total FROM events WHERE status = 2 AND (date < CURDATE() OR (date = CURDATE() AND time < CURTIME()))"
             );
 
             // Add month filter if selected
@@ -126,7 +126,7 @@ public class listHistoryEventMgmt extends HttpServlet {
                     "SELECT e.*, a.* FROM events e "
                     + "JOIN address a ON e.addressID = a.addressID "
                     + "WHERE e.status = 2 AND e.beneficiaryID = ? AND "
-                    + " (e.date < CURDATE() OR (e.date = CURDATE() AND e.time < CURTIME()))"
+                    + "(e.date < CURDATE() OR (e.date = CURDATE() AND TIMESTAMP(e.date, e.time) + INTERVAL e.duration HOUR < NOW()))"
             );
 
             // Add month filter if selected

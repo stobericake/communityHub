@@ -162,7 +162,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response) t
 
             events event = new events(
                 rs.getInt("eventID"),
-                rs.getString("name"),
+                rs.getString("e.name"),
                 rs.getDate("date"),
                 rs.getTime("time"),
                 rs.getTime("duration"),
