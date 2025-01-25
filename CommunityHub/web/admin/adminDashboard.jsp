@@ -1,6 +1,14 @@
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.cm.model.events"%>
 <!DOCTYPE html>
+<%
+    String user = (String) session.getAttribute("userRole");
+
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 <html>
     <head>
         <meta charset="UTF-8">

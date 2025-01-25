@@ -127,65 +127,68 @@ public class donationFormServlet extends HttpServlet {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
+
         try {
-            // Retrieve form data
+            HttpSession session = request.getSession(false);
             String eventID = request.getParameter("eventID");
-            String donorName = request.getParameter("name");
-            String contactInfo = request.getParameter("contactInfo"); // Add a field for contact info in your form if needed
             String amount = request.getParameter("amount");
             java.sql.Date date = new java.sql.Date(System.currentTimeMillis());
-
-            // Handle file upload
             Part filePart = request.getPart("receipt");
-
-            // Ensure file is provided
-            if (filePart == null || filePart.getSize() == 0) {
-                response.sendRedirect("error.jsp?error=NoReceiptProvided");
-                return;
-            }
-
-            // Get input stream for the file
             InputStream fileContent = filePart.getInputStream();
 
-            // Get a database connection
-            conn = dbconnection.getConnection();
+            if (session != null && session.getAttribute("volunteer") != null) {
+                // Volunteer making a donation
+                int volunteerID = (int) session.getAttribute("volunteer");
 
-            // Check if donor exists in the donor table
-            String checkDonorSQL = "SELECT donorID FROM donor WHERE name = ? AND contactInfo = ?";
-            stmt = conn.prepareStatement(checkDonorSQL);
-            stmt.setString(1, donorName);
-            stmt.setInt(2, Integer.parseInt(contactInfo));
-            rs = stmt.executeQuery();
-
-            int donorID;
-            if (rs.next()) {
-                // Donor exists, get the donorID
-                donorID = rs.getInt("donorID");
+                conn = dbconnection.getConnection();
+                String insertDonationSQL = "INSERT INTO donation (amount, date, receiptImage, eventID, volunteerID, donorID) VALUES (?, ?, ?, ?, ?, NULL)";
+                stmt = conn.prepareStatement(insertDonationSQL);
+                stmt.setDouble(1, Double.parseDouble(amount));
+                stmt.setDate(2, date);
+                stmt.setBinaryStream(3, fileContent, (int) filePart.getSize());
+                stmt.setInt(4, Integer.parseInt(eventID));
+                stmt.setInt(5, volunteerID);
             } else {
-                // Donor doesn't exist, insert into donor table
-                String insertDonorSQL = "INSERT INTO donor (name, contactInfo) VALUES (?, ?)";
-                stmt = conn.prepareStatement(insertDonorSQL, PreparedStatement.RETURN_GENERATED_KEYS);
+                // Donor making a donation
+                String donorName = request.getParameter("name");
+                String contactInfo = request.getParameter("contactInfo");
+
+                conn = dbconnection.getConnection();
+
+                // Check if donor exists
+                String checkDonorSQL = "SELECT donorID FROM donor WHERE name = ? AND contactInfo = ?";
+                stmt = conn.prepareStatement(checkDonorSQL);
                 stmt.setString(1, donorName);
-                stmt.setInt(2, Integer.parseInt(contactInfo));
-                stmt.executeUpdate();
+                stmt.setString(2, contactInfo);
+                rs = stmt.executeQuery();
 
-                // Retrieve the generated donorID
-                rs = stmt.getGeneratedKeys();
+                int donorID;
                 if (rs.next()) {
-                    donorID = rs.getInt(1);
+                    donorID = rs.getInt("donorID");
                 } else {
-                    throw new SQLException("Failed to retrieve donorID.");
-                }
-            }
+                    String insertDonorSQL = "INSERT INTO donor (name, contactInfo) VALUES (?, ?)";
+                    stmt = conn.prepareStatement(insertDonorSQL, PreparedStatement.RETURN_GENERATED_KEYS);
+                    stmt.setString(1, donorName);
+                    stmt.setString(2, contactInfo);
+                    stmt.executeUpdate();
+                    rs = stmt.getGeneratedKeys();
 
-            // Insert donation into the donation table
-            String insertDonationSQL = "INSERT INTO donation (amount, date, receiptImage, eventID, donorID) VALUES (?, ?, ?, ?, ?)";
-            stmt = conn.prepareStatement(insertDonationSQL);
-            stmt.setDouble(1, Double.parseDouble(amount));
-            stmt.setDate(2, date);
-            stmt.setBinaryStream(3, fileContent, (int) filePart.getSize()); // Store the receipt as BLOB
-            stmt.setInt(4, Integer.parseInt(eventID));
-            stmt.setInt(5, donorID);
+                    if (rs.next()) {
+                        donorID = rs.getInt(1);
+                    } else {
+                        throw new SQLException("Failed to retrieve donorID.");
+                    }
+                }
+
+                // Insert donation
+                String insertDonationSQL = "INSERT INTO donation (amount, date, receiptImage, eventID, donorID) VALUES (?, ?, ?, ?, ?)";
+                stmt = conn.prepareStatement(insertDonationSQL);
+                stmt.setDouble(1, Double.parseDouble(amount));
+                stmt.setDate(2, date);
+                stmt.setBinaryStream(3, fileContent, (int) filePart.getSize());
+                stmt.setInt(4, Integer.parseInt(eventID));
+                stmt.setInt(5, donorID);
+            }
 
             int rowsInserted = stmt.executeUpdate();
             if (rowsInserted > 0) {
@@ -197,19 +200,23 @@ public class donationFormServlet extends HttpServlet {
             e.printStackTrace();
             response.sendRedirect("error.jsp");
         } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+            closeResources(rs, stmt, conn);
+        }
+    }
+
+    private void closeResources(ResultSet rs, PreparedStatement stmt, Connection conn) {
+        try {
+            if (rs != null) {
+                rs.close();
             }
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
