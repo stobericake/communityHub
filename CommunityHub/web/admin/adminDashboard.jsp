@@ -137,7 +137,9 @@
                             </div>
                             <div class="stat-item py-2 border-bottom">
                                 <p class="mb-1">Total Donations:</p>
-                                <span class="fw-bold text-info fs-4">$<%= request.getAttribute("totalDonations")%></span>
+                               <span class="fw-bold text-info fs-4">
+    RM<%= String.format("%.2f", request.getAttribute("totalDonations")) %>
+</span>
                             </div>
                             <div class="flex-grow-1"></div> <!-- Spacer to align content -->
                         </div>

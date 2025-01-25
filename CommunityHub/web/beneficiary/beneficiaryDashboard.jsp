@@ -64,7 +64,7 @@
                     </div>
                 </div>
             </div>
-                    
+
             <!-- Additional Information Section -->
             <div class="mt-5">
                 <h4 class="section-title text-center fw-bold mb-4">Additional Insights</h4>
@@ -88,7 +88,7 @@
                                         <p class="mb-0 text-muted">Date: <%= event.getDate()%></p>
                                         <p class="mb-0 text-muted">Time: <%= event.getTime()%></p>
                                     </div>
-                                  
+
                                 </li>
                                 <%
                                     }
@@ -107,7 +107,9 @@
                             </div>
                             <div class="stat-item py-2 border-bottom">
                                 <p class="mb-1">Total Donations:</p>
-                                <span class="fw-bold text-info fs-4">$<%= request.getAttribute("totalDonations")%></span>
+                                <span class="fw-bold text-info fs-4">
+                                    RM<%= String.format("%.2f", request.getAttribute("totalDonations"))%>
+                                </span>
                             </div>
                             <div class="flex-grow-1"></div> <!-- Spacer to align content -->
                         </div>
