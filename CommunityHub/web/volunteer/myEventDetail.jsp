@@ -285,6 +285,19 @@
                                 </div>
                             <% } %>
                         <% } %>
+                        
+                        <% if (isEventEnded) { %>
+                        <!-- Display Attendance Status Text -->
+                                <div id="attendanceStatusText">
+                                    <p><strong>Attendance:</strong> 
+                                        <% if (ev.getAttendance() == 1) { %>
+                                            Attend
+                                        <% } else if (ev.getAttendance() == 2) { %>
+                                            Absent
+                                        <% } %>
+                                    </p>
+                                </div>
+                        <% } %>
                     </div>
 
 
