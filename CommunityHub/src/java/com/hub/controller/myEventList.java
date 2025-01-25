@@ -66,7 +66,7 @@ public class myEventList extends HttpServlet {
             throws ServletException, IOException {
         int volunteerId = Integer.parseInt(request.getSession().getAttribute("volunteer").toString());
 
-        int pageSize = 5; // Number of events per page
+        int pageSize = 8; // Number of events per page
         int currentPage = request.getParameter("page") != null ? Integer.parseInt(request.getParameter("page")) : 1;
         int totalRecords = 0;
         int totalPages = 0;

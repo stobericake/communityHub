@@ -258,17 +258,31 @@
                             </small>
                         </div>
                         <p><strong>Selected Task:</strong> <%= tasks.getDescription()%></p>
-                        <!-- Confirm Attendance Button -->
-                        <%  if (isEventOngoing) {%>
-                        <!-- Action Buttons at the Bottom -->
-                        <div class="action-buttons mt-auto">
-                            <button onclick="confirmAttendance(<%= eventID%>, 1)" class="btn btn-primary">
-                                <i class="bi bi-calendar-check me-2"></i>Attend
-                            </button>
-                            <button onclick="confirmAttendance(<%= eventID%>, 2)" class="btn btn-danger">
-                                <i class="bi bi-x-circle me-2"></i>Absent
-                            </button>
-                        </div>
+                        <input type="hidden" id="attendanceStatus" value="<%= ev.getAttendance() %>">
+
+                        <% if (isEventOngoing) { %>
+                            <% if (ev.getAttendance() == 0) { %>
+                                <!-- Action Buttons at the Bottom -->
+                                <div class="action-buttons mt-auto">
+                                    <button onclick="confirmAttendance(<%= eventID%>, 1)" class="btn btn-primary">
+                                        <i class="bi bi-calendar-check me-2"></i>Attend
+                                    </button>
+                                    <button onclick="confirmAttendance(<%= eventID%>, 2)" class="btn btn-danger">
+                                        <i class="bi bi-x-circle me-2"></i>Absent
+                                    </button>
+                                </div>
+                            <% } else { %>
+                                <!-- Display Attendance Status Text -->
+                                <div id="attendanceStatusText">
+                                    <p><strong>Attendance:</strong> 
+                                        <% if (ev.getAttendance() == 1) { %>
+                                            Attend
+                                        <% } else if (ev.getAttendance() == 2) { %>
+                                            Absent
+                                        <% } %>
+                                    </p>
+                                </div>
+                            <% } %>
                         <% } %>
                     </div>
 
@@ -311,7 +325,7 @@
                                         <p><strong>DOWNLOAD CERTIFICATE</strong></p>
                                     </div>
                                     <% if (ev.getAttendance() == 1) { %>
-                                        <a href="javascript:void(0)" onclick="showCertificateModal(<%= eventID%>)" 
+                                        <a href="javascript:void(0)" onclick="showCertificateModal(<%= eventID%>)"  
                                            class="btn w-100 py-2" 
                                            style="background-color: #000; color: #fff; border-radius: 30px;">
                                             DOWNLOAD <i class="bi bi-download"></i>
@@ -323,6 +337,28 @@
                                     <% } %>
                                 </div>
                             </div>
+                                
+                                                        <!-- Fullscreen Overlay -->
+                        <div class="modal fade" id="certificateOverlay" tabindex="-1" aria-labelledby="certificateOverlayLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-fullscreen">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="certificateOverlayLabel">Certificate</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!--                                    Wrap the certificate content with a specific class -->
+                                        <div class="certificate-content">
+                                            <iframe id="certificatePreview" style="width: 100%; height: 100%; border: none;"></iframe>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary print-button" onclick="window.print();">Download</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                             <div class="card mb-4" style="border-radius: 10px;">
                                 <div class="card-body text-center">
@@ -354,14 +390,16 @@
         <form id="confirmAttendance" method="post" action="myDetail.do" style="display:none;">
             <input type="hidden" id="eventIdInput" name="eventId">
             <input type="hidden" id="attendaceInput" name="attendance">
-        </form>
-
+        </form>        
         <script>
-            function confirmAttendance(eventId, attendance) {
-
+                function confirmAttendance(eventId, attendance) {
                 document.getElementById('eventIdInput').value = eventId;
                 document.getElementById('attendaceInput').value = attendance;
                 document.getElementById('confirmAttendance').submit();
+
+                // Hide the buttons and show the attendance status text
+                document.querySelector('.action-buttons').style.display = 'none';
+                document.getElementById('attendanceStatusText').style.display = 'block';
             }
         </script>
         <script>
