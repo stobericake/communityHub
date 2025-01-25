@@ -210,45 +210,59 @@
                                             <%
                                                 Long daysLeft = (Long) request.getAttribute("daysLeft");
                                                 if (daysLeft != null) {
-                                                    long daysAgo = Math.abs(daysLeft);
+                                                    if (daysLeft > 0) {
+                                                        // Event is in the future
+%>
+                                            The event should start in <%= daysLeft%> <%= (daysLeft == 1) ? "day" : "days"%>.
+                                            <%
+                                            } else if (daysLeft < 0) {
+                                                // Event is in the past
+                                                long daysAgo = Math.abs(daysLeft);
 
-                                                    // Convert days to years and months
-                                                    long years = daysAgo / 365;
-                                                    long months = (daysAgo % 365) / 30;
+                                                // Convert days to years and months
+                                                long years = daysAgo / 365;
+                                                long months = (daysAgo % 365) / 30;
 
-                                                    if (years > 0) {
-                                                        if (months > 0) {
+                                                if (years > 0) {
+                                                    if (months > 0) {
                                             %>
                                             This event ended <%= years%> <%= (years == 1) ? "year" : "years"%> <br>
-                                            and <%= months%> <%= (months == 1) ? "month" : "months"%> ago
+                                            and <%= months%> <%= (months == 1) ? "month" : "months"%> ago.
                                             <%
                                             } else {
                                             %>
-                                            This event ended <%= years%> <%= (years == 1) ? "year" : "years"%> ago
+                                            This event ended <%= years%> <%= (years == 1) ? "year" : "years"%> ago.
                                             <%
                                                 }
                                             } else if (months > 0) {
                                             %>
-                                            This event ended <%= months%> <%= (months == 1) ? "month" : "months"%> ago
+                                            This event ended <%= months%> <%= (months == 1) ? "month" : "months"%> ago.
                                             <%
                                             } else {
                                             %>
-                                            This event ended <%= daysAgo%> <%= (daysAgo == 1) ? "day" : "days"%> ago
+                                            This event ended <%= daysAgo%> <%= (daysAgo == 1) ? "day" : "days"%> ago.
+                                            <%
+                                                }
+                                            } else {
+                                                // Event is today
+                                            %>
+                                            The event is happening today.
                                             <%
                                                 }
                                             } else {
                                             %>
-                                            Event date not available
+                                            Event date not available.
                                             <%
                                                 }
                                             %>
                                         </small>
                                     </div>
-                                    <div>
+                                 
+                                </div>
+                                           <div>
                                         <i class="bi bi-heart-fill text-danger me-2"></i>
                                         <small class="text-muted"><%= totalContributors%> Contributors</small>
                                     </div>
-                                </div>
                             </div>
                         </div>
 
