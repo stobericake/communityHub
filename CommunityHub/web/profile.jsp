@@ -186,7 +186,7 @@
                             <div class="mb-3">
                                 <label for="currentPassword" class="form-label">Current Password</label>
                                 <div class="position-relative">
-                                    <input type="password" class="form-control" id="currentPassword" value="<%=password%>">
+                                    <input type="password" class="form-control" id="currentPassword" value="<%=password%>" required>
                                     <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#currentPassword">
                                         <i class="bi bi-eye"></i>
                                     </button>
@@ -195,7 +195,7 @@
                             <div class="mb-3">
                                 <label for="newPassword" class="form-label">New Password</label>
                                 <div class="position-relative">
-                                    <input type="password" name="password" class="form-control" id="newPassword">
+                                    <input type="password" name="password" class="form-control" id="newPassword" required>
                                     <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#newPassword">
                                         <i class="bi bi-eye"></i>
                                     </button>
@@ -204,7 +204,7 @@
                             <div class="mb-3">
                                 <label for="confirmPassword" class="form-label">Confirm Password</label>
                                 <div class="position-relative">
-                                    <input type="password" name="password" class="form-control" id="confirmPassword">
+                                    <input type="password" name="password" class="form-control" id="confirmPassword" required>
                                     <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#confirmPassword">
                                         <i class="bi bi-eye"></i>
                                     </button>

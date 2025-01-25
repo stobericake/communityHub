@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
+@WebServlet("/UpdateProfile")
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
     maxFileSize = 1024 * 1024 * 10,      // 10 MB
@@ -59,6 +60,7 @@ public class UpdateProfile extends HttpServlet {
                 updatePassword(request, conn, userId, userRole);
             }
 
+            // Redirect to profile page after successful update
             response.sendRedirect(request.getContextPath() + "/ProfileDetail");
 
         } catch (SQLException ex) {
@@ -73,79 +75,79 @@ public class UpdateProfile extends HttpServlet {
     }
 
     // Method to update user info (name, email, contact, username, profile picture)
-   private void updateUserInfo(HttpServletRequest request, Connection conn, String userId, String userRole)
-        throws SQLException, IOException, ServletException {
-    // Retrieve form parameters
-    String name = request.getParameter("name");
-    String email = request.getParameter("email");
-    String contact = request.getParameter("phone_number");
-    String username = request.getParameter("username");
+    private void updateUserInfo(HttpServletRequest request, Connection conn, String userId, String userRole)
+            throws SQLException, IOException, ServletException {
+        // Retrieve form parameters
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String contact = request.getParameter("phone_number");
+        String username = request.getParameter("username");
 
-    // Retrieve the uploaded image file
-    Part filePart = request.getPart("profilePicture");
-    InputStream imageInputStream = null;
+        // Retrieve the uploaded image file
+        Part filePart = request.getPart("profilePicture");
+        InputStream imageInputStream = null;
 
-    // Check if a new image was uploaded
-    boolean hasNewImage = false;
-    if (filePart != null && filePart.getSize() > 0) {
-        imageInputStream = filePart.getInputStream();
-        hasNewImage = true; // Flag to indicate a new image was uploaded
-    }
-
-    // Prepare the SQL query based on the user role
-    String updateUserSQL;
-    if (userRole.equals("admin")) {
-        if (hasNewImage) {
-            updateUserSQL = "UPDATE admin SET name = ?, email = ?, contactInfo = ?, username = ?, image = ? WHERE adminID = ?";
-        } else {
-            updateUserSQL = "UPDATE admin SET name = ?, email = ?, contactInfo = ?, username = ? WHERE adminID = ?";
+        // Check if a new image was uploaded
+        boolean hasNewImage = false;
+        if (filePart != null && filePart.getSize() > 0) {
+            imageInputStream = filePart.getInputStream();
+            hasNewImage = true; // Flag to indicate a new image was uploaded
         }
-    } else if (userRole.equals("volunteer")) {
-        if (hasNewImage) {
-            updateUserSQL = "UPDATE volunteer SET name = ?, contactInfo = ?, username = ?, image = ? WHERE volunteerID = ?";
-        } else {
-            updateUserSQL = "UPDATE volunteer SET name = ?, contactInfo = ?, username = ? WHERE volunteerID = ?";
-        }
-    } else {
-        if (hasNewImage) {
-            updateUserSQL = "UPDATE beneficiary SET name = ?, contactInfo = ?, username = ?, image = ? WHERE beneficiaryID = ?";
-        } else {
-            updateUserSQL = "UPDATE beneficiary SET name = ?, contactInfo = ?, username = ? WHERE beneficiaryID = ?";
-        }
-    }
 
-    try (PreparedStatement userStmt = conn.prepareStatement(updateUserSQL)) {
-        // Set parameters based on the user role
+        // Prepare the SQL query based on the user role
+        String updateUserSQL;
         if (userRole.equals("admin")) {
-            userStmt.setString(1, name);
-            userStmt.setString(2, email);
-            userStmt.setInt(3, Integer.parseInt(contact));
-            userStmt.setString(4, username);
             if (hasNewImage) {
-                userStmt.setBlob(5, imageInputStream); // Set the new image
-                userStmt.setInt(6, Integer.parseInt(userId));
+                updateUserSQL = "UPDATE admin SET name = ?, email = ?, contactInfo = ?, username = ?, image = ? WHERE adminID = ?";
             } else {
-                userStmt.setInt(5, Integer.parseInt(userId));
+                updateUserSQL = "UPDATE admin SET name = ?, email = ?, contactInfo = ?, username = ? WHERE adminID = ?";
+            }
+        } else if (userRole.equals("volunteer")) {
+            if (hasNewImage) {
+                updateUserSQL = "UPDATE volunteer SET name = ?, contactInfo = ?, username = ?, image = ? WHERE volunteerID = ?";
+            } else {
+                updateUserSQL = "UPDATE volunteer SET name = ?, contactInfo = ?, username = ? WHERE volunteerID = ?";
             }
         } else {
-            userStmt.setString(1, name);
-            userStmt.setInt(2, Integer.parseInt(contact));
-            userStmt.setString(3, username);
             if (hasNewImage) {
-                userStmt.setBlob(4, imageInputStream); // Set the new image
-                userStmt.setInt(5, Integer.parseInt(userId));
+                updateUserSQL = "UPDATE beneficiary SET name = ?, contactInfo = ?, username = ?, image = ? WHERE beneficiaryID = ?";
             } else {
-                userStmt.setInt(4, Integer.parseInt(userId));
+                updateUserSQL = "UPDATE beneficiary SET name = ?, contactInfo = ?, username = ? WHERE beneficiaryID = ?";
             }
         }
 
-        // Execute the update
-        int rowsUpdated = userStmt.executeUpdate();
-        if (rowsUpdated <= 0) {
-            throw new SQLException("Failed to update user info.");
+        try (PreparedStatement userStmt = conn.prepareStatement(updateUserSQL)) {
+            // Set parameters based on the user role
+            if (userRole.equals("admin")) {
+                userStmt.setString(1, name);
+                userStmt.setString(2, email);
+                userStmt.setInt(3, Integer.parseInt(contact));
+                userStmt.setString(4, username);
+                if (hasNewImage) {
+                    userStmt.setBlob(5, imageInputStream); // Set the new image
+                    userStmt.setInt(6, Integer.parseInt(userId));
+                } else {
+                    userStmt.setInt(5, Integer.parseInt(userId));
+                }
+            } else {
+                userStmt.setString(1, name);
+                userStmt.setInt(2, Integer.parseInt(contact));
+                userStmt.setString(3, username);
+                if (hasNewImage) {
+                    userStmt.setBlob(4, imageInputStream); // Set the new image
+                    userStmt.setInt(5, Integer.parseInt(userId));
+                } else {
+                    userStmt.setInt(4, Integer.parseInt(userId));
+                }
+            }
+
+            // Execute the update
+            int rowsUpdated = userStmt.executeUpdate();
+            if (rowsUpdated <= 0) {
+                throw new SQLException("Failed to update user info.");
+            }
         }
     }
-}
 
     // Method to update address (only for volunteers and beneficiaries)
     private void updateAddress(HttpServletRequest request, Connection conn, String userId)
@@ -155,11 +157,14 @@ public class UpdateProfile extends HttpServlet {
         String street = request.getParameter("street");
         String city = request.getParameter("city");
         String state = request.getParameter("state");
-        
 
-        String updateAddressSQL = "UPDATE address SET country = ?, postalCode = ?, street = ?, city = ?, state = ? "
-        + "WHERE addressID = (SELECT addressID FROM volunteer WHERE volunteerID = ? "
-        + "UNION SELECT addressID FROM beneficiary WHERE beneficiaryID = ?)";
+       String updateAddressSQL = "UPDATE address " +
+            "SET country = ?, postalCode = ?, street = ?, city = ?, state = ? " +
+            "WHERE addressID IN (" +
+            "    SELECT addressID FROM volunteer WHERE volunteerID = ? " +
+            "    UNION " +
+            "    SELECT addressID FROM beneficiary WHERE beneficiaryID = ?" +
+            ")";
 
         try (PreparedStatement addressStmt = conn.prepareStatement(updateAddressSQL)) {
             addressStmt.setString(1, country);
@@ -180,25 +185,31 @@ public class UpdateProfile extends HttpServlet {
     // Method to update password (for all users)
     private void updatePassword(HttpServletRequest request, Connection conn, String userId, String userRole)
             throws SQLException {
+        // Retrieve the new password from the form
         String newPassword = request.getParameter("password");
 
-        String updatePasswordSQL;
-        if (userRole.equals("admin")) {
-            updatePasswordSQL = "UPDATE admin SET password = ? WHERE adminID = ?";
-        } else if (userRole.equals("volunteer")) {
-            updatePasswordSQL = "UPDATE volunteer SET password = ? WHERE volunteerID = ?";
-        } else {
-            updatePasswordSQL = "UPDATE beneficiary SET password = ? WHERE beneficiaryID = ?";
-        }
+        // Only update the password if a new password is provided
+        if (newPassword != null && !newPassword.trim().isEmpty()) {
+            String updatePasswordSQL;
+            if (userRole.equals("admin")) {
+                updatePasswordSQL = "UPDATE admin SET password = ? WHERE adminID = ?";
+            } else if (userRole.equals("volunteer")) {
+                updatePasswordSQL = "UPDATE volunteer SET password = ? WHERE volunteerID = ?";
+            } else {
+                updatePasswordSQL = "UPDATE beneficiary SET password = ? WHERE beneficiaryID = ?";
+            }
 
-        try (PreparedStatement passwordStmt = conn.prepareStatement(updatePasswordSQL)) {
-            passwordStmt.setString(1, newPassword);
-            passwordStmt.setInt(2, Integer.parseInt(userId));
+            try (PreparedStatement passwordStmt = conn.prepareStatement(updatePasswordSQL)) {
+                passwordStmt.setString(1, newPassword); // Set the new password
+                passwordStmt.setInt(2, Integer.parseInt(userId));
 
-            int rowsUpdated = passwordStmt.executeUpdate();
-            if (rowsUpdated <= 0) {
-                throw new SQLException("Failed to update password.");
+                // Execute the update
+                int rowsUpdated = passwordStmt.executeUpdate();
+                if (rowsUpdated <= 0) {
+                    throw new SQLException("Failed to update password.");
+                }
             }
         }
+        // If the password field is empty, do nothing (retain the current password)
     }
 }
