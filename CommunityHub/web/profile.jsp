@@ -186,7 +186,7 @@
                             <div class="mb-3">
                                 <label for="currentPassword" class="form-label">Current Password</label>
                                 <div class="position-relative">
-                                    <input type="password" class="form-control" id="currentPassword" value="<%=password%>" required>
+                                    <input type="password" class="form-control" id="currentPassword" value="<%=password%>" readonly>
                                     <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y toggle-password" data-target="#currentPassword">
                                         <i class="bi bi-eye"></i>
                                     </button>
