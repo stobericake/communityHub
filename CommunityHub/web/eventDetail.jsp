@@ -72,6 +72,7 @@
             double totalDonation = Double.parseDouble(request.getAttribute("totalDonation").toString());
             double remainingAmount = Double.parseDouble(request.getAttribute("remainingAmount").toString());
             double progress = Double.parseDouble(request.getAttribute("progress").toString());
+            String daysLeft = request.getAttribute("daysLeft").toString();
         %>    
         <div class="container mt-4">
             <img src="getImage.do?type=events&id=<%= event.getEventID() %>" class="rounded mx-auto d-block event-image" alt="Event Image">
@@ -97,9 +98,12 @@
                             <small class="text-muted text-end">Remaining<br>RM<%= String.format("%.2f", remainingAmount) %></small>
                         </div>
                         <div class="d-flex align-items-start justify-content-start">
-                        <i class="bi bi-clock me-2"></i>
-                        <small class="text-muted"> 123 days </small>
-                    </div>
+                            <i class="bi bi-clock me-2"></i>
+                            <small class="text-muted">
+                                <%= daysLeft %> days left
+                            </small>
+                        </div>
+
                     <div class="d-flex align-items-start justify-content-start">
                         <i class="bi bi-heart-fill text-danger me-2"></i>
                         <small class="text-muted"><%= totalContributors %> Contributors</small>

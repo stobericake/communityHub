@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -167,11 +168,17 @@ public class myEventDetail extends HttpServlet {
                     String formattedDate = inputDateFormat.format(rs.getDate("date"));
                     String formattedStartTime = outputFormat.format(rs.getTime("time"));
                     String formattedEndTime = outputFormat.format(Time.valueOf(endTime));
+                    
+                    // Calculate days left from the current date to the event date
+                    LocalDate currentDate = LocalDate.now();
+                    long daysLeft = ChronoUnit.DAYS.between(currentDate, eventLocalDate);
+
 
                     request.setAttribute("formattedDate", formattedDate);
                     request.setAttribute("formattedStartTime", formattedStartTime);
                     request.setAttribute("formattedEndTime", formattedEndTime);
                     request.setAttribute("event", event);
+                    request.setAttribute("daysLeft", daysLeft);
                     request.setAttribute("address", address);
                     request.setAttribute("beneficiary", beneficiary);
                     request.setAttribute("task", tasks);

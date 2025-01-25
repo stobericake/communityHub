@@ -215,6 +215,7 @@
             // Debugging: Print results
             System.out.println("Is Event Ongoing: " + isEventOngoing);
             System.out.println("Is Event Ended: " + isEventEnded);
+            String daysLeft = request.getAttribute("daysLeft").toString();
         %>
         <div class="container mt-4">
             <img src="getImage.do?type=events&id=<%= eventID%>" class="rounded mx-auto d-block event-image font-weight-bold" alt="Event Image">
@@ -302,7 +303,9 @@
                                     </div>
                                     <div class="d-flex align-items-start justify-content-start">
                                         <i class="bi bi-clock me-2"></i>
-                                        <small class="text-muted"> 123 days </small>
+                                        <small class="text-muted">
+                                            <%= daysLeft %> days left
+                                        </small>
                                     </div>
                                     <div class="d-flex align-items-start justify-content-start">
                                         <i class="bi bi-heart-fill text-danger me-2"></i>
