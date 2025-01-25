@@ -90,7 +90,7 @@
                     <!-- Recent Events -->
                     <div class="col-md-6">
                         <div class="info-section recent-events p-4 bg-light border rounded shadow-sm h-100 d-flex flex-column">
-                            <h5 class="text-primary mb-3">Recent Events</h5>
+                            <h5 class="text-primary mb-3">Recently Created Events</h5>
                             <ul class="list-unstyled flex-grow-1">
                                 <%
                                     ArrayList<events> recentEvents = (ArrayList<events>) request.getAttribute("recentEvents");

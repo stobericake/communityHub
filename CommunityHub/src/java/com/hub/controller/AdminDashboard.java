@@ -109,7 +109,7 @@ public class AdminDashboard extends HttpServlet {
 
     private ArrayList<events> getRecentEvents(Connection conn) throws Exception {
         ArrayList<events> eventsList = new ArrayList<>();
-        String query = "SELECT * FROM events ORDER BY date DESC LIMIT 3";
+        String query = "SELECT * FROM events ORDER BY eventID DESC LIMIT 3";
         try (PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
