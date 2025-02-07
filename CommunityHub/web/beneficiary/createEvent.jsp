@@ -3,7 +3,8 @@
     <head>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
+        <title>Create Event</title>
+        
         <style>
             .progress-step {
                 width: 35px;
@@ -704,6 +705,207 @@
                     imagePreview.src = '#'; // Reset the image source if no file is selected
                     imagePreview.style.display = 'none'; // Hide the image preview
                 }
+            });
+
+            // Validation functions for each step
+            function validateStep1() {
+                const eventName = document.getElementById('eventName').value.trim();
+                const eventDescription = document.getElementById('eventDescription').value.trim();
+                const numParticipants = document.getElementById('numParticipants').value;
+                const donationLimit = document.getElementById('donationLimit').value;
+                const eventImage = document.getElementById('eventImage').files[0];
+
+                let isValid = true;
+                let errorMessage = [];
+
+                if (!eventName) {
+                    errorMessage.push("Event name is required");
+                    isValid = false;
+                }
+
+                if (!eventDescription) {
+                    errorMessage.push("Event description is required");
+                    isValid = false;
+                }
+
+                if (!numParticipants || numParticipants <= 0) {
+                    errorMessage.push("Number of participants must be greater than 0");
+                    isValid = false;
+                }
+
+                if (!donationLimit || donationLimit < 0) {
+                    errorMessage.push("Donation limit must be 0 or greater");
+                    isValid = false;
+                }
+
+                if (!eventImage) {
+                    errorMessage.push("Event image is required");
+                    isValid = false;
+                }
+
+                return {isValid, errorMessage};
+            }
+
+            function validateStep2() {
+                const street = document.querySelector('input[name="street"]').value.trim();
+                const city = document.querySelector('input[name="city"]').value.trim();
+                const state = document.querySelector('select[name="state"]').value;
+                const postalCode = document.querySelector('input[name="postalCode"]').value.trim();
+
+                let isValid = true;
+                let errorMessage = [];
+
+                if (!street) {
+                    errorMessage.push("Street address is required");
+                    isValid = false;
+                }
+
+                if (!city) {
+                    errorMessage.push("City is required");
+                    isValid = false;
+                }
+
+                if (!state) {
+                    errorMessage.push("State is required");
+                    isValid = false;
+                }
+
+                if (!postalCode || !/^\d{5}$/.test(postalCode)) {
+                    errorMessage.push("Valid 5-digit postal code is required");
+                    isValid = false;
+                }
+
+                return {isValid, errorMessage};
+            }
+
+            function validateStep3() {
+                const eventDate = document.getElementById('eventDate').value;
+                const eventTime = document.getElementById('eventTime').value;
+                const durationHours = document.getElementById('durationHours').value;
+                const durationMinutes = document.getElementById('durationMinutes').value;
+
+                let isValid = true;
+                let errorMessage = [];
+
+                if (!eventDate) {
+                    errorMessage.push("Event date is required");
+                    isValid = false;
+                } else {
+                    const selectedDate = new Date(eventDate);
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(0, 0, 0, 0);
+
+                    if (selectedDate < tomorrow) {
+                        errorMessage.push("Event date must be at least tomorrow");
+                        isValid = false;
+                    }
+                }
+
+                if (!eventTime) {
+                    errorMessage.push("Event time is required");
+                    isValid = false;
+                }
+
+                if (!durationHours && !durationMinutes) {
+                    errorMessage.push("Event duration is required (hours or minutes)");
+                    isValid = false;
+                }
+
+                return {isValid, errorMessage};
+            }
+
+            function validateStep4() {
+                const taskList = document.getElementById('taskList');
+                const tasks = taskList.querySelectorAll('tr:not(#emptyState)');
+
+                let isValid = true;
+                let errorMessage = [];
+
+                if (tasks.length === 0) {
+                    errorMessage.push("At least one task is required");
+                    isValid = false;
+                }
+
+                return {isValid, errorMessage};
+            }
+
+            // Update the nextStep function to include validation
+            function nextStep() {
+                let validationResult = {isValid: true, errorMessage: []};
+
+                // Validate current step
+                switch (currentStep) {
+                    case 1:
+                        validationResult = validateStep1();
+                        break;
+                    case 2:
+                        validationResult = validateStep2();
+                        break;
+                    case 3:
+                        validationResult = validateStep3();
+                        break;
+                    case 4:
+                        validationResult = validateStep4();
+                        break;
+                }
+
+                if (!validationResult.isValid) {
+                    alert(validationResult.errorMessage.join("\n"));
+                    return;
+                }
+
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateSteps();
+                } else {
+                    const termsCheck = document.getElementById('termsCheck');
+                    if (!termsCheck.checked) {
+                        alert('Please confirm that all the details provided are correct before submitting.');
+                        return;
+                    }
+
+                    // Final form validation before submission
+                    const form = document.querySelector('form');
+                    if (form.checkValidity()) {
+                        const nextBtn = document.getElementById('nextBtn');
+                        nextBtn.setAttribute('type', 'submit');
+                        form.submit();
+                    } else {
+                        alert('Please ensure all required fields are filled correctly.');
+                    }
+                }
+            }
+
+            // Add form submission validation
+            document.querySelector('form').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                // Validate all steps before final submission
+                const validationResults = [
+                    validateStep1(),
+                    validateStep2(),
+                    validateStep3(),
+                    validateStep4()
+                ];
+
+                const errors = validationResults
+                        .flatMap(result => result.errorMessage)
+                        .filter(message => message);
+
+                if (errors.length > 0) {
+                    alert('Please correct the following errors before submitting:\n\n' + errors.join('\n'));
+                    return;
+                }
+
+                const termsCheck = document.getElementById('termsCheck');
+                if (!termsCheck.checked) {
+                    alert('Please confirm that all the details provided are correct before submitting.');
+                    return;
+                }
+
+                // If all validations pass, submit the form
+                this.submit();
             });
         </script>
     </body>

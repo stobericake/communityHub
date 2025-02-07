@@ -272,7 +272,8 @@ public class updateEvent extends HttpServlet {
 
         String deleteTasks = request.getParameter("deleteTasks");
 
-        Part filePart = request.getPart("eventImage"); // Get the uploaded file
+        Part filePart = null;
+        filePart = request.getPart("eventImage"); // Get the uploaded file
         InputStream imageInputStream = null;
 
         if (filePart != null && filePart.getSize() > 0) {
@@ -326,7 +327,7 @@ public class updateEvent extends HttpServlet {
                     }
                 }
             }
-
+            boolean newAddress = false;
             if (addressID == -1) {
                 // Address does not exist, create a new one
                 String insertAddressSQL = "INSERT INTO address (country, postalCode, street, city, state) VALUES (?, ?, ?, ?, ?)";
@@ -344,6 +345,7 @@ public class updateEvent extends HttpServlet {
                             addressID = generatedKeys.getInt(1);
                         }
                     }
+                    newAddress = true;
                 }
             }
 
@@ -428,10 +430,11 @@ public class updateEvent extends HttpServlet {
             String sqlTask = null;
             
                   // If the original address is not shared, delete it
-            if (!isAddressShared) {
+            if (!isAddressShared && newAddress) {
                 String deleteAddressSQL = "DELETE FROM address WHERE addressID = ?";
+                int addressID2 = Integer.parseInt(request.getParameter("addressID"));
                 try (PreparedStatement deleteStmt = conn.prepareStatement(deleteAddressSQL)) {
-                    deleteStmt.setInt(1, Integer.parseInt(request.getParameter("addressID"))); // Original addressID
+                    deleteStmt.setInt(1, addressID2); // Original addressID
                     deleteStmt.executeUpdate();
                 }
             }

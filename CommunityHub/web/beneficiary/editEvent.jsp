@@ -95,7 +95,21 @@
                 background-color: #fff; /* Match the background color of the table headers */
             }
 
+            .was-validated .form-control:invalid, .form-control.is-invalid {
+                border-color: #dc3545;
+            }
 
+            .was-validated .form-control:invalid ~ .invalid-feedback, .form-control.is-invalid ~ .invalid-feedback {
+                display: block;
+            }
+
+            .invalid-feedback {
+                display: none;
+                width: 100%;
+                margin-top: 0.25rem;
+                font-size: 0.875em;
+                color: #dc3545;
+            }
 
         </style>
 
@@ -166,31 +180,27 @@
                             </div>
                             <div class="mb-3">
                                 <label for="eventDescription" class="form-label">Event Description <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="eventDescription" name="eventDescription" rows="3" placeholder="Enter your event description"><%= event.getDescription()%></textarea>
+                                <textarea class="form-control" id="eventDescription" name="eventDescription" rows="3" placeholder="Enter your event description" required minlength="10" maxlength="500"><%= event.getDescription()%></textarea>
+                                <div class="invalid-feedback">
+                                    Please provide a valid event description (1-500 characters).
+                                </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label for="numParticipants" class="form-label">Total Participants <span class="text-danger">*</span></label>
-                                    <input type="number" 
-                                           class="form-control" 
-                                           id="numParticipants" 
-                                           name="numParticipants" 
-                                           min="0" 
-                                           placeholder="Enter total participants" 
-                                           value="<%= event.getVolunteersNeeded()%>">
+                                    <input type="number" class="form-control" id="numParticipants" name="numParticipants" min="1" placeholder="Enter total participants" value="<%= event.getVolunteersNeeded()%>" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid number of participants (minimum 1).
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="donationLimit" class="form-label">Donation Limit <span class="text-danger">*</span></label>
-                                    <input type="number" 
-                                           class="form-control" 
-                                           id="donationLimit" 
-                                           name="donationLimit" 
-                                           step="1" 
-                                           min="0" 
-                                           max="99999999.99" 
-                                           placeholder="Enter donation limit" 
-                                           value="<%= event.getDonationLimit()%>" 
-                                           required>
+                                    <input type="number" class="form-control" id="donationLimit" 
+                                           name="donationLimit" step="1" min="0" max="99999999.99" 
+                                           placeholder="Enter donation limit" value="<%= event.getDonationLimit()%>" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid donation limit (minimum 0).
+                                    </div>
                                 </div>
                             </div>
 
@@ -284,11 +294,10 @@
                                            class="form-control" 
                                            placeholder="Enter your postal code" 
                                            value="<%= address.getPostalCode()%>" 
-                                           required 
                                            pattern="[0-9]{5}" 
                                            title="Please enter a valid 5-digit postal code" 
                                            maxlength="5"
-                                           inputmode="numeric" />
+                                           inputmode="numeric" required/>
 
                                     <div class="form-text">5-digit postal code</div>
                                 </div>
@@ -297,7 +306,7 @@
                                     <label class="form-label fw-medium">Country</label>
                                     <input type="text" name="country" class="form-control"  value="Malaysia"   
                                            style="background-color: #f8f9fa; color: #6c757d; border: 1px solid #ced4da;"  
-                                           value=<%= address.getCountry()%>  readonly />
+                                           value=<%= address.getCountry()%>  readonly required/>
                                 </div>
                             </div>
 
@@ -325,9 +334,11 @@
                                             <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
                                             </svg>
                                         </span>
-                                        <input type="date" class="form-control" id="eventDate" name="eventDate" value=<%= event.getDate()%>  required  min="" />
+                                        <input type="date" class="form-control" id="eventDate" name="eventDate" value="<%= event.getDate()%>" required min="<%= new java.util.Date().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().plusDays(1)%>">
                                     </div>
-                                    <div class="form-text">Select a date for your event</div>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid future date.
+                                    </div>
                                 </div>
 
                                 <!-- Event Time -->
@@ -340,9 +351,11 @@
                                             <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
                                             </svg>
                                         </span>
-                                        <input type="time" class="form-control" id="eventTime" name="eventTime" value=<%= event.getTime()%> required />
+                                        <input type="time" class="form-control" id="eventTime" name="eventTime" value="<%= event.getTime()%>" required>
                                     </div>
-                                    <div class="form-text">Select the starting time</div>
+                                    <div class="invalid-feedback">
+                                        Please provide a valid time.
+                                    </div>
                                 </div>
 
                                 <!-- Event Duration -->
@@ -369,21 +382,24 @@
                                     <div class="row g-2">
                                         <div class="col-sm-6">
                                             <div class="input-group">
-                                                <input type="number" class="form-control" id="durationHours" name="durationHours" 
-                                                       placeholder="Hours" min="0" max="24" value=<%= hours%> required />
+                                                <input type="number" class="form-control" id="durationHours" name="durationHours" placeholder="Hours" min="0" max="24" value="<%= hours%>" required>
                                                 <span class="input-group-text bg-light">Hours</span>
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Please provide a valid number of hours (0-24).
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="input-group">
-                                                <input type="number" class="form-control" id="durationMinutes" name="durationMinutes" 
-                                                       placeholder="Minutes" min="0" max="59" value=<%= minutes%> required />
+                                                <input type="number" class="form-control" id="durationMinutes" name="durationMinutes" placeholder="Minutes" min="0" max="59" value="<%= minutes%>" required>
                                                 <span class="input-group-text bg-light">Minutes</span>
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Please provide a valid number of minutes (0-59).
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-text">Enter the duration of your event</div>
-                                </div> 
+                                </div>
                             </div>
                         </div>
 
@@ -505,7 +521,20 @@
              * and open the template in the editor.
              */
 
+            document.addEventListener('DOMContentLoaded', function () {
+                const forms = document.querySelectorAll('form');
 
+                forms.forEach(form => {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            });
 
             const eventImage = document.getElementById('eventImage');
             const imagePreview = document.getElementById('imagePreview');
@@ -828,6 +857,201 @@
                 }
             });
 
+            // Validation functions for each step
+            function validateStep1() {
+                const eventName = document.getElementById('eventName').value.trim();
+                const eventDescription = document.getElementById('eventDescription').value.trim();
+                const numParticipants = document.getElementById('numParticipants').value;
+                const donationLimit = document.getElementById('donationLimit').value;
+                const eventImage = document.getElementById('eventImage').files[0];
+
+                let isValid = true;
+                let errorMessage = [];
+
+                if (!eventName) {
+                    errorMessage.push("Event name is required");
+                    isValid = false;
+                }
+
+                if (!eventDescription) {
+                    errorMessage.push("Event description is required");
+                    isValid = false;
+                }
+
+                if (!numParticipants || numParticipants <= 0) {
+                    errorMessage.push("Number of participants must be greater than 0");
+                    isValid = false;
+                }
+
+                if (!donationLimit || donationLimit < 0) {
+                    errorMessage.push("Donation limit must be 0 or greater");
+                    isValid = false;
+                }
+
+                return {isValid, errorMessage};
+            }
+
+            function validateStep2() {
+                const street = document.querySelector('input[name="street"]').value.trim();
+                const city = document.querySelector('input[name="city"]').value.trim();
+                const state = document.querySelector('select[name="state"]').value;
+                const postalCode = document.querySelector('input[name="postalCode"]').value.trim();
+
+                let isValid = true;
+                let errorMessage = [];
+
+                if (!street) {
+                    errorMessage.push("Street address is required");
+                    isValid = false;
+                }
+
+                if (!city) {
+                    errorMessage.push("City is required");
+                    isValid = false;
+                }
+
+                if (!state) {
+                    errorMessage.push("State is required");
+                    isValid = false;
+                }
+
+                if (!postalCode || !/^\d{5}$/.test(postalCode)) {
+                    errorMessage.push("Valid 5-digit postal code is required");
+                    isValid = false;
+                }
+
+                return {isValid, errorMessage};
+            }
+
+            function validateStep3() {
+                const eventDate = document.getElementById('eventDate').value;
+                const eventTime = document.getElementById('eventTime').value;
+                const durationHours = document.getElementById('durationHours').value;
+                const durationMinutes = document.getElementById('durationMinutes').value;
+
+                let isValid = true;
+                let errorMessage = [];
+
+                if (!eventDate) {
+                    errorMessage.push("Event date is required");
+                    isValid = false;
+                } else {
+                    const selectedDate = new Date(eventDate);
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(0, 0, 0, 0);
+
+                    if (selectedDate < tomorrow) {
+                        errorMessage.push("Event date must be at least tomorrow");
+                        isValid = false;
+                    }
+                }
+
+                if (!eventTime) {
+                    errorMessage.push("Event time is required");
+                    isValid = false;
+                }
+
+                if (!durationHours && !durationMinutes) {
+                    errorMessage.push("Event duration is required (hours or minutes)");
+                    isValid = false;
+                }
+
+                return {isValid, errorMessage};
+            }
+
+            function validateStep4() {
+                const taskList = document.getElementById('taskList');
+                const tasks = taskList.querySelectorAll('tr:not(#emptyState)');
+
+                let isValid = true;
+                let errorMessage = [];
+
+                if (tasks.length === 0) {
+                    errorMessage.push("At least one task is required");
+                    isValid = false;
+                }
+
+                return {isValid, errorMessage};
+            }
+
+            // Update the nextStep function to include validation
+            function nextStep() {
+                let validationResult = {isValid: true, errorMessage: []};
+
+                // Validate current step
+                switch (currentStep) {
+                    case 1:
+                        validationResult = validateStep1();
+                        break;
+                    case 2:
+                        validationResult = validateStep2();
+                        break;
+                    case 3:
+                        validationResult = validateStep3();
+                        break;
+                    case 4:
+                        validationResult = validateStep4();
+                        break;
+                }
+
+                if (!validationResult.isValid) {
+                    alert(validationResult.errorMessage.join("\n"));
+                    return;
+                }
+
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateSteps();
+                } else {
+                    const termsCheck = document.getElementById('termsCheck');
+                    if (!termsCheck.checked) {
+                        alert('Please confirm that all the details provided are correct before submitting.');
+                        return;
+                    }
+
+                    // Final form validation before submission
+                    const form = document.querySelector('form');
+                    if (form.checkValidity()) {
+                        const nextBtn = document.getElementById('nextBtn');
+                        nextBtn.setAttribute('type', 'submit');
+                        form.submit();
+                    } else {
+                        alert('Please ensure all required fields are filled correctly.');
+                    }
+                }
+            }
+
+            // Add form submission validation
+            document.querySelector('form').addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                // Validate all steps before final submission
+                const validationResults = [
+                    validateStep1(),
+                    validateStep2(),
+                    validateStep3(),
+                    validateStep4()
+                ];
+
+                const errors = validationResults
+                        .flatMap(result => result.errorMessage)
+                        .filter(message => message);
+
+                if (errors.length > 0) {
+                    alert('Please correct the following errors before submitting:\n\n' + errors.join('\n'));
+                    return;
+                }
+
+                const termsCheck = document.getElementById('termsCheck');
+                if (!termsCheck.checked) {
+                    alert('Please confirm that all the details provided are correct before submitting.');
+                    return;
+                }
+
+                // If all validations pass, submit the form
+                this.submit();
+            });
         </script>
     </body>
 </html>

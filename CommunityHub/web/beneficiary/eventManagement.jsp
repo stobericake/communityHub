@@ -165,7 +165,7 @@
                                                 <i class="bi bi-eye me-2" aria-hidden="true"></i> View
                                             </a>
                                             <a href="updateEvent.do?editEventId=<%= eventList.get(i).getEventID()%>" 
-                                               class="btn btn-outline-primary btn-sm">
+                                               class="btn btn-outline-secondary btn-sm">
                                                 <i class="bi bi-pencil"></i> Edit
                                             </a>
                                             <a href="#" class="btn btn-outline-danger btn-sm delete-link"
