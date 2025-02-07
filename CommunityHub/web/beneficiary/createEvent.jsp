@@ -3,7 +3,8 @@
     <head>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-
+        <title>Create Event</title>
+        
         <style>
             .progress-step {
                 width: 35px;
