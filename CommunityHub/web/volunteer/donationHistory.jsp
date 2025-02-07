@@ -121,7 +121,7 @@
 
             .modal-img {
                 max-width: 100%;
-                max-height: 80vh; /* Adjust height to prevent overflow */
+                max-height: 70vh; /* Adjust height to prevent overflow */
                 object-fit: contain;
             }
 
@@ -231,7 +231,7 @@
                                     <th scope="col" width="25%">Events</th>
                                     <th>Date</th>
                                     <th>Amount</th>
-                                    <th scope="col" width="15%" class="text-center">View Receipt</th>
+                                    <th scope="col" width="15%" class="text-center">Receipt</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -249,9 +249,10 @@
                                     <td>RM<%= amount%></td>
                                     <td class="text-center">
                                         <!-- Use a unique ID for each button and modal -->
-                                        <button class="view-details-button" data-bs-toggle="modal" data-bs-target="#receiptOverlay_<%= donation.getDonationID()%>">
-                                            <i class="bi bi-receipt-cutoff"></i>
-                                        </button>
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#receiptOverlay_<%= donation.getDonationID()%>"
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="bi bi-receipt-cutoff"></i> View
+                                        </a>
                                     </td>
                                 </tr>
                                 <!-- Fullscreen Overlay with Unique ID -->

@@ -110,7 +110,7 @@
                             <th>Date</th>
                             <th>Time</th>
                             <th scope="col" width="20%">Task</th>
-                            <th scope="col" width="10%" class="text-center">View Detail</th>
+                            <th scope="col" width="10%"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -140,8 +140,9 @@
                         <td><%= formattedTime %></td>
                         <td><%= taskDescription %></td> <!-- Display "Crew" if no task is assigned -->
                         <td class="text-center">
-                            <a href="myDetail.do?eventID=<%= event.getEventID() %>">
-                                <i class="bi bi-arrow-right-circle"></i>
+                            
+                            <a href="myDetail.do?eventID=<%= event.getEventID() %>" class="btn btn-outline-primary btn-sm">
+                               View Detail
                             </a>
                         </td>
                     </tr>                                       
