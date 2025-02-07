@@ -153,18 +153,21 @@
                                     <td><%= eventList.get(i).getTime()%></td>
                                     <td><%= addressList.get(i).getState()%></td>
                                     <td class="text-center">
-                                        <div class="btn-group" role="group" aria-label="Event Actions">
+                                   
+                                                 <div class="btn-group" role="group">
                                             <a href="eventDetailMgmt?id=<%= eventList.get(i).getEventID()%>" 
                                                class="btn btn-outline-primary btn-sm view-event-button" 
-                                               aria-label="View Details for Event <%= eventList.get(i).getEventID()%>">
-                                                <i class="bi bi-eye me-2" aria-hidden="true"></i>View
+                                               aria-label="View Event <%= eventList.get(i).getEventID()%>">
+                                                <i class="bi bi-eye me-2" aria-hidden="true"></i> View
                                             </a>
-                                            <a href="AdminEvent?eventID=<%= eventList.get(i).getEventID()%>" 
-                                               class="btn btn-outline-secondary btn-sm view-event-button" 
+                                            <a  href="AdminEvent?eventID=<%= eventList.get(i).getEventID()%>" 
+                                              class="btn btn-outline-secondary btn-sm" 
                                                aria-label="Generate Report for Event <%= eventList.get(i).getEventID()%>">
                                                 <i class="bi bi-file-earmark-text me-2" aria-hidden="true"></i>Generate
                                             </a>
+                                           
                                         </div>
+                                                
                                     </td>
                                 </tr>
                                 <%
