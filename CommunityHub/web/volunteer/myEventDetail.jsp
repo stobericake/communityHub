@@ -278,7 +278,7 @@
                                     <p><strong>Attendance:</strong> 
                                         <% if (ev.getAttendance() == 1) { %>
                                             Attend
-                                        <% } else if (ev.getAttendance() == 2) { %>
+                                        <% } else if (ev.getAttendance() == 0 || ev.getAttendance() == 2) { %>
                                             Absent
                                         <% } %>
                                     </p>
