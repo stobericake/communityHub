@@ -134,42 +134,67 @@
                     </div>
                 </div>
 
-                <!--Left Side-->
+                <!--Right Side-->
                 <div class="col-6 pt-3 border-start border-black border-1">
                     <div class="container">
                         <div class="col ms-4 mb-3 ">
-                            <h4 class="fw-bold">Environement & Community Impact</h4>
+                            <h4 class="fw-bold">Environment & Community Impact</h4>
                             <ul class="text-body-secondary">
-                                <% for (String feedback : (ArrayList<String>) request.getAttribute("feedbackList")) {%>
-                                <li><%= feedback%></li>
-                                    <% } %>
+                                <%
+                                    ArrayList<String> feedbackList = (ArrayList<String>) request.getAttribute("feedbackList");
+                                    if (feedbackList == null || feedbackList.isEmpty()) {
+                                %>
+                                There's no report submitted
+                                    <% } else {
+                                for (String feedback : feedbackList) {%>
+                                                    <li><%= feedback%></li>
+                                                        <%  }
+                                } %>
                             </ul>
                         </div>
 
                         <div class="col ms-4 mb-3 mt-4">
-                            <h4 class="fw-bold">Challanges and Solutions</h4>
+                            <h4 class="fw-bold">Challenges and Solutions</h4>
                             <ul class="text-body-secondary">
+                                <%
+                                    ArrayList<String> challengeList = (ArrayList<String>) request.getAttribute("challengeList");
+                                    ArrayList<String> solutionList = (ArrayList<String>) request.getAttribute("solutionList");
+                                    if ((challengeList == null || challengeList.isEmpty())
+                                            && (solutionList == null || solutionList.isEmpty())) {
+                                %>
+                                There's no report submitted
+                                    <% } else { %>
                                 <li>Challenge:
-                                    <% for (String challenge : (ArrayList<String>) request.getAttribute("challengeList")) {
-                                            %>
-                                            
-                                            <%= challenge + ',' %> 
-                                       <% } %>
+                                    <% if (challengeList != null) {
+                                    for (String challenge : challengeList) {%>
+                                                <%= challenge + ','%> 
+                                                <% }
+                                    } %>
                                 </li>
                                 <li>Solutions:
-                                    <% for (String solution : (ArrayList<String>) request.getAttribute("solutionList")) { %>
-                                            <%= solution + ',' %> 
-                                      <%  } %>
+                                    <% if (solutionList != null) {
+                                    for (String solution : solutionList) {%>
+                                            <%= solution + ','%> 
+                                        <% }
+                                    } %>
                                 </li>
+                                <% } %>
                             </ul>
                         </div>
 
                         <div class="col ms-4 mb-3 mt-4">
                             <h4 class="fw-bold">Recommendations for Future Events</h4>
                             <ol class="text-body-secondary">
-                                <% for (String recommendation : (ArrayList<String>) request.getAttribute("recommendationList")) {%>
-                                <li><%= recommendation%></li>
-                                    <% } %>
+                                <%
+                                    ArrayList<String> recommendationList = (ArrayList<String>) request.getAttribute("recommendationList");
+                                    if (recommendationList == null || recommendationList.isEmpty()) {
+                                %>
+                                There's no report submitted
+                                    <% } else {
+                                for (String recommendation : recommendationList) {%>
+                                        <li><%= recommendation%></li>
+                                    <%  }
+                                } %>
                             </ol>
                         </div>
                         <!--                        End Of Left Side-->

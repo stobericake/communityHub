@@ -211,9 +211,11 @@
                                                 // Check if the current time is after the event's end time
                                                 if (currentDateTime.isAfter(eventEndTime)) {
                                         %>
-                                        <a class="btn btn-info bg-purple rounded-3" href="<%= request.getContextPath()%>/AdminEvent?eventID=<%= event.getEventID()%>">Generate</a>
+                                        <a class="btn btn-outline-secondary btn-sm" href="<%= request.getContextPath()%>/AdminEvent?eventID=<%= event.getEventID()%>">
+                                            <i class="bi bi-file-earmark-text me-2"></i>Generate
+                                        </a>
                                         <% } else { %>
-                                        <button class="btn btn-info bg-purple rounded-3" disabled>Generate</button>
+                                        <button class="btn btn-outline-secondary btn-sm" disabled><i class="bi bi-file-earmark-text me-2"></i>Generate</button>
                                         <% } %>
                                         <%
                                         } catch (Exception e) {
@@ -250,8 +252,8 @@
                                 </ul>
                             </nav>
                         </div>
-                        <button id="generateEventReports" class="btn btn-info  rounded-4">
-                            Generate Reports for Selected Events
+                        <button id="generateEventReports" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-file-earmark-text me-2"></i>Generate Reports for Selected Events
                         </button>
                     </div>
                 </div>
@@ -299,7 +301,9 @@
                                     <td><%=vol.getName()%></td>
                                     <td class="text-center"><%=vol.getContactInfo()%></td>
                                     <td class="text-center">
-                                        <a class="btn btn-info bg-purple rounded-4" href="<%= request.getContextPath()%>/AdminVolunteer?volunteerID=<%= vol.getVolunteerID()%>">Generate</a>
+                                        <a class="btn btn-outline-secondary btn-sm" href="<%= request.getContextPath()%>/AdminVolunteer?volunteerID=<%= vol.getVolunteerID()%>">
+                                            <i class="bi bi-file-earmark-text me-2"></i>Generate
+                                        </a>
                                     </td>
                                 </tr>
                                 <% }
@@ -328,8 +332,8 @@
                                 </ul>
                             </nav>
                         </div>
-                        <button id="generateVolunteerReports" class="btn btn-info bg-purple rounded-4">
-                            Generate Reports for Selected Volunteers
+                        <button id="generateVolunteerReports" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-file-earmark-text me-2"></i>Generate Reports for Selected Volunteers
                         </button>
                     </div>
                 </div>
