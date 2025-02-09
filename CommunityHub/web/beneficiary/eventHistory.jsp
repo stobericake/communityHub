@@ -114,7 +114,7 @@
             </div>
 
             <div class="card-body">
-                <form action="updateEvent.do" method="post">
+      
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped" id="eventTable" >
                             <thead class="table-dark">
@@ -178,7 +178,7 @@
                         </table>
                     </div>
 
-                </form>
+        
             </div>
 
 
