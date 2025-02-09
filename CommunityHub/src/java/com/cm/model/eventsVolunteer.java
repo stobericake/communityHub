@@ -7,8 +7,12 @@ package com.cm.model;
 
 import java.io.Serializable;
 
+public class eventsVolunteer implements Serializable {
 
-public class eventsVolunteer implements Serializable{
+    private int eventsVolunteerID;
+    private int eventID;
+    private int volunteerID;
+    private int attendance;
 
     public eventsVolunteer(int eventsVolunteerID, int eventID, int volunteerID, int attendance) {
         this.eventsVolunteerID = eventsVolunteerID;
@@ -16,10 +20,6 @@ public class eventsVolunteer implements Serializable{
         this.volunteerID = volunteerID;
         this.attendance = attendance;
     }
-    private int eventsVolunteerID;
-    private int eventID;
-    private int volunteerID;
-    private int attendance;
 
     public int getEventsVolunteerID() {
         return eventsVolunteerID;
@@ -44,7 +44,7 @@ public class eventsVolunteer implements Serializable{
     public void setVolunteerID(int volunteerID) {
         this.volunteerID = volunteerID;
     }
-    
+
     public int getAttendance() {
         return attendance;
     }
@@ -53,4 +53,3 @@ public class eventsVolunteer implements Serializable{
         this.attendance = attendance;
     }
 }
-

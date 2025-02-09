@@ -72,34 +72,5 @@ public class task implements Serializable  {
         return volunteerID;
     }
 
-    // Method to assign the task to a volunteer (assuming volunteerID is passed)
-    public void assignTask(int volunteerID) {
-        String sql = "UPDATE tasks SET assigned_to = ? WHERE task_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, volunteerID); // Assign volunteer to the task
-            stmt.setInt(2, this.taskID);  // Specify the task ID to update
-            stmt.executeUpdate();         // Execute the update
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Method to update the status of the task
-    public void updateStatus(int newStatus) {
-        this.status = newStatus; // Update the status in the object
-        String sql = "UPDATE tasks SET status = ? WHERE task_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, newStatus);  // Set the new status
-            stmt.setInt(2, this.taskID);   // Specify the task ID to update
-            stmt.executeUpdate();          // Execute the update
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Task{" + "taskID=" + taskID + ", description=" + description + ", status=" + status + '}';
-    }
 }
 
