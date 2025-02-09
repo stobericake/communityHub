@@ -71,25 +71,5 @@ public class address implements Serializable{
         this.state = state;
     }
 
-    @Override
-    public String toString() {
-        return "Address{" + "addressID=" + addressID + ", country=" + country + ", postalCode=" + postalCode + ", street=" + street + ", city=" + city + ", state=" + state + '}';
-    }
 
-    // Method to update an address in the database
-    public void updateAddress(Map<String, Object> addressDetails, Connection conn) throws SQLException {
-        String sql = "UPDATE Address SET country = ?, postalCode = ?, street = ?, city = ?, state = ? WHERE addressID = ?";
-        
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, (String) addressDetails.get("country"));
-            ps.setString(2, (String) addressDetails.get("postalCode"));
-            ps.setString(3, (String) addressDetails.get("street"));
-            ps.setString(4, (String) addressDetails.get("city"));
-            ps.setString(5, (String) addressDetails.get("state"));
-            ps.setInt(6, (int) addressDetails.get("addressID"));
-            
-            // Execute the update query
-            ps.executeUpdate();
-        }
-    }
 }

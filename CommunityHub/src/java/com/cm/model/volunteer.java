@@ -5,10 +5,7 @@
  */
 package com.cm.model;
 
-/**
- *
- * @author Rina
- */
+
 import java.io.Serializable;
 import java.sql.*;
 

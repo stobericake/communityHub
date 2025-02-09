@@ -157,30 +157,4 @@ public class events implements Serializable{
     public void updateStatus(String newStatus) {
         this.status = newStatus;
     }
-
-    // Get event details method
-    public Map<String, Object> getEventDetails(int eventID) {
-        // Create a map to store event details
-        Map<String, Object> eventDetails = new HashMap<>();
-        
-        // Check if eventID matches the current object's eventID
-        if (this.eventID == eventID) {
-            eventDetails.put("eventID", this.eventID);
-            eventDetails.put("name", this.name);
-            eventDetails.put("date", this.date);
-            eventDetails.put("time", this.time);
-            eventDetails.put("duration", this.duration);
-            eventDetails.put("description", this.description);
-            eventDetails.put("volunteersNeeded", this.volunteersNeeded);
-            eventDetails.put("status", this.status);
-        }
-        
-        return eventDetails;
-    }
-
-    // Override toString for better representation
-    @Override
-    public String toString() {
-        return "Event{" + "eventID=" + eventID + ", name=" + name + ", date=" + date + ", time=" + time +  ", duration=" + duration + ", description=" + description + ", volunteersNeeded=" + volunteersNeeded + ", status=" + status + '}';
-    }
 }

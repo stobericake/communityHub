@@ -5,10 +5,7 @@
  */
 package com.cm.model;
 
-/**
- *
- * @author Rina
- */
+
 public class donor {
 
     private int donorID;         // Primary key

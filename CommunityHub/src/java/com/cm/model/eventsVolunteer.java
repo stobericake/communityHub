@@ -7,10 +7,7 @@ package com.cm.model;
 
 import java.io.Serializable;
 
-/**
- *
- * @author Ipah
- */
+
 public class eventsVolunteer implements Serializable{
 
     public eventsVolunteer(int eventsVolunteerID, int eventID, int volunteerID, int attendance) {
