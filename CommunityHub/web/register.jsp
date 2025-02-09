@@ -3,10 +3,6 @@
     <%@ page import="javax.servlet.http.HttpSession"%>
     <%
         String error = (String) request.getAttribute("error");
-        if (error != null) {
-            // Display the error message
-            out.println("<div class='alert alert-danger'>" + error + "</div>");
-        }
     %>
     <head>
         <meta charset="UTF-8">
@@ -44,27 +40,24 @@
                 color: #6c757d;
             }
             #register {
-                transition: background-color 0.3s ease; /* Smooth transition */
+                transition: background-color 0.3s ease;
             }
             #register:hover {
                 background-color: #1E4A68 !important;
             }
-            /* Style for username availability message */
-            .username-feedback {
-                font-size: 14px;
-                margin-top: 5px;
-            }
-            .username-available {
-                color: green;
-            }
-            .username-taken {
-                color: red;
+            .error-container {
+                margin-bottom: 20px;
             }
         </style>
     </head>
     <body>
         <%@ include file="header.jspf" %>
         <div class="signup-container">
+            <div class="error-container" id="error-container">
+                <% if (error != null) { %>
+                    <div class='alert alert-danger'><%= error %></div>
+                <% } %>
+            </div>
             <div class="signup-header">
                 <h2>Welcome to</h2>
                 <h1 style="color: #2F6690;">CommUNITYHub</h1>
@@ -75,10 +68,8 @@
                         <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
                     </div>
                     <div class="col-md-6">
-                        <input type="text" name="username" id="username" class="form-control" placeholder="Username" required 
-                               oninput="checkUsernameAvailability()" data-bs-toggle="tooltip" data-bs-placement="right" 
-                               title="" data-bs-trigger="manual">
-                        <div id="username-feedback" class="username-feedback"></div>
+                        <input type="text" name="username" id="username" class="form-control" 
+                               placeholder="Username" required oninput="checkUsernameAvailability()">
                     </div>
                 </div>
                 <div class="row mb-3">
@@ -130,81 +121,74 @@
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            // Initialize Bootstrap tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-
-            // Function to enforce maximum length for number inputs
             function enforceMaxLength(input, maxLength) {
                 if (input.value.length > maxLength) {
-                    input.value = input.value.slice(0, maxLength); // Truncate the input
+                    input.value = input.value.slice(0, maxLength);
                 }
             }
 
-            // Function to validate the form
             function validateForm() {
                 const phoneNumber = document.querySelector('input[name="phone_number"]').value;
                 const postcode = document.querySelector('input[name="postcode"]').value;
-                const usernameFeedback = document.getElementById("username-feedback");
+                const errorContainer = document.getElementById("error-container");
+                let isValid = true;
 
-                // Validate phone number length (10 to 13 digits)
+                errorContainer.innerHTML = '';
+
                 if (phoneNumber.length < 10 || phoneNumber.length > 13) {
-                    alert("Phone number must be between 10 to 13 digits.");
-                    return false;
+                    createError('Phone number must be between 10 to 13 digits.');
+                    isValid = false;
                 }
 
-                // Validate postcode length (exactly 5 digits)
                 if (postcode.length !== 5) {
-                    alert("Postcode must be exactly 5 digits.");
-                    return false;
+                    createError('Postcode must be exactly 5 digits.');
+                    isValid = false;
                 }
 
-                // Check if username is already taken
-                if (usernameFeedback.classList.contains("username-taken")) {
-                    alert("Username is already taken. Please choose a different username.");
-                    return false;
+                const username = document.getElementById("username").value;
+                if (username.length === 0) {
+                    createError('Username is required.');
+                    isValid = false;
                 }
 
-                return true;
+                return isValid;
             }
 
-            // Function to check username availability
             function checkUsernameAvailability() {
                 const username = document.getElementById("username").value;
-                const role = document.getElementById("role").value;
-                const usernameInput = document.getElementById("username");
-                const usernameFeedback = document.getElementById("username-feedback");
+                const errorContainer = document.getElementById("error-container");
 
-                if (username.length === 0) {
-                    usernameFeedback.textContent = "";
-                    usernameInput.setAttribute("title", "");
-                    bootstrap.Tooltip.getInstance(usernameInput).hide();
-                    return;
-                }
+                clearUsernameErrors();
 
-                // Send AJAX request to check username availability
-                fetch(`/register?username=${username}&role=${role}`)
+                if (username.length === 0) return;
+
+                fetch(`/register?username=${username}`)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.available) {
-                            usernameFeedback.textContent = "Username is available.";
-                            usernameFeedback.classList.remove("username-taken");
-                            usernameFeedback.classList.add("username-available");
-                            usernameInput.setAttribute("title", "");
-                            bootstrap.Tooltip.getInstance(usernameInput).hide();
-                        } else {
-                            usernameFeedback.textContent = "";
-                            usernameInput.setAttribute("title", "Username is already taken.");
-                            bootstrap.Tooltip.getInstance(usernameInput).show();
-                            usernameFeedback.classList.remove("username-available");
-                            usernameFeedback.classList.add("username-taken");
+                        if (!data.available) {
+                            createError('Username is already taken. Please choose a different username.');
                         }
                     })
-                    .catch(error => {
-                        console.error("Error checking username availability:", error);
-                    });
+                    .catch(error => console.error("Error:", error));
+            }
+
+            function createError(message) {
+                const errorContainer = document.getElementById("error-container");
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger mb-2';
+                errorDiv.textContent = message;
+                errorContainer.appendChild(errorDiv);
+            }
+
+            function clearUsernameErrors() {
+                const errorContainer = document.getElementById("error-container");
+                const errors = errorContainer.getElementsByClassName('alert-danger');
+                
+                Array.from(errors).forEach(error => {
+                    if (error.textContent.includes('Username is already taken')) {
+                        error.remove();
+                    }
+                });
             }
         </script>
     </body>
